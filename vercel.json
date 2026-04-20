@@ -2,6 +2,7 @@
   "buildCommand": "cd api && pip install -r requirements.txt && cd ..",
   "outputDirectory": "api",
   "env": {
+    "DB_TYPE": "postgres",
     "ALLOW_UNRESTRICTED_EDITS": "false"
   },
   "crons": [
