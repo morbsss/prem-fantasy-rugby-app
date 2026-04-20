@@ -1,0 +1,12 @@
+.env.local
+.env.production
+*.db
+__pycache__/
+.venv/
+.pytest_cache/
+*.pyc
+.DS_Store
+node_modules/
+.vercel/
+dist/
+build/

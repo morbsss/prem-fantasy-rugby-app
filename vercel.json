@@ -1,0 +1,13 @@
+{
+  "buildCommand": "cd api && pip install -r requirements.txt && cd ..",
+  "outputDirectory": "api",
+  "env": {
+    "ALLOW_UNRESTRICTED_EDITS": "@allow-unrestricted-edits"
+  },
+  "crons": [
+    {
+      "path": "/api/cron/player-data",
+      "schedule": "0 12 * * 2"
+    }
+  ]
+}

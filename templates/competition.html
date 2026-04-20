@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block page_title %}OFDS Fantasy — League Table{% endblock %}
+
+{% block extra_styles %}
+    /* ── Layout ── */
+    .content { max-width: 1100px; margin: 0 auto; padding: 20px 16px; }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted);
+      margin-bottom: 10px; margin-top: 24px;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* ── League table ── */
+    .league-table { width: 100%; border-collapse: collapse; }
+    .league-table th, .league-table td { padding: 9px 12px; text-align: right; }
+    .league-table th {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: var(--surface);
+    }
+    .league-table th:nth-child(1) { text-align: center; width: 36px; }
+    .league-table th:nth-child(2) { text-align: left; }
+    .league-table td:nth-child(1) { text-align: center; color: var(--muted); font-weight: 700; font-size: 12px; }
+    .league-table td:nth-child(2) { text-align: left; font-weight: 600; }
+    .league-table td { border-bottom: 1px solid var(--border); font-size: 13px; }
+    .league-table tbody tr:last-child td { border-bottom: none; }
+    .league-table tbody tr:hover { background: rgba(255,255,255,.03); }
+    .league-table tr.leader td { background: rgba(34,197,94,.06); }
+    .pts-col { font-weight: 700 !important; color: var(--text); }
+    .pd-pos { color: var(--green); }
+    .pd-neg { color: var(--red); }
+
+    .loading { padding: 40px; text-align: center; color: var(--muted); }
+{% endblock %}
+
+{% block content %}
+<div class="content">
+
+  <p class="section-title">League Table</p>
+  <div class="card" id="table-wrap"><div class="loading">Loading…</div></div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  async function init() {
+    const res  = await fetch('/api/competition');
+    const data = await res.json();
+    document.getElementById('round-badge').textContent = `Round ${data.max_round}`;
+    renderTable(data.table);
+  }
+
+  function renderTable(table) {
+    const wrap = document.getElementById('table-wrap');
+    if (!table.length) { wrap.innerHTML = '<div class="loading">No data yet.</div>'; return; }
+
+    const rows = table.map((t, i) => {
+      const pd    = t.points_diff;
+      const pdStr = pd >= 0 ? `+${pd.toFixed(1)}` : pd.toFixed(1);
+      const pdCls = pd >= 0 ? 'pd-pos' : 'pd-neg';
+      return `<tr class="${i === 0 ? 'leader' : ''}">
+        <td>${i + 1}</td>
+        <td>${esc(t.name)}</td>
+        <td>${t.played}</td>
+        <td>${t.won}</td>
+        <td>${t.drawn}</td>
+        <td>${t.lost}</td>
+        <td>${t.bonus_points}</td>
+        <td>${t.points_for.toFixed(1)}</td>
+        <td>${t.points_against.toFixed(1)}</td>
+        <td class="${pdCls}">${pdStr}</td>
+        <td class="pts-col">${t.league_points}</td>
+      </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `
+      <table class="league-table">
+        <thead><tr>
+          <th>#</th><th>Team</th>
+          <th>P</th><th>W</th><th>D</th><th>L</th>
+          <th>BP</th><th>PF</th><th>PA</th><th>PD</th><th>Pts</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  init();
+</script>
+{% endblock %}

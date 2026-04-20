@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block page_title %}OFDS Fantasy — Fixtures{% endblock %}
+
+{% block extra_styles %}
+    /* ── Round filter bar ── */
+    .filter-bar {
+      padding: 10px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .round-chip {
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      transition: all .15s;
+    }
+    .round-chip:hover { color: var(--text); border-color: var(--muted); }
+    .round-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    /* Played rounds: green tint when not active */
+    .round-chip.played { border-color: rgba(34,197,94,.4); color: var(--green); }
+    .round-chip.played.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    /* Upcoming rounds: dim */
+    .round-chip.upcoming { border-color: var(--border); color: var(--muted); }
+
+    /* ── Content ── */
+    .content { max-width: 1100px; margin: 0 auto; padding: 20px 16px; }
+
+    .weeks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 14px; }
+    .single-round { max-width: 640px; margin: 0 auto; }
+
+    /* ── Week card ── */
+    .week-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .week-card-header {
+      padding: 8px 14px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--muted); background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .week-status {
+      font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+      text-transform: none; letter-spacing: 0;
+    }
+    .week-status.played   { color: var(--green); background: rgba(34,197,94,.1);  border: 1px solid rgba(34,197,94,.3); }
+    .week-status.upcoming { color: var(--muted);  background: rgba(255,255,255,.04); border: 1px solid var(--border); }
+
+    /* ── Match rows ── */
+    .match-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .match-row:last-child { border-bottom: none; }
+    .match-home { font-weight: 500; }
+    .match-away { font-weight: 500; text-align: right; }
+    .match-home.winner, .match-away.winner { color: var(--green); font-weight: 700; }
+    .match-score-wrap { display: flex; align-items: center; gap: 4px; white-space: nowrap; justify-content: center; }
+    .match-score { font-weight: 700; font-size: 14px; min-width: 34px; text-align: center; }
+    .match-score.winner { color: var(--green); }
+    .match-vsep { color: var(--muted); font-size: 12px; }
+    .bp-tag { font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; color: var(--gold); border: 1px solid rgba(245,158,11,.4); background: rgba(245,158,11,.08); }
+    .bp-spacer { display: inline-block; min-width: 22px; }
+
+    .upcoming-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      font-size: 13px; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .upcoming-row:last-child { border-bottom: none; }
+    .upcoming-row .away-name { text-align: right; }
+    .upcoming-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(91,106,245,.15); color: var(--accent); border: 1px solid rgba(91,106,245,.3); white-space: nowrap; }
+
+    .bye-row { padding: 11px 16px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    .bye-row:last-child { border-bottom: none; }
+    .bye-avg-score { color: var(--muted) !important; font-style: italic; }
+    .bye-label { color: var(--muted); font-style: italic; font-size: 12px; }
+
+    .loading { padding: 40px; text-align: center; color: var(--muted); }
+{% endblock %}
+
+{% block content %}
+<div class="filter-bar" id="filter-bar">
+  <button class="round-chip active" data-week="ALL">All</button>
+</div>
+
+<div class="content">
+  <div id="fixtures-wrap"><div class="loading">Loading…</div></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let maxRound   = 0;
+  let activeWeek = 'ALL';
+
+  async function init() {
+    const res  = await fetch('/api/competition');
+    const data = await res.json();
+    allResults = data.results;
+    maxRound   = data.max_round;
+
+    document.getElementById('round-badge').textContent = `Round ${maxRound}`;
+    buildChips();
+    render();
+  }
+
+  function buildChips() {
+    const bar = document.getElementById('filter-bar');
+    const allChip = bar.querySelector('[data-week="ALL"]');
+    allChip.addEventListener('click', () => setFilter('ALL'));
+
+    allResults.forEach(({ week }) => {
+      const played = week <= maxRound;
+      const btn    = document.createElement('button');
+      btn.className   = `round-chip ${played ? 'played' : 'upcoming'}`;
+      btn.dataset.week = String(week);
+      btn.textContent  = `Wk ${week}`;
+      btn.addEventListener('click', () => setFilter(week));
+      bar.appendChild(btn);
+    });
+  }
+
+  function setFilter(week) {
+    activeWeek = week;
+    document.querySelectorAll('.round-chip').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.week === String(week));
+    });
+    render();
+  }
+
+  function render() {
+    const wrap  = document.getElementById('fixtures-wrap');
+    const weeks = activeWeek === 'ALL'
+      ? [...allResults].reverse()
+      : allResults.filter(r => r.week === activeWeek);
+
+    if (!weeks.length) {
+      wrap.innerHTML = '<div class="loading">No fixtures for this round.</div>';
+      return;
+    }
+
+    const cards = weeks.map(({ week, matches }) => makeWeekCard(week, matches)).join('');
+    wrap.innerHTML = activeWeek === 'ALL'
+      ? `<div class="weeks-grid">${cards}</div>`
+      : `<div class="single-round">${cards}</div>`;
+  }
+
+  function makeWeekCard(week, matches) {
+    const hasData     = matches.some(m => m.played);
+    const isUpcoming  = week > maxRound;
+    const statusLabel = hasData ? 'Played' : isUpcoming ? 'Upcoming' : 'No data';
+    const statusCls   = hasData ? 'played' : 'upcoming';
+
+    const rows = matches.map(m => {
+      if (m.is_bye) {
+        if (!m.played) {
+          return `<div class="bye-row">${esc(m.team)} — BYE</div>`;
+        }
+        const tWin = m.wins, tLose = m.loses;
+        return `<div class="match-row">
+          <span class="match-home ${tWin ? 'winner' : ''}">${esc(m.team)}</span>
+          <div class="match-score-wrap">
+            ${m.team_bp ? `<span class="bp-tag">BP</span>` : `<span class="bp-spacer"></span>`}
+            <span class="match-score ${tWin ? 'winner' : ''}">${m.team_score.toFixed(1)}</span>
+            <span class="match-vsep"> v </span>
+            <span class="match-score bye-avg-score">${m.bye_score.toFixed(1)}</span>
+            <span class="bp-spacer"></span>
+          </div>
+          <span class="match-away bye-label">Bye avg</span>
+        </div>`;
+      }
+      if (!m.played) {
+        return `<div class="upcoming-row">
+          <span>${esc(m.home)}</span>
+          <span class="upcoming-badge">Upcoming</span>
+          <span class="away-name">${esc(m.away)}</span>
+        </div>`;
+      }
+      const hWin = m.home_wins, aWin = m.away_wins;
+      return `<div class="match-row">
+        <span class="match-home ${hWin ? 'winner' : ''}">${esc(m.home)}</span>
+        <div class="match-score-wrap">
+          ${m.home_bp ? `<span class="bp-tag">BP</span>` : `<span class="bp-spacer"></span>`}
+          <span class="match-score ${hWin ? 'winner' : ''}">${m.home_score.toFixed(1)}</span>
+          <span class="match-vsep"> v </span>
+          <span class="match-score ${aWin ? 'winner' : ''}">${m.away_score.toFixed(1)}</span>
+          ${m.away_bp ? `<span class="bp-tag">BP</span>` : `<span class="bp-spacer"></span>`}
+        </div>
+        <span class="match-away ${aWin ? 'winner' : ''}">${esc(m.away)}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="week-card">
+      <div class="week-card-header">
+        <span>Week ${week}</span>
+        <span class="week-status ${statusCls}">${statusLabel}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }
+
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  init();
+</script>
+{% endblock %}
