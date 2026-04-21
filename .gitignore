@@ -10,3 +10,7 @@ node_modules/
 .vercel/
 dist/
 build/
+/app.py
+/db.py
+/competition.py
+/parameters.py
