@@ -29,6 +29,17 @@ WINNER_BP_MARGIN = 27   # winner gets BP if margin >= this
 LOSER_BP_MARGIN  = 11   # loser gets BP if margin <= this
 
 
+def _get_placeholder(conn):
+    """Return the appropriate placeholder for the database type."""
+    try:
+        import psycopg2
+        if isinstance(conn, psycopg2.extensions.connection):
+            return '%s'
+    except ImportError:
+        pass
+    return '?'
+
+
 # ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
@@ -95,7 +106,7 @@ def parse_fixtures(path: str) -> list[tuple[int, str, bool, str, bool]]:
 # Score lookup
 # ---------------------------------------------------------------------------
 
-def get_team_score(conn: sqlite3.Connection, team_name: str, round_num: int) -> float:
+def get_team_score(conn, team_name: str, round_num: int) -> float:
     """
     Sum weekly points for all players in team_name's selection for round_num.
     - Points are cumulative, so each player's score = this round - previous round.
@@ -105,7 +116,9 @@ def get_team_score(conn: sqlite3.Connection, team_name: str, round_num: int) -> 
     - Captain (is_captain=1): (base_delta - kick_delta) * 2.
     - MAX() + GROUP BY guards against duplicate weekly_stats rows.
     """
-    row = conn.execute('''
+    cursor = conn.cursor()
+    placeholder = _get_placeholder(conn)
+    cursor.execute(f'''
         SELECT COALESCE(SUM(
             CASE
                 WHEN is_captain = 1 THEN (base_delta - kick_delta) * 2
@@ -127,10 +140,12 @@ def get_team_score(conn: sqlite3.Connection, team_name: str, round_num: int) -> 
                 ON ws_curr.player_id = ts.player_id AND ws_curr.round = ts.round
             LEFT JOIN weekly_stats ws_prev
                 ON ws_prev.player_id = ts.player_id AND ws_prev.round = ts.round - 1
-            WHERE ts.team_name = ? AND ts.round = ?
+            WHERE ts.team_name = {placeholder} AND ts.round = {placeholder}
             GROUP BY ts.player_id, ts.is_captain, ts.is_kicker
         )
-    ''', (team_name, round_num)).fetchone()
+    ''', (team_name, round_num))
+    row = cursor.fetchone()
+    cursor.close()
     return float(row[0]) if row else 0.0
 
 
