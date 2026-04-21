@@ -8,7 +8,6 @@ Scrapes player statistics from SuperBru and updates the database.
 """
 
 import os
-import sys
 from datetime import datetime
 from flask import Flask, jsonify
 
@@ -17,10 +16,7 @@ import urllib3
 import pandas as pd
 from bs4 import BeautifulSoup as bs
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from db import get_connection, DB_TYPE
+from ..db import get_connection, DB_TYPE
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 

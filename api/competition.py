@@ -15,11 +15,13 @@ Scoring:
 
 import re
 import sqlite3
+import os
 from collections import defaultdict
 from dataclasses import dataclass, field
 
 DB_PATH      = 'prem_rugby_25_26.db'
 FIXTURES_CSV = 'fixtures.csv'
+DB_TYPE      = os.getenv('DB_TYPE', 'sqlite').lower()
 
 WIN_PTS          = 4
 DRAW_PTS         = 2
@@ -124,7 +126,7 @@ def get_team_score(conn, team_name: str, round_num: int) -> float:
                 WHEN is_captain = 1 THEN (base_delta - kick_delta) * 2
                 WHEN is_kicker  = 1 THEN base_delta
                 ELSE base_delta - kick_delta
-            END), 0)
+            END), 0) AS total_score
         FROM (
             SELECT
                 ts.is_captain,
@@ -146,7 +148,14 @@ def get_team_score(conn, team_name: str, round_num: int) -> float:
     ''', (team_name, round_num))
     row = cursor.fetchone()
     cursor.close()
-    return float(row[0]) if row else 0.0
+
+    if not row:
+        return 0.0
+
+    if DB_TYPE == 'postgres':
+        return float(row.get('total_score', 0))
+    else:
+        return float(row[0])
 
 
 # ---------------------------------------------------------------------------
