@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block page_title %}OFDS Fantasy{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0f1117;
+      --surface: #1a1d27;
+      --card:    #222535;
+      --border:  #2e3248;
+      --accent:  #5b6af5;
+      --green:   #22c55e;
+      --red:     #ef4444;
+      --gold:    #f59e0b;
+      --text:    #e2e8f0;
+      --muted:   #8892a4;
+      --radius:  8px;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+
+    /* ── Page nav ── */
+    .page-nav { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; }
+    .page-nav a { padding: 10px 18px; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--muted); border-bottom: 2px solid transparent; transition: all .15s; }
+    .page-nav a:hover { color: var(--text); }
+    .page-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 18px; font-weight: 700; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9px; }
+
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Owen Farrel Dis-appreciation Society</h1>
+  <span id="round-badge" style="margin-left: auto; font-size: 13px; color: var(--muted);"></span>
+  {% block header_controls %}{% endblock %}
+</header>
+
+<nav class="page-nav">
+  <a href="/" {% if current_page == 'squad' %}class="active"{% endif %}>Squad Builder</a>
+  <a href="/competition" {% if current_page == 'competition' %}class="active"{% endif %}>League Table</a>
+  <a href="/fixtures" {% if current_page == 'fixtures' %}class="active"{% endif %}>Fixtures</a>
+</nav>
+
+{% block content %}{% endblock %}
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

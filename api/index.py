@@ -34,19 +34,22 @@ from .competition import (
     WINNER_BP_MARGIN, LOSER_BP_MARGIN,
 )
 
-app = Flask(__name__, template_folder='../public/templates')
+app = Flask(__name__, template_folder='templates')
 
 # Get database type and fixture path
 DB_TYPE_LOCAL = os.getenv('DB_TYPE', 'sqlite').lower()
 
-# For Vercel: fixtures.csv is in ../data/
+# For Vercel: fixtures.csv is in api/data/
 # For local: bespoke-scripts/fixtures.csv
-if os.path.exists('../data/fixtures.csv'):
-    FIXTURES_CSV = '../data/fixtures.csv'
-elif os.path.exists('bespoke-scripts/fixtures.csv'):
-    FIXTURES_CSV = os.path.join(os.path.dirname(__file__), 'bespoke-scripts', 'fixtures.csv')
+api_data = os.path.join(os.path.dirname(__file__), 'data', 'fixtures.csv')
+bespoke_data = os.path.join(os.path.dirname(__file__), '..', 'bespoke-scripts', 'fixtures.csv')
+
+if os.path.exists(api_data):
+    FIXTURES_CSV = api_data
+elif os.path.exists(bespoke_data):
+    FIXTURES_CSV = bespoke_data
 else:
-    FIXTURES_CSV = os.path.join(os.path.dirname(__file__), '..', 'data', 'fixtures.csv')
+    FIXTURES_CSV = api_data  # Default to api/data/
 
 # Squad composition rules
 SQUAD_QUOTAS  = {'PR': 3, 'HK': 2, 'LK': 3, 'LF': 4, 'SH': 2, 'FH': 2, 'MID': 3, 'OBK': 4}

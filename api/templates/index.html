@@ -1,0 +1,905 @@
+{% extends "base.html" %}
+
+{% block page_title %}OFDS Fantasy - Squad Builder{% endblock %}
+
+{% block extra_styles %}
+    #round-badge {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 99px;
+      padding: 2px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    #lock-banner {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    #lock-banner.locked { color: var(--red); font-weight: 600; }
+
+    #edit-round-controls {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #edit-round-btn {
+      padding: 4px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    #edit-round-btn:hover { border-color: var(--gold); color: var(--gold); }
+    #edit-round-form { display: none; align-items: center; gap: 6px; }
+    #edit-round-input {
+      width: 60px;
+      padding: 4px 8px;
+      border-radius: var(--radius);
+      border: 1px solid var(--gold);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+    }
+    #edit-round-go, #edit-round-cancel {
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #edit-round-go     { border-color: var(--gold);   background: rgba(245,158,11,.15); color: var(--gold);  }
+    #edit-round-cancel { border-color: var(--border); background: transparent;          color: var(--muted); }
+    #edit-mode-banner {
+      display: none;
+      background: rgba(245,158,11,.15);
+      border-bottom: 1px solid rgba(245,158,11,.4);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 20px;
+      gap: 12px;
+      align-items: center;
+    }
+    #edit-mode-banner button {
+      padding: 2px 10px;
+      border-radius: 99px;
+      border: 1px solid var(--gold);
+      background: transparent;
+      color: var(--gold);
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 0;
+      height: calc(100vh - 49px);
+      overflow: hidden;
+    }
+
+    /* ── Left panel ── */
+    .player-panel {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .panel-toolbar {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: var(--surface);
+    }
+    .filter-chip {
+      padding: 4px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all .15s;
+    }
+    .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .filter-sep { color: var(--border); font-size: 16px; align-self: center; padding: 0 2px; }
+    #search {
+      margin-left: auto;
+      padding: 5px 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      width: 160px;
+      font-size: 13px;
+    }
+
+    .table-wrap { overflow-y: auto; flex: 1; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.sorted { color: var(--accent); }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; cursor: pointer; }
+    tbody tr:hover { background: var(--card); }
+    tbody tr.unavailable { opacity: .5; cursor: not-allowed; }
+    tbody tr.pos-full { opacity: .6; cursor: not-allowed; }
+    tbody tr.in-my-team { background: rgba(91,106,245,.12); cursor: default; }
+    tbody tr.in-my-team:hover { background: rgba(91,106,245,.12); }
+    tbody td { padding: 8px 12px; }
+    .name-cell { font-weight: 500; }
+    .pos-badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-badge.available { background: rgba(34,197,94,.15); color: var(--green); }
+    .status-badge.taken     { background: rgba(239,68,68,.15);  color: var(--red);   }
+    .status-badge.mine      { background: rgba(91,106,245,.2);  color: #a0aaff;      }
+    .status-badge.pos-full  { background: rgba(245,158,11,.15); color: var(--gold); }
+
+    /* ── Right panel (team builder) ── */
+    .team-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      overflow: hidden;
+    }
+    .team-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .team-header h2 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    #team-select-wrap { display: flex; gap: 6px; }
+    #team-select {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+    }
+    #new-team-input {
+      display: none;
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--accent);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+    }
+    #team-count { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    /* ── Quota strip ── */
+    .quota-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .quota-chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .quota-chip.partial { border-color: var(--gold); color: var(--gold); background: rgba(245,158,11,.1); }
+    .quota-chip.full    { border-color: var(--green); color: var(--green); background: rgba(34,197,94,.1); }
+
+    /* ── Section header ── */
+    .section-header {
+      padding: 4px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-header.bench-divider {
+      border-top: 2px solid var(--border);
+      color: var(--gold);
+    }
+
+    .picks-list { flex: 1; overflow-y: auto; }
+    .pick-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    /* Jersey number badge — display only */
+    .jersey-badge {
+      width: 26px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+    }
+    .jersey-badge.starter { border-color: var(--green); color: var(--green); background: rgba(34,197,94,.1); }
+    .jersey-badge.bench   { border-color: var(--gold);  color: var(--gold);  background: rgba(245,158,11,.1); }
+
+    /* Swap to bench (▼) / to start (▲) button */
+    .swap-btn { font-size: 10px; }
+    .swap-btn.to-bench { color: var(--gold); }
+    .swap-btn.to-bench:hover { border-color: var(--gold); background: rgba(245,158,11,.1); color: var(--gold); }
+    .swap-btn.to-start { color: var(--green); }
+    .swap-btn.to-start:hover { border-color: var(--green); background: rgba(34,197,94,.1); color: var(--green); }
+
+    .pick-row .pick-pos  { font-size: 11px; font-weight: 700; color: var(--muted); width: 28px; }
+    .pick-row .pick-name { flex: 1; font-size: 13px; font-weight: 500; }
+    .icon-btn {
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted);
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { border-color: var(--border); color: var(--text); }
+    .icon-btn.active-c { color: var(--gold); border-color: var(--gold); background: rgba(245,158,11,.1); }
+    .icon-btn.active-k { color: var(--accent); border-color: var(--accent); background: rgba(91,106,245,.1); }
+    .icon-btn.remove   { color: var(--muted); }
+    .icon-btn.remove:hover { color: var(--red); border-color: var(--red); }
+
+    .empty-picks {
+      padding: 40px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .team-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+    #save-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    #save-btn:disabled { opacity: .4; cursor: not-allowed; }
+    #save-msg { margin-top: 8px; font-size: 12px; text-align: center; min-height: 16px; }
+    #save-msg.ok  { color: var(--green); }
+    #save-msg.err { color: var(--red); }
+{% endblock %}
+
+{% block header_controls %}
+  <span id="round-badge">Round —</span>
+  <div id="edit-round-controls">
+    <span id="lock-banner">Loading…</span>
+    <button id="edit-round-btn">✏ Edit Round</button>
+    <div id="edit-round-form">
+      <label style="font-size:12px;color:var(--muted)">Round:</label>
+      <input id="edit-round-input" type="number" min="1" value="1">
+      <button id="edit-round-go">Go</button>
+      <button id="edit-round-cancel">✕</button>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div id="edit-mode-banner">
+  ✏ Editing Round <span id="edit-round-label"></span> — changes will overwrite picks for this round
+  <button id="exit-edit-btn">Exit Edit Mode</button>
+</div>
+
+<div class="layout">
+
+  <!-- ── Left: player pool ── -->
+  <div class="player-panel">
+    <div class="panel-toolbar">
+      <button class="filter-chip active" data-pos="ALL">All</button>
+      <button class="filter-chip" data-pos="PR">PR</button>
+      <button class="filter-chip" data-pos="HK">HK</button>
+      <button class="filter-chip" data-pos="LK">LK</button>
+      <button class="filter-chip" data-pos="LF">LF</button>
+      <button class="filter-chip" data-pos="SH">SH</button>
+      <button class="filter-chip" data-pos="FH">FH</button>
+      <button class="filter-chip" data-pos="MID">MID</button>
+      <button class="filter-chip" data-pos="OBK">OBK</button>
+      <span class="filter-sep">|</span>
+      <button class="filter-chip" id="avail-chip">Available</button>
+      <input id="search" type="text" placeholder="Search player…">
+    </div>
+    <div class="table-wrap">
+      <table id="player-table">
+        <thead>
+          <tr>
+            <th data-col="name">Player</th>
+            <th data-col="position">Pos</th>
+            <th data-col="real_team">Club</th>
+            <th data-col="price">Price</th>
+            <th data-col="last_round_score">Rnd <span id="last-rnd-label">—</span></th>
+            <th data-col="fantasy_team">Status</th>
+          </tr>
+        </thead>
+        <tbody id="player-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Right: team builder ── -->
+  <div class="team-panel">
+    <div class="team-header">
+      <h2>My Squad</h2>
+      <div id="team-select-wrap">
+        <select id="team-select">
+          <option value="">— select team —</option>
+          <option value="__new__">+ Create new team</option>
+        </select>
+        <input id="new-team-input" type="text" placeholder="Team name…">
+      </div>
+      <div id="team-count">0 / 23 players selected</div>
+    </div>
+    <div class="picks-list" id="picks-list">
+      <div class="empty-picks">Select a team above,<br>then click players to build your squad.<br><br><small>Squad: 3 PR · 2 HK · 3 LK · 4 LF<br>2 SH · 2 FH · 3 MID · 4 OBK</small></div>
+    </div>
+    <div class="team-footer">
+      <button id="save-btn" disabled>Save Squad</button>
+      <div id="save-msg"></div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let allPlayers  = [];
+  let myPicks     = [];   // {player_id, position, name, ..., jersey}
+  let captainId   = null;
+  let kickerId    = null;
+  let activePos   = 'ALL';
+  let sortCol     = 'last_round_score';
+  let sortAsc     = false;
+  let isLocked    = false;
+  let nextRound   = null;
+  let QUOTAS      = {};
+  let STARTERS    = {};
+  let TOTAL_SQUAD = 23;
+  let isDirty          = false;
+  let showAvailableOnly = false;
+  let editRound        = null;  // non-null when editing a historical round
+
+  // Fixed jersey slot assignments per position (starters first, bench last)
+  const SLOT_ORDER = {
+    PR:  [1, 3, 17],
+    HK:  [2, 16],
+    LK:  [4, 5, 18],
+    LF:  [6, 7, 8, 19],
+    SH:  [9, 20],
+    FH:  [10, 21],
+    MID: [12, 13, 22],
+    OBK: [11, 14, 15, 23],
+  };
+
+  // ── Boot ──
+  async function init() {
+    const url = editRound ? `/api/state?round=${editRound}` : '/api/state';
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    nextRound   = data.round;
+    isLocked    = data.is_locked;
+    allPlayers  = data.players;
+    QUOTAS      = data.quotas;
+    STARTERS    = data.starters;
+    TOTAL_SQUAD = data.total_squad;
+
+    if (editRound) {
+      document.getElementById('round-badge').textContent = `Round ${editRound}`;
+      document.getElementById('last-rnd-label').textContent = editRound;
+      document.getElementById('lock-banner').textContent = '';
+      document.getElementById('edit-round-label').textContent = editRound;
+      document.getElementById('edit-mode-banner').style.display = 'flex';
+      document.getElementById('edit-round-btn').style.display = 'none';
+    } else {
+      document.getElementById('round-badge').textContent = `Round ${nextRound}`;
+      document.getElementById('last-rnd-label').textContent = data.last_round;
+      document.getElementById('edit-mode-banner').style.display = 'none';
+      document.getElementById('edit-round-btn').style.display = '';
+
+      const lockEl = document.getElementById('lock-banner');
+      if (isLocked) {
+        const reopen = new Date(data.reopen);
+        lockEl.textContent = `🔒 Locked — reopens ${reopen.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+        lockEl.classList.add('locked');
+        document.getElementById('save-btn').disabled = true;
+      } else {
+        const cut = new Date(data.cutoff);
+        lockEl.textContent = `Deadline: ${cut.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+        startCountdown(cut, data.reopen);
+      }
+    }
+
+    const sel = document.getElementById('team-select');
+    // Only rebuild team list on first load or when not in edit mode
+    if (!editRound) {
+      // Clear existing team options (except placeholder and __new__)
+      [...sel.options].filter(o => o.value && o.value !== '__new__').forEach(o => o.remove());
+      data.teams.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = t;
+        sel.insertBefore(opt, sel.lastElementChild);
+      });
+    }
+
+    renderTable();
+  }
+
+  function startCountdown(cutoff, reopen) {
+    const el = document.getElementById('lock-banner');
+    setInterval(() => {
+      const diff = cutoff - Date.now();
+      if (diff <= 0) {
+        const reopenDate = new Date(reopen);
+        el.textContent = `🔒 Locked — reopens ${reopenDate.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+        el.classList.add('locked');
+        return;
+      }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      el.textContent = `Deadline in ${h}h ${m}m ${s}s`;
+    }, 1000);
+  }
+
+  // ── Jersey slot helpers ──
+  function nextJerseySlot(pos) {
+    const slots  = SLOT_ORDER[pos] || [];
+    const taken  = new Set(myPicks.filter(p => p.position === pos).map(p => p.jersey));
+    return slots.find(s => !taken.has(s)) ?? null;
+  }
+
+  function posQuotaFull(pos) {
+    return myPicks.filter(p => p.position === pos).length >= (QUOTAS[pos] || 0);
+  }
+
+  function squadIsComplete() {
+    if (myPicks.length !== TOTAL_SQUAD) return false;
+    for (const [pos, required] of Object.entries(QUOTAS)) {
+      if (myPicks.filter(p => p.position === pos).length !== required) return false;
+    }
+    return true;
+  }
+
+  // ── Render table ──
+  function renderTable() {
+    const search    = document.getElementById('search').value.toLowerCase();
+    const myPickIds = new Set(myPicks.map(p => p.player_id));
+    const teamName  = activeTeamName();
+    let rows = allPlayers.filter(p => {
+      if (activePos !== 'ALL' && p.position !== activePos) return false;
+      if (search && !p.name.toLowerCase().includes(search)) return false;
+      if (showAvailableOnly && (p.fantasy_team || myPickIds.has(p.player_id))) return false;
+      return true;
+    });
+
+    rows.sort((a, b) => {
+      let av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
+      if (typeof av === 'string') av = av.toLowerCase();
+      if (typeof bv === 'string') bv = bv.toLowerCase();
+      return sortAsc ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1);
+    });
+
+    const tbody   = document.getElementById('player-tbody');
+    tbody.innerHTML = '';
+
+    rows.forEach(p => {
+      const inMyTeam  = myPickIds.has(p.player_id);
+      const taken     = p.fantasy_team && p.fantasy_team !== teamName;
+      const quotaFull = !inMyTeam && !taken && posQuotaFull(p.position);
+      const tr = document.createElement('tr');
+      if (taken)     tr.classList.add('unavailable');
+      if (inMyTeam)  tr.classList.add('in-my-team');
+      if (quotaFull) tr.classList.add('pos-full');
+
+      let statusHtml;
+      if (inMyTeam) {
+        const pick = myPicks.find(q => q.player_id === p.player_id);
+        statusHtml = `<span class="status-badge mine">My Team</span>`;
+      } else if (taken) {
+        statusHtml = `<span class="status-badge taken">${p.fantasy_team}</span>`;
+      } else if (quotaFull) {
+        statusHtml = `<span class="status-badge pos-full">${p.position} full</span>`;
+      } else {
+        statusHtml = `<span class="status-badge available">Available</span>`;
+      }
+
+      tr.innerHTML = `
+        <td class="name-cell">${formatName(p.name)}</td>
+        <td><span class="pos-badge">${p.position ?? '?'}</span></td>
+        <td>${p.real_team ?? '—'}</td>
+        <td>${formatPrice(p.price)}</td>
+        <td>${p.last_round_score ?? '—'}</td>
+        <td>${statusHtml}</td>
+      `;
+
+      if (!taken && !inMyTeam && !isLocked) {
+        tr.addEventListener('click', () => togglePick(p));
+      }
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ── Picks ──
+  function activeTeamName() {
+    const sel = document.getElementById('team-select');
+    if (sel.value === '__new__') return document.getElementById('new-team-input').value.trim();
+    return sel.value;
+  }
+
+  function togglePick(player) {
+    const idx = myPicks.findIndex(p => p.player_id === player.player_id);
+    if (idx >= 0) {
+      myPicks.splice(idx, 1);
+      if (captainId === player.player_id) captainId = null;
+      if (kickerId  === player.player_id) kickerId  = null;
+    } else {
+      if (posQuotaFull(player.position)) {
+        flashMsg(`${player.position} quota full (${QUOTAS[player.position]}/${QUOTAS[player.position]}).`, true);
+        return;
+      }
+      if (myPicks.length >= TOTAL_SQUAD) {
+        flashMsg(`Squad is full (${TOTAL_SQUAD} players).`, true);
+        return;
+      }
+      const jersey = nextJerseySlot(player.position);
+      myPicks.push({ ...player, jersey });
+    }
+    isDirty = true;
+    renderPicks();
+    renderTable();
+  }
+
+  // Swap a player between their starter and bench jersey slot
+  function toggleSlot(playerId) {
+    const pick = myPicks.find(p => p.player_id === playerId);
+    if (!pick) return;
+    const slots       = SLOT_ORDER[pick.position] || [];
+    const starterSlots = slots.filter(s => s <= 15);
+    const benchSlot    = slots.find(s => s > 15);
+    if (!benchSlot || !starterSlots.length) return;
+
+    if (pick.jersey <= 15) {
+      // Starter → bench: swap with whoever holds the bench slot
+      const benchPick = myPicks.find(p => p.jersey === benchSlot && p.player_id !== playerId);
+      const old = pick.jersey;
+      if (benchPick) benchPick.jersey = old;
+      pick.jersey = benchSlot;
+    } else {
+      // Bench → starter: find a free starter slot, or swap with last filled one
+      const others     = myPicks.filter(p => p.position === pick.position && p.player_id !== playerId);
+      const takenSlots = new Set(others.map(p => p.jersey));
+      const freeSlot   = starterSlots.find(s => !takenSlots.has(s));
+      if (freeSlot) {
+        pick.jersey = freeSlot;
+      } else {
+        // All starter slots taken — swap with the last starter
+        const lastSlot   = starterSlots[starterSlots.length - 1];
+        const swapTarget = myPicks.find(p => p.jersey === lastSlot);
+        if (swapTarget) swapTarget.jersey = benchSlot;
+        pick.jersey = lastSlot;
+      }
+    }
+    isDirty = true;
+    renderPicks();
+    renderTable();
+  }
+
+  function makePickRow(p) {
+    const div      = document.createElement('div');
+    div.className  = 'pick-row';
+    const isCap    = captainId === p.player_id;
+    const isKick   = kickerId  === p.player_id;
+    const isBench  = p.jersey > 15;
+
+    div.innerHTML = `
+      <span class="jersey-badge ${isBench ? 'bench' : 'starter'}">${p.jersey}</span>
+      <span class="pick-pos">${p.position ?? '?'}</span>
+      <span class="pick-name">${formatName(p.name)}</span>
+      <button class="icon-btn swap-btn ${isBench ? 'to-start' : 'to-bench'}"
+              title="${isBench ? 'Move to Starting XV' : 'Move to Bench'}"
+              data-action="slot" data-id="${p.player_id}">${isBench ? '▲' : '▼'}</button>
+      <button class="icon-btn ${isCap  ? 'active-c' : ''}" title="Captain (doubles points)" data-action="cap"  data-id="${p.player_id}">C</button>
+      <button class="icon-btn ${isKick ? 'active-k' : ''}" title="Kicker (adds kicking pts)" data-action="kick" data-id="${p.player_id}">K</button>
+      <button class="icon-btn remove" title="Remove" data-action="remove" data-id="${p.player_id}">✕</button>
+    `;
+    return div;
+  }
+
+  function renderPicks() {
+    const list         = document.getElementById('picks-list');
+    const starterCount = myPicks.filter(p => p.jersey <= 15).length;
+    const benchCount   = myPicks.filter(p => p.jersey > 15).length;
+    document.getElementById('team-count').textContent =
+      `Starters: ${starterCount}/15 · Bench: ${benchCount}/8 · Total: ${myPicks.length}/${TOTAL_SQUAD}`;
+
+    document.getElementById('save-btn').disabled =
+      isLocked || !activeTeamName() || !squadIsComplete() || !isDirty;
+    document.getElementById('save-btn').textContent =
+      editRound ? `Update Round ${editRound}` : 'Save Squad';
+
+    if (myPicks.length === 0) {
+      list.innerHTML = '<div class="empty-picks">Select a team above,<br>then click players to build your squad.<br><br><small>Squad: 3 PR · 2 HK · 3 LK · 4 LF<br>2 SH · 2 FH · 3 MID · 4 OBK</small></div>';
+      document.getElementById('save-btn').disabled = true;
+      document.getElementById('save-btn').textContent = editRound ? `Update Round ${editRound}` : 'Save Squad';
+      return;
+    }
+
+    list.innerHTML = '';
+
+    // Position quota summary
+    const quotaDiv = document.createElement('div');
+    quotaDiv.className = 'quota-strip';
+    quotaDiv.innerHTML = Object.entries(QUOTAS).map(([pos, max]) => {
+      const count = myPicks.filter(p => p.position === pos).length;
+      const cls   = count === max ? 'full' : count > 0 ? 'partial' : '';
+      return `<span class="quota-chip ${cls}">${pos} ${count}/${max}</span>`;
+    }).join('');
+    list.appendChild(quotaDiv);
+
+    // Sort all picks by jersey number
+    const sorted   = [...myPicks].sort((a, b) => a.jersey - b.jersey);
+    const starters = sorted.filter(p => p.jersey <= 15);
+    const bench    = sorted.filter(p => p.jersey > 15);
+
+    // Starting XV
+    const sh = document.createElement('div');
+    sh.className = 'section-header';
+    sh.textContent = `Starting XV  (${starters.length}/15)`;
+    list.appendChild(sh);
+    starters.forEach(p => list.appendChild(makePickRow(p)));
+
+    // Bench — with a heavier divider
+    const bh = document.createElement('div');
+    bh.className = 'section-header bench-divider';
+    bh.textContent = `Bench  (${bench.length}/8)  ·  16 HK  17 PR  18 LK  19 LF  20 SH  21 FH  22 MID  23 OBK`;
+    list.appendChild(bh);
+    bench.forEach(p => list.appendChild(makePickRow(p)));
+
+    list.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id     = parseInt(btn.dataset.id);
+        const action = btn.dataset.action;
+        if (action === 'slot')   { toggleSlot(id); return; }
+        if (action === 'cap')    { captainId = captainId === id ? null : id; isDirty = true; }
+        if (action === 'kick')   { kickerId  = kickerId  === id ? null : id; isDirty = true; }
+        if (action === 'remove') { togglePick(myPicks.find(p => p.player_id === id)); return; }
+        renderPicks();
+        renderTable();
+      });
+    });
+  }
+
+  // ── Save ──
+  document.getElementById('save-btn').addEventListener('click', async () => {
+    const teamName = activeTeamName();
+    if (!teamName) { flashMsg('Choose or enter a team name first.', true); return; }
+    if (!squadIsComplete()) { flashMsg('Squad incomplete — check position quotas.', true); return; }
+
+    const jerseys = {};
+    myPicks.forEach(p => { jerseys[p.player_id] = p.jersey; });
+
+    const body = {
+      player_ids: myPicks.map(p => p.player_id),
+      bench_ids:  myPicks.filter(p => p.jersey > 15).map(p => p.player_id),
+      jerseys,
+      captain_id: captainId,
+      kicker_id:  kickerId,
+    };
+
+    const roundParam = editRound ? `?round=${editRound}` : '';
+    const res  = await fetch(`/api/team/${encodeURIComponent(teamName)}/picks${roundParam}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (!res.ok) { flashMsg(data.error, true); return; }
+
+    isDirty = false;
+    flashMsg(`✓ ${data.count} players saved for Round ${data.round}`, false);
+
+    const stateUrl  = editRound ? `/api/state?round=${editRound}` : '/api/state';
+    const stateRes  = await fetch(stateUrl);
+    const stateData = await stateRes.json();
+    allPlayers = stateData.players;
+    renderPicks();  // re-render to reflect isDirty = false on save button
+    const sel = document.getElementById('team-select');
+    if (![...sel.options].some(o => o.value === teamName)) {
+      const opt = document.createElement('option');
+      opt.value = teamName; opt.textContent = teamName;
+      sel.insertBefore(opt, sel.lastElementChild);
+      sel.value = teamName;
+      document.getElementById('new-team-input').style.display = 'none';
+    }
+    renderTable();
+  });
+
+  // ── Team select ──
+  document.getElementById('team-select').addEventListener('change', async function () {
+    const newInput = document.getElementById('new-team-input');
+    if (this.value === '__new__') {
+      newInput.style.display = 'block';
+      myPicks = []; captainId = null; kickerId = null; isDirty = false;
+      renderPicks(); renderTable();
+      return;
+    }
+    newInput.style.display = 'none';
+    if (!this.value) { myPicks = []; captainId = null; kickerId = null; isDirty = false; renderPicks(); renderTable(); return; }
+
+    const roundParam = editRound ? `?round=${editRound}` : '';
+    const res  = await fetch(`/api/team/${encodeURIComponent(this.value)}${roundParam}`);
+    const data = await res.json();
+
+    // Auto-assign jerseys for picks stored without a jersey value (old data)
+    const posCounters = {};
+    myPicks = data.picks.map(pk => {
+      const full = allPlayers.find(p => p.player_id === pk.player_id) || pk;
+      if (pk.jersey) return { ...full, jersey: pk.jersey };
+      // Fallback: assign next slot sequentially (starters come first from ORDER BY is_bench)
+      const pos    = full.position || pk.position;
+      const slots  = SLOT_ORDER[pos] || [];
+      const idx    = posCounters[pos] = (posCounters[pos] ?? 0);
+      posCounters[pos]++;
+      return { ...full, jersey: slots[idx] ?? null };
+    });
+
+    captainId = (data.picks.find(pk => pk.is_captain)?.player_id) ?? null;
+    kickerId  = (data.picks.find(pk => pk.is_kicker)?.player_id)  ?? null;
+    isDirty   = false;
+    renderPicks(); renderTable();
+  });
+
+  // ── Filters / search / sort ──
+  document.querySelectorAll('.filter-chip[data-pos]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip[data-pos]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activePos = btn.dataset.pos;
+      renderTable();
+    });
+  });
+
+  document.getElementById('avail-chip').addEventListener('click', function () {
+    showAvailableOnly = !showAvailableOnly;
+    this.classList.toggle('active', showAvailableOnly);
+    renderTable();
+  });
+
+  document.getElementById('search').addEventListener('input', renderTable);
+
+  document.querySelectorAll('thead th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = false; }
+      document.querySelectorAll('thead th').forEach(t => t.classList.remove('sorted'));
+      th.classList.add('sorted');
+      renderTable();
+    });
+  });
+
+  // ── Formatters ──
+  function formatName(name) {
+    if (!name) return '—';
+    const [last, init] = name.split(',');
+    return init ? `${init}. ${last}` : last;
+  }
+
+  function formatPrice(p) {
+    if (!p) return '—';
+    return `£${(p / 1000000).toFixed(1)}m`;
+  }
+
+  function flashMsg(msg, isErr) {
+    const el = document.getElementById('save-msg');
+    el.textContent = msg;
+    el.className = isErr ? 'err' : 'ok';
+    setTimeout(() => { el.textContent = ''; el.className = ''; }, 4000);
+  }
+
+  // ── Edit Round controls ──
+  document.getElementById('edit-round-btn').addEventListener('click', () => {
+    const maxRound = nextRound ? nextRound - 1 : 1;
+    document.getElementById('edit-round-input').value = maxRound;
+    document.getElementById('edit-round-input').max   = maxRound;
+    document.getElementById('edit-round-form').style.display = 'flex';
+    document.getElementById('edit-round-btn').style.display  = 'none';
+    document.getElementById('edit-round-input').focus();
+  });
+
+  document.getElementById('edit-round-cancel').addEventListener('click', () => {
+    document.getElementById('edit-round-form').style.display = 'none';
+    document.getElementById('edit-round-btn').style.display  = '';
+  });
+
+  document.getElementById('edit-round-go').addEventListener('click', async () => {
+    const val = parseInt(document.getElementById('edit-round-input').value);
+    if (!val || val < 1) return;
+    document.getElementById('edit-round-form').style.display = 'none';
+    editRound = val;
+    myPicks = []; captainId = null; kickerId = null; isDirty = false;
+    renderPicks();
+    await init();
+  });
+
+  document.getElementById('edit-round-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('edit-round-go').click();
+    if (e.key === 'Escape') document.getElementById('edit-round-cancel').click();
+  });
+
+  document.getElementById('exit-edit-btn').addEventListener('click', async () => {
+    editRound = null;
+    myPicks = []; captainId = null; kickerId = null; isDirty = false;
+    renderPicks();
+    await init();
+  });
+
+  init();
+</script>
+{% endblock %}
