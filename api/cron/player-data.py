@@ -115,7 +115,7 @@ def upsert_player(conn, name: str, team: str, position: str) -> int:
 
     if DB_TYPE == 'postgres':
         cursor.execute(
-            'INSERT INTO players (name, team, position) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING',
+            'INSERT INTO players (name, team, position) VALUES (%s, %s, %s) ON CONFLICT (name, team, position) DO NOTHING',
             (name, team, position),
         )
     else:
