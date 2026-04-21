@@ -28,8 +28,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from flask import Flask, jsonify, render_template, request
 
-from db import get_connection, ensure_schema, DB_TYPE
-from competition import (
+from .db import get_connection, ensure_schema, DB_TYPE
+from .competition import (
     parse_fixtures, calculate_table, get_team_score,
     WINNER_BP_MARGIN, LOSER_BP_MARGIN,
 )

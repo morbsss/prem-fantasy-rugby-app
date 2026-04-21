@@ -1,9 +1,15 @@
 {
   "buildCommand": "cd api && pip install -r requirements.txt && cd ..",
   "outputDirectory": "api",
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.11"
+    }
+  },
   "env": {
     "DB_TYPE": "postgres",
-    "ALLOW_UNRESTRICTED_EDITS": "false"
+    "ALLOW_UNRESTRICTED_EDITS": "false",
+    "PYTHONUNBUFFERED": "1"
   },
   "crons": [
     {
