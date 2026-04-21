@@ -233,7 +233,7 @@ def state():
                 p.position,
                 p.team AS real_team,
                 ws.price,
-                ROUND(ws.total_points - COALESCE(ws_prev.total_points, 0), 1) AS last_round_score,
+                ws.total_points - COALESCE(ws_prev.total_points, 0) AS last_round_score,
                 ts_edit.team_name AS fantasy_team
             FROM players p
             JOIN weekly_stats ws
@@ -248,6 +248,9 @@ def state():
             ORDER BY p.position, ws.total_points DESC
         ''', (last_round, last_round - 1, edit_round))
         players = [dict(r) for r in cursor.fetchall()]
+        for p in players:
+            if p.get('last_round_score') is not None:
+                p['last_round_score'] = round(p['last_round_score'], 1)
         cursor.close()
     else:
         cursor = _get_cursor(conn)
@@ -270,7 +273,7 @@ def state():
                 p.position,
                 p.team AS real_team,
                 ws.price,
-                ROUND(ws.total_points - COALESCE(ws_prev.total_points, 0), 1) AS last_round_score,
+                ws.total_points - COALESCE(ws_prev.total_points, 0) AS last_round_score,
                 cp.team_name AS fantasy_team
             FROM players p
             JOIN weekly_stats ws
@@ -281,6 +284,9 @@ def state():
             ORDER BY p.position, ws.total_points DESC
         ''', (last_round, last_round - 1))
         players = [dict(r) for r in cursor.fetchall()]
+        for p in players:
+            if p.get('last_round_score') is not None:
+                p['last_round_score'] = round(p['last_round_score'], 1)
         cursor.close()
 
     cursor = _get_cursor(conn)
