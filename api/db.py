@@ -196,5 +196,27 @@ def ensure_schema(conn):
             )
         ''')
 
+    # Users table
+    if DB_TYPE == 'postgres':
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                user_id SERIAL PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                team_name TEXT UNIQUE,
+                created_at TEXT NOT NULL
+            )
+        ''')
+    else:
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                team_name TEXT UNIQUE,
+                created_at TEXT NOT NULL
+            )
+        ''')
+
     conn.commit()
     cursor.close()

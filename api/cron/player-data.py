@@ -64,6 +64,29 @@ def setup_database(conn) -> None:
                 UNIQUE(player_id, round)
             )
         ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS team_selections (
+                id SERIAL PRIMARY KEY,
+                round INTEGER NOT NULL,
+                team_name TEXT NOT NULL,
+                player_id INTEGER NOT NULL REFERENCES players(player_id),
+                is_captain INTEGER NOT NULL DEFAULT 0,
+                is_kicker INTEGER NOT NULL DEFAULT 0,
+                is_bench INTEGER NOT NULL DEFAULT 0,
+                jersey INTEGER,
+                scraped_at TEXT NOT NULL,
+                UNIQUE(round, team_name, player_id)
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                user_id SERIAL PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                team_name TEXT UNIQUE,
+                created_at TEXT NOT NULL
+            )
+        ''')
     else:
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS players (
@@ -87,6 +110,29 @@ def setup_database(conn) -> None:
                 form TEXT,
                 scraped_at TEXT NOT NULL,
                 UNIQUE(player_id, round)
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS team_selections (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                round INTEGER NOT NULL,
+                team_name TEXT NOT NULL,
+                player_id INTEGER NOT NULL REFERENCES players(player_id),
+                is_captain INTEGER NOT NULL DEFAULT 0,
+                is_kicker INTEGER NOT NULL DEFAULT 0,
+                is_bench INTEGER NOT NULL DEFAULT 0,
+                jersey INTEGER,
+                scraped_at TEXT NOT NULL,
+                UNIQUE(round, team_name, player_id)
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                team_name TEXT UNIQUE,
+                created_at TEXT NOT NULL
             )
         ''')
 
@@ -184,6 +230,67 @@ def upsert_weekly_stats(conn, player_id: int, round_num: int, total_points, pric
     cursor.close()
 
 
+def copy_team_selections_to_next_round(conn, previous_round: int, current_round: int) -> dict:
+    """Copy team selections from previous round to current round for all teams."""
+    cursor = conn.cursor()
+
+    try:
+        # Get all teams from the previous round
+        if DB_TYPE == 'postgres':
+            cursor.execute('''
+                SELECT DISTINCT team_name FROM team_selections WHERE round = %s
+            ''', (previous_round,))
+        else:
+            cursor.execute('''
+                SELECT DISTINCT team_name FROM team_selections WHERE round = ?
+            ''', (previous_round,))
+
+        teams = [row['team_name'] if isinstance(row, dict) else row[0] for row in cursor.fetchall()]
+
+        if not teams:
+            cursor.close()
+            return {'status': 'info', 'message': 'No teams to copy', 'teams_copied': 0}
+
+        # Copy picks from previous round to current round for each team
+        copied_count = 0
+        scraped_at = datetime.utcnow().isoformat()
+
+        for team_name in teams:
+            if DB_TYPE == 'postgres':
+                cursor.execute('''
+                    INSERT INTO team_selections
+                        (round, team_name, player_id, is_captain, is_kicker, is_bench, jersey, scraped_at)
+                    SELECT %s, team_name, player_id, is_captain, is_kicker, is_bench, jersey, %s
+                    FROM team_selections
+                    WHERE team_name = %s AND round = %s
+                    ON CONFLICT(round, team_name, player_id) DO NOTHING
+                ''', (current_round, scraped_at, team_name, previous_round))
+            else:
+                cursor.execute('''
+                    INSERT OR IGNORE INTO team_selections
+                        (round, team_name, player_id, is_captain, is_kicker, is_bench, jersey, scraped_at)
+                    SELECT ?, team_name, player_id, is_captain, is_kicker, is_bench, jersey, ?
+                    FROM team_selections
+                    WHERE team_name = ? AND round = ?
+                ''', (current_round, scraped_at, team_name, previous_round))
+
+            copied_count += cursor.rowcount
+
+        conn.commit()
+        cursor.close()
+
+        return {
+            'status': 'success',
+            'message': f'Copied {copied_count} picks from round {previous_round} to round {current_round}',
+            'teams_copied': len(teams),
+            'picks_copied': copied_count
+        }
+
+    except Exception as e:
+        cursor.close()
+        return {'status': 'error', 'message': str(e), 'teams_copied': 0}
+
+
 def scrape_player_data() -> dict:
     """Scrape player data from SuperBru API."""
     try:
@@ -264,13 +371,24 @@ def scrape_player_data() -> dict:
                 conn.close()
                 raise e
 
+        # Copy team selections from previous round to new round (if not preseason)
+        copy_result = None
+        if current_round > 0:
+            copy_result = copy_team_selections_to_next_round(conn, current_round - 1, current_round)
+
         conn.close()
+
+        # Build response message
+        response_msg = f'{label.capitalize()} data scraped and saved'
+        if copy_result and copy_result['status'] == 'success':
+            response_msg += f" ({copy_result['message']})"
 
         return {
             'status': 'success',
-            'message': f'{label.capitalize()} data scraped and saved',
+            'message': response_msg,
             'round': current_round,
-            'count': len(df)
+            'count': len(df),
+            'team_copy': copy_result
         }
 
     except Exception as e:

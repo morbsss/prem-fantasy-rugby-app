@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block page_title %}Login - Fantasy Rugby{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .auth-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all .15s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+  .tab-content {
+    display: none;
+    padding: 24px;
+  }
+
+  .tab-content.active { display: block; }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 14px;
+    transition: border .15s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  button:hover { background: #4a5ae5; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .alert {
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--red);
+    color: #fca5a5;
+  }
+
+  .alert-info {
+    background: rgba(91, 106, 245, 0.1);
+    border: 1px solid var(--accent);
+    color: #c7d2fe;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin .6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="tabs">
+    <button class="tab active" data-tab="login">Login</button>
+    <button class="tab" data-tab="register">Register</button>
+  </div>
+
+  <div id="login" class="tab-content active">
+    <div id="login-alert"></div>
+    <form id="login-form">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="Enter username" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter password" required>
+      </div>
+      <button type="submit" id="login-btn">Login</button>
+    </form>
+  </div>
+
+  <div id="register" class="tab-content">
+    <div id="register-alert"></div>
+    <form id="register-form">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="register-username" placeholder="At least 3 characters" minlength="3" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="register-password" placeholder="At least 6 characters" minlength="6" required>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="register-password-confirm" placeholder="Confirm password" required>
+      </div>
+      <div class="form-group">
+        <label>Choose Your Team</label>
+        <select id="register-team" required>
+          <option value="">-- Select a team --</option>
+        </select>
+      </div>
+      <button type="submit" id="register-btn">Create Account</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.dataset.tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+      document.getElementById(tabName + '-alert').innerHTML = '';
+    });
+  });
+
+  // Load available teams
+  async function loadTeams() {
+    try {
+      const res = await fetch('/api/auth/teams');
+      const teams = await res.json();
+      const select = document.getElementById('register-team');
+      teams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team.name;
+        option.textContent = team.name + (team.owner ? ` (claimed by ${team.owner})` : '');
+        option.disabled = !team.available;
+        select.appendChild(option);
+      });
+    } catch (err) {
+      console.error('Failed to load teams:', err);
+    }
+  }
+
+  // Login form
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const btn = document.getElementById('login-btn');
+    const alertDiv = document.getElementById('login-alert');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alertDiv.innerHTML = `<div class="alert alert-info">Logged in successfully. Redirecting...</div>`;
+        setTimeout(() => window.location.href = '/', 500);
+      } else {
+        alertDiv.innerHTML = `<div class="alert alert-error">${data.error || 'Login failed'}</div>`;
+      }
+    } catch (err) {
+      alertDiv.innerHTML = `<div class="alert alert-error">Network error: ${err.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Login';
+    }
+  });
+
+  // Register form
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('register-username').value;
+    const password = document.getElementById('register-password').value;
+    const passwordConfirm = document.getElementById('register-password-confirm').value;
+    const team = document.getElementById('register-team').value;
+    const btn = document.getElementById('register-btn');
+    const alertDiv = document.getElementById('register-alert');
+
+    if (password !== passwordConfirm) {
+      alertDiv.innerHTML = `<div class="alert alert-error">Passwords do not match</div>`;
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> Creating account...';
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, team_name: team })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alertDiv.innerHTML = `<div class="alert alert-info">Account created successfully. Redirecting...</div>`;
+        setTimeout(() => window.location.href = '/', 500);
+      } else {
+        alertDiv.innerHTML = `<div class="alert alert-error">${data.error || 'Registration failed'}</div>`;
+      }
+    } catch (err) {
+      alertDiv.innerHTML = `<div class="alert alert-error">Network error: ${err.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Create Account';
+    }
+  });
+
+  // Load teams on page load
+  loadTeams();
+</script>
+{% endblock %}

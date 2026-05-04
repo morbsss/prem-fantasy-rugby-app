@@ -54,6 +54,12 @@
   <h1>⚡ Owen Farrel Dis-appreciation Society</h1>
   <span id="round-badge" style="margin-left: auto; font-size: 13px; color: var(--muted);"></span>
   {% block header_controls %}{% endblock %}
+
+  <!-- User menu -->
+  <div style="margin-left: 16px; display: flex; align-items: center; gap: 12px; border-left: 1px solid var(--border); padding-left: 16px;">
+    <span id="user-info" style="font-size: 13px; color: var(--muted);"></span>
+    <button id="logout-btn" style="background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 4px; transition: all .15s;" onclick="logout()">Logout</button>
+  </div>
 </header>
 
 <nav class="page-nav">
@@ -65,6 +71,37 @@
 {% block content %}{% endblock %}
 
 {% block scripts %}{% endblock %}
+
+<script>
+  async function checkUserSession() {
+    try {
+      const res = await fetch('/api/auth/user');
+      if (res.ok) {
+        const user = await res.json();
+        document.getElementById('user-info').textContent = `${user.username} → ${user.team_name}`;
+        document.getElementById('logout-btn').style.display = 'block';
+      } else {
+        document.getElementById('user-info').textContent = '';
+        document.getElementById('logout-btn').style.display = 'none';
+      }
+    } catch (err) {
+      console.error('Failed to check session:', err);
+    }
+  }
+
+  async function logout() {
+    if (!confirm('Are you sure you want to logout?')) return;
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/auth';
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  }
+
+  // Check session on page load
+  checkUserSession();
+</script>
 
 </body>
 </html>

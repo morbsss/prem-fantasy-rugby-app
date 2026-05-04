@@ -41,6 +41,29 @@ def setup_database(conn: sqlite3.Connection) -> None:
             UNIQUE(player_id, round)
         )
     ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS team_selections (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            round       INTEGER NOT NULL,
+            team_name   TEXT    NOT NULL,
+            player_id   INTEGER NOT NULL REFERENCES players(player_id),
+            is_captain  INTEGER NOT NULL DEFAULT 0,
+            is_kicker   INTEGER NOT NULL DEFAULT 0,
+            is_bench    INTEGER NOT NULL DEFAULT 0,
+            jersey      INTEGER,
+            scraped_at  TEXT    NOT NULL,
+            UNIQUE(round, team_name, player_id)
+        )
+    ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            user_id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            username        TEXT UNIQUE NOT NULL,
+            password_hash   TEXT NOT NULL,
+            team_name       TEXT UNIQUE,
+            created_at      TEXT NOT NULL
+        )
+    ''')
     conn.commit()
 
 
@@ -97,6 +120,46 @@ def get_next_round(conn: sqlite3.Connection) -> int:
     """Return max(round) + 1, or 0 if the database has no data yet (preseason)."""
     row = conn.execute('SELECT MAX(round) FROM weekly_stats').fetchone()
     return 0 if row[0] is None else row[0] + 1
+
+
+def copy_team_selections_to_next_round(conn: sqlite3.Connection, previous_round: int, current_round: int) -> dict:
+    """Copy team selections from previous round to current round for all teams."""
+    try:
+        # Get all teams from the previous round
+        teams = [row[0] for row in conn.execute(
+            'SELECT DISTINCT team_name FROM team_selections WHERE round = ?',
+            (previous_round,)
+        ).fetchall()]
+
+        if not teams:
+            return {'status': 'info', 'message': 'No teams to copy', 'teams_copied': 0, 'picks_copied': 0}
+
+        # Copy picks from previous round to current round for each team
+        copied_count = 0
+        scraped_at = dt.now().isoformat()
+
+        for team_name in teams:
+            conn.execute('''
+                INSERT OR IGNORE INTO team_selections
+                    (round, team_name, player_id, is_captain, is_kicker, is_bench, jersey, scraped_at)
+                SELECT ?, team_name, player_id, is_captain, is_kicker, is_bench, jersey, ?
+                FROM team_selections
+                WHERE team_name = ? AND round = ?
+            ''', (current_round, scraped_at, team_name, previous_round))
+
+            copied_count += conn.total_changes
+
+        conn.commit()
+
+        return {
+            'status': 'success',
+            'message': f'Copied {copied_count} picks from round {previous_round} to round {current_round}',
+            'teams_copied': len(teams),
+            'picks_copied': copied_count
+        }
+
+    except Exception as e:
+        return {'status': 'error', 'message': str(e), 'teams_copied': 0, 'picks_copied': 0}
 
 
 # ---------------------------------------------------------------------------
@@ -185,4 +248,14 @@ for db_path in DB_PATHS:
                 scraped_at,
             )
         conn.commit()
-    print(f'{label.capitalize()} data saved to {db_path} — {len(df)} players stored.')
+        print(f'{label.capitalize()} data saved to {db_path} — {len(df)} players stored.')
+
+        # Copy team selections from previous round to current round (if not preseason)
+        if Round > 0:
+            copy_result = copy_team_selections_to_next_round(conn, Round - 1, Round)
+            if copy_result['status'] == 'success':
+                print(f"  Team selections: {copy_result['message']}")
+            elif copy_result['status'] == 'info':
+                print(f"  Team selections: {copy_result['message']}")
+            else:
+                print(f"  Team selections error: {copy_result['message']}")

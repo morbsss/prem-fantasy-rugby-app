@@ -26,15 +26,22 @@ import os
 import sqlite3
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session, redirect
 
 from .db import get_connection, ensure_schema, DB_TYPE
+from .auth import create_user, authenticate_user, get_available_teams
 from .competition import (
     parse_fixtures, calculate_table, get_team_score,
     WINNER_BP_MARGIN, LOSER_BP_MARGIN,
 )
 
 app = Flask(__name__, template_folder='templates')
+
+# Configure session
+app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV', 'development') == 'production'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Get database type and fixture path
 DB_TYPE_LOCAL = os.getenv('DB_TYPE', 'sqlite').lower()
@@ -205,6 +212,104 @@ def reopen_time() -> str:
 # Routes
 # ---------------------------------------------------------------------------
 
+# AUTH ENDPOINTS
+
+@app.route('/auth')
+def auth_page():
+    if session.get('user_id'):
+        return redirect('/')
+    return render_template('auth.html', current_page='auth')
+
+
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    """Register a new user."""
+    data = request.get_json()
+    username = data.get('username', '').strip()
+    password = data.get('password', '')
+    team_name = data.get('team_name', '').strip()
+
+    if not username or len(username) < 3:
+        return jsonify({'error': 'Username must be at least 3 characters'}), 400
+
+    if not password or len(password) < 6:
+        return jsonify({'error': 'Password must be at least 6 characters'}), 400
+
+    if not team_name:
+        return jsonify({'error': 'Team selection required'}), 400
+
+    conn = get_db()
+    ensure_schema(conn)
+    result = create_user(conn, username, password, team_name)
+    conn.close()
+
+    if 'error' in result:
+        return jsonify(result), 400
+
+    session['user_id'] = result['user_id']
+    session['username'] = result['username']
+    session['team_name'] = result['team_name']
+
+    return jsonify({'status': 'success', 'message': 'Account created', **result}), 201
+
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    """Login user."""
+    data = request.get_json()
+    username = data.get('username', '').strip()
+    password = data.get('password', '')
+
+    if not username or not password:
+        return jsonify({'error': 'Username and password required'}), 400
+
+    conn = get_db()
+    ensure_schema(conn)
+    result = authenticate_user(conn, username, password)
+    conn.close()
+
+    if 'error' in result:
+        return jsonify(result), 401
+
+    session['user_id'] = result['user_id']
+    session['username'] = result['username']
+    session['team_name'] = result['team_name']
+
+    return jsonify({'status': 'success', 'message': 'Logged in', **result}), 200
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+def logout():
+    """Logout user."""
+    session.clear()
+    return jsonify({'status': 'success', 'message': 'Logged out'}), 200
+
+
+@app.route('/api/auth/user')
+def get_user():
+    """Get current logged-in user."""
+    if not session.get('user_id'):
+        return jsonify({'error': 'Not logged in'}), 401
+
+    return jsonify({
+        'user_id': session['user_id'],
+        'username': session['username'],
+        'team_name': session['team_name'],
+    }), 200
+
+
+@app.route('/api/auth/teams')
+def list_teams():
+    """Get available teams for registration."""
+    conn = get_db()
+    ensure_schema(conn)
+    teams = get_available_teams(conn)
+    conn.close()
+    return jsonify(teams), 200
+
+
+# MAIN ROUTES
+
 @app.route('/')
 def index():
     return render_template('index.html', current_page='squad')
@@ -359,6 +464,16 @@ def get_team(team_name):
 
 @app.route('/api/team/<team_name>/picks', methods=['POST'])
 def save_picks(team_name):
+    # Check user is logged in
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    # Check user owns this team
+    user_team = session.get('team_name')
+    if user_team != team_name:
+        return jsonify({'error': 'You can only edit your own team'}), 403
+
     edit_round = request.args.get('round', type=int)
     if not edit_round and is_locked():
         return jsonify({'error': 'Deadline has passed — picks are locked until next round.'}), 403
