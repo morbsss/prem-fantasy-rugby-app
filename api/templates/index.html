@@ -4,75 +4,15 @@
 
 {% block extra_styles %}
     #round-badge {
-      background: var(--accent);
-      color: #fff;
-      border-radius: 99px;
-      padding: 2px 12px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      color: var(--muted);
+      margin-right: 20px;
     }
     #lock-banner {
       font-size: 12px;
       color: var(--muted);
     }
     #lock-banner.locked { color: var(--red); font-weight: 600; }
-
-    #edit-round-controls {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    #edit-round-btn {
-      padding: 4px 12px;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    #edit-round-btn:hover { border-color: var(--gold); color: var(--gold); }
-    #edit-round-form { display: none; align-items: center; gap: 6px; }
-    #edit-round-input {
-      width: 60px;
-      padding: 4px 8px;
-      border-radius: var(--radius);
-      border: 1px solid var(--gold);
-      background: var(--card);
-      color: var(--text);
-      font-size: 13px;
-    }
-    #edit-round-go, #edit-round-cancel {
-      padding: 4px 10px;
-      border-radius: 99px;
-      border: 1px solid;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    #edit-round-go     { border-color: var(--gold);   background: rgba(245,158,11,.15); color: var(--gold);  }
-    #edit-round-cancel { border-color: var(--border); background: transparent;          color: var(--muted); }
-    #edit-mode-banner {
-      display: none;
-      background: rgba(245,158,11,.15);
-      border-bottom: 1px solid rgba(245,158,11,.4);
-      color: var(--gold);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 20px;
-      gap: 12px;
-      align-items: center;
-    }
-    #edit-mode-banner button {
-      padding: 2px 10px;
-      border-radius: 99px;
-      border: 1px solid var(--gold);
-      background: transparent;
-      color: var(--gold);
-      font-size: 11px;
-      cursor: pointer;
-    }
 
     /* ── Layout ── */
     .layout {
@@ -328,24 +268,10 @@
 
 {% block header_controls %}
   <span id="round-badge">Round —</span>
-  <div id="edit-round-controls">
-    <span id="lock-banner">Loading…</span>
-    <button id="edit-round-btn">✏ Edit Round</button>
-    <div id="edit-round-form">
-      <label style="font-size:12px;color:var(--muted)">Round:</label>
-      <input id="edit-round-input" type="number" min="1" value="1">
-      <button id="edit-round-go">Go</button>
-      <button id="edit-round-cancel">✕</button>
-    </div>
-  </div>
+  <span id="lock-banner">Loading…</span>
 {% endblock %}
 
 {% block content %}
-<div id="edit-mode-banner">
-  ✏ Editing Round <span id="edit-round-label"></span> — changes will overwrite picks for this round
-  <button id="exit-edit-btn">Exit Edit Mode</button>
-</div>
-
 <div class="layout">
 
   <!-- ── Left: player pool ── -->
@@ -385,6 +311,16 @@
   <div class="team-panel">
     <div class="team-header">
       <h2>My Squad</h2>
+      <div id="view-round-wrap" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center;">
+        <label for="view-round-select" style="font-size: 12px; color: var(--muted); white-space: nowrap;">View Round:</label>
+        <select id="view-round-select" style="flex: 1; padding: 6px 10px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 13px;">
+          <option value="">Latest</option>
+        </select>
+        <div id="round-total" style="font-size: 12px; color: var(--muted); white-space: nowrap;"></div>
+      </div>
+      <div id="view-only-banner" style="display: none; background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.4); border-radius: var(--radius); padding: 6px 10px; margin-bottom: 8px; font-size: 12px; color: #60a5fa;">
+        Viewing <span id="viewing-team-name"></span> — read-only
+      </div>
       <div id="team-select-wrap">
         <select id="team-select">
           <option value="">— select team —</option>
@@ -417,12 +353,14 @@
   let sortAsc     = false;
   let isLocked    = false;
   let nextRound   = null;
+  let lastRound   = null;
+  let viewRound   = null;  // null = latest, otherwise specific round number
+  let userTeam    = null;  // current user's team name
   let QUOTAS      = {};
   let STARTERS    = {};
   let TOTAL_SQUAD = 23;
   let isDirty          = false;
   let showAvailableOnly = false;
-  let editRound        = null;  // non-null when editing a historical round
 
   // Fixed jersey slot assignments per position (starters first, bench last)
   const SLOT_ORDER = {
@@ -438,54 +376,53 @@
 
   // ── Boot ──
   async function init() {
-    const url = editRound ? `/api/state?round=${editRound}` : '/api/state';
+    const url = '/api/state';
     const res  = await fetch(url);
     const data = await res.json();
 
     nextRound   = data.round;
+    lastRound   = data.last_round;
     isLocked    = data.is_locked;
     allPlayers  = data.players;
     QUOTAS      = data.quotas;
     STARTERS    = data.starters;
     TOTAL_SQUAD = data.total_squad;
 
-    if (editRound) {
-      document.getElementById('round-badge').textContent = `Round ${editRound}`;
-      document.getElementById('last-rnd-label').textContent = editRound;
-      document.getElementById('lock-banner').textContent = '';
-      document.getElementById('edit-round-label').textContent = editRound;
-      document.getElementById('edit-mode-banner').style.display = 'flex';
-      document.getElementById('edit-round-btn').style.display = 'none';
-    } else {
-      document.getElementById('round-badge').textContent = `Round ${nextRound}`;
-      document.getElementById('last-rnd-label').textContent = data.last_round;
-      document.getElementById('edit-mode-banner').style.display = 'none';
-      document.getElementById('edit-round-btn').style.display = '';
+    document.getElementById('round-badge').textContent = `Round ${nextRound}`;
+    document.getElementById('last-rnd-label').textContent = data.last_round;
 
-      const lockEl = document.getElementById('lock-banner');
-      if (isLocked) {
-        const reopen = new Date(data.reopen);
-        lockEl.textContent = `🔒 Locked — reopens ${reopen.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
-        lockEl.classList.add('locked');
-        document.getElementById('save-btn').disabled = true;
-      } else {
-        const cut = new Date(data.cutoff);
-        lockEl.textContent = `Deadline: ${cut.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
-        startCountdown(cut, data.reopen);
+    const lockEl = document.getElementById('lock-banner');
+    if (isLocked) {
+      const reopen = new Date(data.reopen);
+      lockEl.textContent = `🔒 Locked — reopens ${reopen.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+      lockEl.classList.add('locked');
+      document.getElementById('save-btn').disabled = true;
+    } else {
+      const cut = new Date(data.cutoff);
+      lockEl.textContent = `Deadline: ${cut.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+      startCountdown(cut, data.reopen);
+    }
+
+    // Populate view-round dropdown
+    const viewRoundSelect = document.getElementById('view-round-select');
+    [...viewRoundSelect.options].slice(1).forEach(o => o.remove()); // Remove all except "Latest"
+    for (let r = lastRound; r >= 1; r--) {
+      if (r < lastRound) {
+        const opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = `Round ${r}`;
+        viewRoundSelect.appendChild(opt);
       }
     }
 
     const sel = document.getElementById('team-select');
-    // Only rebuild team list on first load or when not in edit mode
-    if (!editRound) {
-      // Clear existing team options (except placeholder and __new__)
-      [...sel.options].filter(o => o.value && o.value !== '__new__').forEach(o => o.remove());
-      data.teams.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t; opt.textContent = t;
-        sel.insertBefore(opt, sel.lastElementChild);
-      });
-    }
+    // Clear existing team options (except placeholder and __new__)
+    [...sel.options].filter(o => o.value && o.value !== '__new__').forEach(o => o.remove());
+    data.teams.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      sel.insertBefore(opt, sel.lastElementChild);
+    });
 
     renderTable();
   }
@@ -656,11 +593,14 @@
     const isCap    = captainId === p.player_id;
     const isKick   = kickerId  === p.player_id;
     const isBench  = p.jersey > 15;
+    const score    = p.last_round_score ?? 0;
+    const scoreColor = score > 0 ? 'var(--green)' : score < 0 ? 'var(--red)' : 'var(--muted)';
 
     div.innerHTML = `
       <span class="jersey-badge ${isBench ? 'bench' : 'starter'}">${p.jersey}</span>
       <span class="pick-pos">${p.position ?? '?'}</span>
       <span class="pick-name">${formatName(p.name)}</span>
+      <span class="pick-score" style="font-size: 12px; color: ${scoreColor}; min-width: 30px; text-align: right;">${score.toFixed(1)}</span>
       <button class="icon-btn swap-btn ${isBench ? 'to-start' : 'to-bench'}"
               title="${isBench ? 'Move to Starting XV' : 'Move to Bench'}"
               data-action="slot" data-id="${p.player_id}">${isBench ? '▲' : '▼'}</button>
@@ -680,13 +620,12 @@
 
     document.getElementById('save-btn').disabled =
       isLocked || !activeTeamName() || !squadIsComplete() || !isDirty;
-    document.getElementById('save-btn').textContent =
-      editRound ? `Update Round ${editRound}` : 'Save Squad';
+    document.getElementById('save-btn').textContent = 'Save Squad';
 
     if (myPicks.length === 0) {
       list.innerHTML = '<div class="empty-picks">Select a team above,<br>then click players to build your squad.<br><br><small>Squad: 3 PR · 2 HK · 3 LK · 4 LF<br>2 SH · 2 FH · 3 MID · 4 OBK</small></div>';
       document.getElementById('save-btn').disabled = true;
-      document.getElementById('save-btn').textContent = editRound ? `Update Round ${editRound}` : 'Save Squad';
+      document.getElementById('save-btn').textContent = 'Save Squad';
       return;
     }
 
@@ -721,6 +660,13 @@
     list.appendChild(bh);
     bench.forEach(p => list.appendChild(makePickRow(p)));
 
+    // Round total
+    const roundTotal = myPicks.reduce((sum, p) => sum + (p.last_round_score || 0), 0);
+    const totalDiv = document.createElement('div');
+    totalDiv.style.cssText = 'padding: 8px 12px; border-top: 2px solid var(--border); margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--text); text-align: right;';
+    totalDiv.textContent = `Total: ${roundTotal.toFixed(1)} pts`;
+    list.appendChild(totalDiv);
+
     list.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', () => {
         const id     = parseInt(btn.dataset.id);
@@ -752,7 +698,7 @@
       kicker_id:  kickerId,
     };
 
-    const roundParam = editRound ? `?round=${editRound}` : '';
+    const roundParam = '';
     const res  = await fetch(`/api/team/${encodeURIComponent(teamName)}/picks${roundParam}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -765,7 +711,7 @@
     isDirty = false;
     flashMsg(`✓ ${data.count} players saved for Round ${data.round}`, false);
 
-    const stateUrl  = editRound ? `/api/state?round=${editRound}` : '/api/state';
+    const stateUrl  = '/api/state';
     const stateRes  = await fetch(stateUrl);
     const stateData = await stateRes.json();
     allPlayers = stateData.players;
@@ -787,13 +733,20 @@
     if (this.value === '__new__') {
       newInput.style.display = 'block';
       myPicks = []; captainId = null; kickerId = null; isDirty = false;
+      document.getElementById('view-round-select').value = ''; // Reset view round
+      viewRound = null;
+      document.getElementById('round-total').textContent = '';
       renderPicks(); renderTable();
       return;
     }
     newInput.style.display = 'none';
-    if (!this.value) { myPicks = []; captainId = null; kickerId = null; isDirty = false; renderPicks(); renderTable(); return; }
+    if (!this.value) { myPicks = []; captainId = null; kickerId = null; isDirty = false; document.getElementById('view-round-select').value = ''; viewRound = null; document.getElementById('round-total').textContent = ''; renderPicks(); renderTable(); return; }
 
-    const roundParam = editRound ? `?round=${editRound}` : '';
+    document.getElementById('view-round-select').value = ''; // Reset view round when switching teams
+    viewRound = null;
+    document.getElementById('round-total').textContent = '';
+
+    const roundParam = '';
     const res  = await fetch(`/api/team/${encodeURIComponent(this.value)}${roundParam}`);
     const data = await res.json();
 
@@ -814,6 +767,45 @@
     kickerId  = (data.picks.find(pk => pk.is_kicker)?.player_id)  ?? null;
     isDirty   = false;
     renderPicks(); renderTable();
+  });
+
+  // ── View Round selector ──
+  document.getElementById('view-round-select').addEventListener('change', async function () {
+    viewRound = this.value ? parseInt(this.value) : null;
+    const teamName = activeTeamName();
+    if (!teamName) { return; }
+
+    const roundParam = viewRound ? `?round=${viewRound}` : '';
+    const res = await fetch(`/api/team/${encodeURIComponent(teamName)}${roundParam}`);
+    const data = await res.json();
+
+    // Load picks for this round (view-only, don't allow editing)
+    const posCounters = {};
+    myPicks = data.picks.map(pk => {
+      const full = allPlayers.find(p => p.player_id === pk.player_id) || pk;
+      if (pk.jersey) return { ...full, jersey: pk.jersey };
+      const pos = full.position || pk.position;
+      const slots = SLOT_ORDER[pos] || [];
+      const idx = posCounters[pos] = (posCounters[pos] ?? 0);
+      posCounters[pos]++;
+      return { ...full, jersey: slots[idx] ?? null };
+    });
+
+    captainId = (data.picks.find(pk => pk.is_captain)?.player_id) ?? null;
+    kickerId = (data.picks.find(pk => pk.is_kicker)?.player_id) ?? null;
+    isDirty = false;
+
+    // Calculate round total
+    if (viewRound) {
+      const roundTotal = myPicks.reduce((sum, p) => sum + (p.last_round_score || 0), 0);
+      document.getElementById('round-total').textContent = `Round total: ${roundTotal.toFixed(1)}`;
+      document.getElementById('save-btn').disabled = true;
+    } else {
+      document.getElementById('round-total').textContent = '';
+      document.getElementById('save-btn').disabled = isLocked || !activeTeamName() || !squadIsComplete() || !isDirty;
+    }
+
+    renderPicks();
   });
 
   // ── Filters / search / sort ──
@@ -862,43 +854,6 @@
     el.className = isErr ? 'err' : 'ok';
     setTimeout(() => { el.textContent = ''; el.className = ''; }, 4000);
   }
-
-  // ── Edit Round controls ──
-  document.getElementById('edit-round-btn').addEventListener('click', () => {
-    const maxRound = nextRound ? nextRound - 1 : 1;
-    document.getElementById('edit-round-input').value = maxRound;
-    document.getElementById('edit-round-input').max   = maxRound;
-    document.getElementById('edit-round-form').style.display = 'flex';
-    document.getElementById('edit-round-btn').style.display  = 'none';
-    document.getElementById('edit-round-input').focus();
-  });
-
-  document.getElementById('edit-round-cancel').addEventListener('click', () => {
-    document.getElementById('edit-round-form').style.display = 'none';
-    document.getElementById('edit-round-btn').style.display  = '';
-  });
-
-  document.getElementById('edit-round-go').addEventListener('click', async () => {
-    const val = parseInt(document.getElementById('edit-round-input').value);
-    if (!val || val < 1) return;
-    document.getElementById('edit-round-form').style.display = 'none';
-    editRound = val;
-    myPicks = []; captainId = null; kickerId = null; isDirty = false;
-    renderPicks();
-    await init();
-  });
-
-  document.getElementById('edit-round-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('edit-round-go').click();
-    if (e.key === 'Escape') document.getElementById('edit-round-cancel').click();
-  });
-
-  document.getElementById('exit-edit-btn').addEventListener('click', async () => {
-    editRound = null;
-    myPicks = []; captainId = null; kickerId = null; isDirty = false;
-    renderPicks();
-    await init();
-  });
 
   // Check authentication before initializing page
   async function checkAuth() {
