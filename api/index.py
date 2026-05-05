@@ -163,7 +163,7 @@ ALLOW_UNRESTRICTED_EDITS = os.getenv('ALLOW_UNRESTRICTED_EDITS', 'false').lower(
 
 # Lock window: Friday 19:30 UTC → Tuesday 23:59 UTC
 LOCK_HOUR, LOCK_MIN     = 19, 30   # Friday lock time (start of lock window)
-REOPEN_HOUR, REOPEN_MIN = 23, 59   # Tuesday reopen time (end of lock window)
+REOPEN_HOUR, REOPEN_MIN = 14, 00   # Tuesday reopen time (end of lock window)
 
 
 def _lock_window():
@@ -172,9 +172,9 @@ def _lock_window():
     days_since_friday = (now.weekday() - 4) % 7
     last_friday = (now - timedelta(days=days_since_friday)).replace(
         hour=LOCK_HOUR, minute=LOCK_MIN, second=0, microsecond=0)
-    next_tuesday = (last_friday + timedelta(days=4)).replace(
+    next_monday = (last_friday + timedelta(days=3)).replace(
         hour=REOPEN_HOUR, minute=REOPEN_MIN, second=0, microsecond=0)
-    return last_friday, next_tuesday
+    return last_friday, next_monday
 
 
 def is_locked() -> bool:
