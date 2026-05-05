@@ -413,14 +413,19 @@
 
     // Populate view-round dropdown
     const viewRoundSelect = document.getElementById('view-round-select');
-    [...viewRoundSelect.options].slice(1).forEach(o => o.remove()); // Remove all except "Latest"
+    [...viewRoundSelect.options].slice(1).forEach(o => o.remove()); // Remove all except first
+
+    // Add Round 15 as default (for saving)
+    const currentOpt = viewRoundSelect.options[0];
+    currentOpt.value = '';
+    currentOpt.textContent = `Round ${nextRound} (saving)`;
+
+    // Add previous rounds for viewing
     for (let r = lastRound; r >= 1; r--) {
-      if (r < lastRound) {
-        const opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = `Round ${r}`;
-        viewRoundSelect.appendChild(opt);
-      }
+      const opt = document.createElement('option');
+      opt.value = r;
+      opt.textContent = `Round ${r}`;
+      viewRoundSelect.appendChild(opt);
     }
 
     const sel = document.getElementById('team-select');

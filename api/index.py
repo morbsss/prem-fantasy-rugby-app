@@ -484,11 +484,7 @@ def save_picks(team_name):
 
     user_team = row['team_name'] if isinstance(row, dict) else row[0]
 
-    # Verify the team_name in URL matches user's team
-    if user_team != team_name:
-        conn.close()
-        return jsonify({'error': 'You can only edit your own team'}), 403
-
+    # Use user_team from database, ignore URL team_name - this prevents any typo/mismatch issues
     edit_round = request.args.get('round', type=int)
     if not edit_round and is_locked():
         conn.close()
