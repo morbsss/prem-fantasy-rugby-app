@@ -267,7 +267,7 @@
 {% endblock %}
 
 {% block header_controls %}
-  <span id="round-badge">Round —</span>
+  <span id="round-badge"></span>
   <span id="lock-banner">Loading…</span>
 {% endblock %}
 
@@ -312,9 +312,9 @@
     <div class="team-header">
       <h2>My Squad</h2>
       <div id="view-round-wrap" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center;">
-        <label for="view-round-select" style="font-size: 12px; color: var(--muted); white-space: nowrap;">View Round:</label>
+        <label for="view-round-select" style="font-size: 12px; color: var(--muted); white-space: nowrap;">Round:</label>
         <select id="view-round-select" style="flex: 1; padding: 6px 10px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 13px;">
-          <option value="">Latest</option>
+          <option value="">Current</option>
         </select>
         <div id="round-total" style="font-size: 12px; color: var(--muted); white-space: nowrap;"></div>
       </div>
@@ -324,9 +324,7 @@
       <div id="team-select-wrap">
         <select id="team-select">
           <option value="">— select team —</option>
-          <option value="__new__">+ Create new team</option>
         </select>
-        <input id="new-team-input" type="text" placeholder="Team name…">
       </div>
       <div id="team-count">0 / 23 players selected</div>
     </div>
@@ -389,6 +387,9 @@
     TOTAL_SQUAD = data.total_squad;
 
     document.getElementById('round-badge').textContent = `Round ${nextRound}`;
+    document.getElementById('round-badge').style.fontWeight = '700';
+    document.getElementById('round-badge').style.fontSize = '14px';
+    document.getElementById('round-badge').style.color = 'var(--accent)';
     document.getElementById('last-rnd-label').textContent = data.last_round;
 
     const lockEl = document.getElementById('lock-banner');
@@ -468,6 +469,7 @@
     const search    = document.getElementById('search').value.toLowerCase();
     const myPickIds = new Set(myPicks.map(p => p.player_id));
     const teamName  = activeTeamName();
+    const canEdit   = teamName === userTeam;
     let rows = allPlayers.filter(p => {
       if (activePos !== 'ALL' && p.position !== activePos) return false;
       if (search && !p.name.toLowerCase().includes(search)) return false;
@@ -515,7 +517,7 @@
         <td>${statusHtml}</td>
       `;
 
-      if (!taken && !inMyTeam && !isLocked) {
+      if (!taken && !inMyTeam && !isLocked && canEdit) {
         tr.addEventListener('click', () => togglePick(p));
       }
       tbody.appendChild(tr);
@@ -524,9 +526,7 @@
 
   // ── Picks ──
   function activeTeamName() {
-    const sel = document.getElementById('team-select');
-    if (sel.value === '__new__') return document.getElementById('new-team-input').value.trim();
-    return sel.value;
+    return document.getElementById('team-select').value;
   }
 
   function togglePick(player) {
@@ -618,9 +618,10 @@
     document.getElementById('team-count').textContent =
       `Starters: ${starterCount}/15 · Bench: ${benchCount}/8 · Total: ${myPicks.length}/${TOTAL_SQUAD}`;
 
+    const canEdit = activeTeamName() === userTeam;
     document.getElementById('save-btn').disabled =
-      isLocked || !activeTeamName() || !squadIsComplete() || !isDirty;
-    document.getElementById('save-btn').textContent = 'Save Squad';
+      isLocked || !activeTeamName() || !squadIsComplete() || !isDirty || !canEdit;
+    document.getElementById('save-btn').textContent = canEdit ? 'Save Squad' : 'Read-only';
 
     if (myPicks.length === 0) {
       list.innerHTML = '<div class="empty-picks">Select a team above,<br>then click players to build your squad.<br><br><small>Squad: 3 PR · 2 HK · 3 LK · 4 LF<br>2 SH · 2 FH · 3 MID · 4 OBK</small></div>';
@@ -684,7 +685,12 @@
   // ── Save ──
   document.getElementById('save-btn').addEventListener('click', async () => {
     const teamName = activeTeamName();
-    if (!teamName) { flashMsg('Choose or enter a team name first.', true); return; }
+    if (!teamName) { flashMsg('Choose a team first.', true); return; }
+    if (teamName !== userTeam) {
+      console.warn(`Save blocked: ${teamName} !== ${userTeam} (your team)`);
+      flashMsg(`You can only edit ${userTeam}. This team is read-only.`, true);
+      return;
+    }
     if (!squadIsComplete()) { flashMsg('Squad incomplete — check position quotas.', true); return; }
 
     const jerseys = {};
@@ -698,6 +704,8 @@
       kicker_id:  kickerId,
     };
 
+    console.log(`Saving team: ${teamName}, user team: ${userTeam}, players: ${body.player_ids.length}`);
+
     const roundParam = '';
     const res  = await fetch(`/api/team/${encodeURIComponent(teamName)}/picks${roundParam}`, {
       method: 'POST',
@@ -706,8 +714,13 @@
     });
     const data = await res.json();
 
-    if (!res.ok) { flashMsg(data.error, true); return; }
+    if (!res.ok) {
+      console.error(`Save failed (${res.status}):`, data);
+      flashMsg(data.error, true);
+      return;
+    }
 
+    console.log('Save successful:', data);
     isDirty = false;
     flashMsg(`✓ ${data.count} players saved for Round ${data.round}`, false);
 
@@ -716,30 +729,11 @@
     const stateData = await stateRes.json();
     allPlayers = stateData.players;
     renderPicks();  // re-render to reflect isDirty = false on save button
-    const sel = document.getElementById('team-select');
-    if (![...sel.options].some(o => o.value === teamName)) {
-      const opt = document.createElement('option');
-      opt.value = teamName; opt.textContent = teamName;
-      sel.insertBefore(opt, sel.lastElementChild);
-      sel.value = teamName;
-      document.getElementById('new-team-input').style.display = 'none';
-    }
     renderTable();
   });
 
   // ── Team select ──
   document.getElementById('team-select').addEventListener('change', async function () {
-    const newInput = document.getElementById('new-team-input');
-    if (this.value === '__new__') {
-      newInput.style.display = 'block';
-      myPicks = []; captainId = null; kickerId = null; isDirty = false;
-      document.getElementById('view-round-select').value = ''; // Reset view round
-      viewRound = null;
-      document.getElementById('round-total').textContent = '';
-      renderPicks(); renderTable();
-      return;
-    }
-    newInput.style.display = 'none';
     if (!this.value) { myPicks = []; captainId = null; kickerId = null; isDirty = false; document.getElementById('view-round-select').value = ''; viewRound = null; document.getElementById('round-total').textContent = ''; renderPicks(); renderTable(); return; }
 
     document.getElementById('view-round-select').value = ''; // Reset view round when switching teams
@@ -863,6 +857,8 @@
         window.location.href = '/auth';
         return false;
       }
+      const user = await res.json();
+      userTeam = user.team_name;  // Store current user's team
       return true;
     } catch (err) {
       console.error('Auth check failed:', err);
