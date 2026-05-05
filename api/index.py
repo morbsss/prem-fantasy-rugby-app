@@ -462,6 +462,7 @@ def get_team(team_name):
     })
 
 
+
 @app.route('/api/team/<team_name>/picks', methods=['POST'])
 def save_picks(team_name):
     # Check user is logged in
@@ -469,13 +470,28 @@ def save_picks(team_name):
     if not user_id:
         return jsonify({'error': 'Not logged in'}), 401
 
-    # Check user owns this team
-    user_team = session.get('team_name')
+    # Look up user's team from database using user_id (not session)
+    conn = get_db()
+    ensure_schema(conn)
+    cursor = _get_cursor(conn)
+    cursor.execute('SELECT team_name FROM users WHERE user_id = ?', (user_id,))
+    row = cursor.fetchone()
+    cursor.close()
+
+    if not row:
+        conn.close()
+        return jsonify({'error': 'User not found'}), 401
+
+    user_team = row['team_name'] if isinstance(row, dict) else row[0]
+
+    # Verify the team_name in URL matches user's team
     if user_team != team_name:
+        conn.close()
         return jsonify({'error': 'You can only edit your own team'}), 403
 
     edit_round = request.args.get('round', type=int)
     if not edit_round and is_locked():
+        conn.close()
         return jsonify({'error': 'Deadline has passed — picks are locked until next round.'}), 403
 
     data = request.get_json()
@@ -486,10 +502,9 @@ def save_picks(team_name):
     kicker_id  = data.get('kicker_id')
 
     if not player_ids:
+        conn.close()
         return jsonify({'error': 'No players selected.'}), 400
 
-    conn = get_db()
-    ensure_schema(conn)
     next_round = edit_round if edit_round else get_next_round(conn)
 
     # Validate position quotas
@@ -523,7 +538,7 @@ def save_picks(team_name):
         WHERE ts.round = ?
           AND ts.player_id IN ({placeholders})
           AND ts.team_name != ?
-    ''', [next_round, *player_ids, team_name])
+    ''', [next_round, *player_ids, user_team])
     conflicts = [dict(r) for r in cursor.fetchall()]
 
     if conflicts:
@@ -537,7 +552,7 @@ def save_picks(team_name):
     # Replace this team's picks for the round
     cursor.execute(
         'DELETE FROM team_selections WHERE team_name = ? AND round = ?',
-        (team_name, next_round),
+        (user_team, next_round),
     )
     for pid in player_ids:
         jnum = jerseys.get(str(pid)) or jerseys.get(pid)
@@ -546,7 +561,7 @@ def save_picks(team_name):
                 (round, team_name, player_id, is_captain, is_kicker, is_bench, jersey, scraped_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            next_round, team_name, pid,
+            next_round, user_team, pid,
             1 if pid == captain_id else 0,
             1 if pid == kicker_id  else 0,
             1 if pid in bench_ids  else 0,
@@ -558,6 +573,7 @@ def save_picks(team_name):
     conn.close()
 
     return jsonify({'status': 'saved', 'round': next_round, 'count': len(player_ids)})
+
 
 
 # ---------------------------------------------------------------------------

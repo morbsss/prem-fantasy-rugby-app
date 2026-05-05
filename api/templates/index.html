@@ -7,6 +7,13 @@
       font-size: 13px;
       color: var(--muted);
       margin-right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #round-badge strong {
+      font-size: 18px;
+      color: var(--accent);
     }
     #lock-banner {
       font-size: 12px;
@@ -298,7 +305,7 @@
             <th data-col="position">Pos</th>
             <th data-col="real_team">Club</th>
             <th data-col="price">Price</th>
-            <th data-col="last_round_score">Rnd <span id="last-rnd-label">—</span></th>
+            <th data-col="last_round_score">Round <span id="last-rnd-label">—</span> Score</th>
             <th data-col="fantasy_team">Status</th>
           </tr>
         </thead>
@@ -311,6 +318,9 @@
   <div class="team-panel">
     <div class="team-header">
       <h2>My Squad</h2>
+      <div id="team-info-banner" style="margin-bottom: 8px; font-size: 12px; color: var(--accent); font-weight: 600; height: 18px;">
+        <!-- Shows "Editing: Pizza Morahana" or similar -->
+      </div>
       <div id="view-round-wrap" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center;">
         <label for="view-round-select" style="font-size: 12px; color: var(--muted); white-space: nowrap;">Round:</label>
         <select id="view-round-select" style="flex: 1; padding: 6px 10px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 13px;">
@@ -386,21 +396,18 @@
     STARTERS    = data.starters;
     TOTAL_SQUAD = data.total_squad;
 
-    document.getElementById('round-badge').textContent = `Round ${nextRound}`;
-    document.getElementById('round-badge').style.fontWeight = '700';
-    document.getElementById('round-badge').style.fontSize = '14px';
-    document.getElementById('round-badge').style.color = 'var(--accent)';
-    document.getElementById('last-rnd-label').textContent = data.last_round;
+    document.getElementById('round-badge').innerHTML = `Picking for Round: <strong>${nextRound}</strong>`;
+    document.getElementById('last-rnd-label').textContent = lastRound;
 
     const lockEl = document.getElementById('lock-banner');
     if (isLocked) {
       const reopen = new Date(data.reopen);
-      lockEl.textContent = `🔒 Locked — reopens ${reopen.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+      lockEl.innerHTML = `🔒 Locked • Results for Round ${lastRound} below • Reopens ${reopen.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}`;
       lockEl.classList.add('locked');
       document.getElementById('save-btn').disabled = true;
     } else {
       const cut = new Date(data.cutoff);
-      lockEl.textContent = `Deadline: ${cut.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+      lockEl.innerHTML = `Deadline for Round ${nextRound}: ${cut.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})} UTC`;
       startCountdown(cut, data.reopen);
     }
 
@@ -434,14 +441,14 @@
       const diff = cutoff - Date.now();
       if (diff <= 0) {
         const reopenDate = new Date(reopen);
-        el.textContent = `🔒 Locked — reopens ${reopenDate.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZoneName:'short'})}`;
+        el.innerHTML = `🔒 Locked • Results for Round ${lastRound} below • Reopens ${reopenDate.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}`;
         el.classList.add('locked');
         return;
       }
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
-      el.textContent = `Deadline in ${h}h ${m}m ${s}s`;
+      el.innerHTML = `Deadline in ${h}h ${m}m ${s}s for Round ${nextRound}`;
     }, 1000);
   }
 
@@ -734,14 +741,32 @@
 
   // ── Team select ──
   document.getElementById('team-select').addEventListener('change', async function () {
-    if (!this.value) { myPicks = []; captainId = null; kickerId = null; isDirty = false; document.getElementById('view-round-select').value = ''; viewRound = null; document.getElementById('round-total').textContent = ''; renderPicks(); renderTable(); return; }
+    if (!this.value) {
+      myPicks = [];
+      captainId = null;
+      kickerId = null;
+      isDirty = false;
+      document.getElementById('view-round-select').value = '';
+      viewRound = null;
+      document.getElementById('round-total').textContent = '';
+      document.getElementById('team-info-banner').textContent = '';
+      renderPicks();
+      renderTable();
+      return;
+    }
 
-    document.getElementById('view-round-select').value = ''; // Reset view round when switching teams
+    document.getElementById('view-round-select').value = '';
     viewRound = null;
     document.getElementById('round-total').textContent = '';
 
+    const teamName = this.value;
+    const isOwnTeam = teamName === userTeam;
+    document.getElementById('team-info-banner').textContent =
+      isOwnTeam ? `Editing: ${teamName}` : `Viewing: ${teamName} (read-only)`;
+    document.getElementById('team-info-banner').style.color = isOwnTeam ? 'var(--accent)' : 'var(--muted)';
+
     const roundParam = '';
-    const res  = await fetch(`/api/team/${encodeURIComponent(this.value)}${roundParam}`);
+    const res  = await fetch(`/api/team/${encodeURIComponent(teamName)}${roundParam}`);
     const data = await res.json();
 
     // Auto-assign jerseys for picks stored without a jersey value (old data)
@@ -749,7 +774,6 @@
     myPicks = data.picks.map(pk => {
       const full = allPlayers.find(p => p.player_id === pk.player_id) || pk;
       if (pk.jersey) return { ...full, jersey: pk.jersey };
-      // Fallback: assign next slot sequentially (starters come first from ORDER BY is_bench)
       const pos    = full.position || pk.position;
       const slots  = SLOT_ORDER[pos] || [];
       const idx    = posCounters[pos] = (posCounters[pos] ?? 0);
@@ -760,7 +784,8 @@
     captainId = (data.picks.find(pk => pk.is_captain)?.player_id) ?? null;
     kickerId  = (data.picks.find(pk => pk.is_kicker)?.player_id)  ?? null;
     isDirty   = false;
-    renderPicks(); renderTable();
+    renderPicks();
+    renderTable();
   });
 
   // ── View Round selector ──
