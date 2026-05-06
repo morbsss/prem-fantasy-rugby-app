@@ -396,7 +396,7 @@ def state():
 
     cursor = _get_cursor(conn)
     cursor.execute('''
-        SELECT team_name FROM users ORDER BY team_name
+        SELECT DISTINCT team_name FROM team_selections ORDER BY team_name
     ''')
     teams = [r['team_name'] if isinstance(r, dict) else r[0] for r in cursor.fetchall()]
     cursor.close()
