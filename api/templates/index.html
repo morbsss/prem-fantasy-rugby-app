@@ -499,7 +499,11 @@
     let rows = allPlayers.filter(p => {
       if (activePos !== 'ALL' && p.position !== activePos) return false;
       if (search && !p.name.toLowerCase().includes(search)) return false;
-      if (showAvailableOnly && (p.fantasy_team || myPickIds.has(p.player_id))) return false;
+      if (showAvailableOnly) {
+        // Edit mode: hide anyone taken by any team or already in myPicks
+        // View mode: hide only players already in the viewed squad
+        if (canEdit ? (p.fantasy_team || myPickIds.has(p.player_id)) : myPickIds.has(p.player_id)) return false;
+      }
       return true;
     });
 
@@ -524,8 +528,9 @@
 
       let statusHtml;
       if (inMyTeam) {
-        const pick = myPicks.find(q => q.player_id === p.player_id);
-        statusHtml = `<span class="status-badge mine">My Team</span>`;
+        statusHtml = canEdit
+          ? `<span class="status-badge mine">My Team</span>`
+          : `<span class="status-badge mine">In Squad</span>`;
       } else if (taken) {
         statusHtml = `<span class="status-badge taken">${p.fantasy_team}</span>`;
       } else if (quotaFull) {
@@ -613,7 +618,7 @@
     renderTable();
   }
 
-  function makePickRow(p) {
+  function makePickRow(p, canEdit) {
     const div      = document.createElement('div');
     div.className  = 'pick-row';
     const isCap    = captainId === p.player_id;
@@ -622,18 +627,29 @@
     const score    = p.last_round_score ?? 0;
     const scoreColor = score > 0 ? 'var(--green)' : score < 0 ? 'var(--red)' : 'var(--muted)';
 
-    div.innerHTML = `
-      <span class="jersey-badge ${isBench ? 'bench' : 'starter'}">${p.jersey}</span>
-      <span class="pick-pos">${p.position ?? '?'}</span>
-      <span class="pick-name">${formatName(p.name)}</span>
-      <span class="pick-score" style="font-size: 12px; color: ${scoreColor}; min-width: 30px; text-align: right;">${score.toFixed(1)}</span>
-      <button class="icon-btn swap-btn ${isBench ? 'to-start' : 'to-bench'}"
-              title="${isBench ? 'Move to Starting XV' : 'Move to Bench'}"
-              data-action="slot" data-id="${p.player_id}">${isBench ? '▲' : '▼'}</button>
-      <button class="icon-btn ${isCap  ? 'active-c' : ''}" title="Captain (doubles points)" data-action="cap"  data-id="${p.player_id}">C</button>
-      <button class="icon-btn ${isKick ? 'active-k' : ''}" title="Kicker (adds kicking pts)" data-action="kick" data-id="${p.player_id}">K</button>
-      <button class="icon-btn remove" title="Remove" data-action="remove" data-id="${p.player_id}">✕</button>
-    `;
+    if (canEdit) {
+      div.innerHTML = `
+        <span class="jersey-badge ${isBench ? 'bench' : 'starter'}">${p.jersey}</span>
+        <span class="pick-pos">${p.position ?? '?'}</span>
+        <span class="pick-name">${formatName(p.name)}</span>
+        <span class="pick-score" style="font-size: 12px; color: ${scoreColor}; min-width: 30px; text-align: right;">${score.toFixed(1)}</span>
+        <button class="icon-btn swap-btn ${isBench ? 'to-start' : 'to-bench'}"
+                title="${isBench ? 'Move to Starting XV' : 'Move to Bench'}"
+                data-action="slot" data-id="${p.player_id}">${isBench ? '▲' : '▼'}</button>
+        <button class="icon-btn ${isCap  ? 'active-c' : ''}" title="Captain (doubles points)" data-action="cap"  data-id="${p.player_id}">C</button>
+        <button class="icon-btn ${isKick ? 'active-k' : ''}" title="Kicker (adds kicking pts)" data-action="kick" data-id="${p.player_id}">K</button>
+        <button class="icon-btn remove" title="Remove" data-action="remove" data-id="${p.player_id}">✕</button>
+      `;
+    } else {
+      div.innerHTML = `
+        <span class="jersey-badge ${isBench ? 'bench' : 'starter'}">${p.jersey}</span>
+        <span class="pick-pos">${p.position ?? '?'}</span>
+        <span class="pick-name">${formatName(p.name)}</span>
+        <span class="pick-score" style="font-size: 12px; color: ${scoreColor}; min-width: 30px; text-align: right;">${score.toFixed(1)}</span>
+        ${isCap  ? '<span class="icon-btn active-c" title="Captain">C</span>' : ''}
+        ${isKick ? '<span class="icon-btn active-k" title="Kicker">K</span>'  : ''}
+      `;
+    }
     return div;
   }
 
@@ -650,7 +666,9 @@
     document.getElementById('save-btn').textContent = canEdit ? 'Save Squad' : 'Read-only';
 
     if (myPicks.length === 0) {
-      list.innerHTML = '<div class="empty-picks">Select a team above,<br>then click players to build your squad.<br><br><small>Squad: 3 PR · 2 HK · 3 LK · 4 LF<br>2 SH · 2 FH · 3 MID · 4 OBK</small></div>';
+      list.innerHTML = canEdit
+        ? '<div class="empty-picks">Select a team above,<br>then click players to build your squad.<br><br><small>Squad: 3 PR · 2 HK · 3 LK · 4 LF<br>2 SH · 2 FH · 3 MID · 4 OBK</small></div>'
+        : '<div class="empty-picks">No picks found for this team.</div>';
       document.getElementById('save-btn').disabled = true;
       document.getElementById('save-btn').textContent = 'Save Squad';
       return;
@@ -678,14 +696,14 @@
     sh.className = 'section-header';
     sh.textContent = `Starting XV  (${starters.length}/15)`;
     list.appendChild(sh);
-    starters.forEach(p => list.appendChild(makePickRow(p)));
+    starters.forEach(p => list.appendChild(makePickRow(p, canEdit)));
 
     // Bench — with a heavier divider
     const bh = document.createElement('div');
     bh.className = 'section-header bench-divider';
     bh.textContent = `Bench  (${bench.length}/8)  ·  16 HK  17 PR  18 LK  19 LF  20 SH  21 FH  22 MID  23 OBK`;
     list.appendChild(bh);
-    bench.forEach(p => list.appendChild(makePickRow(p)));
+    bench.forEach(p => list.appendChild(makePickRow(p, canEdit)));
 
     // Round total
     const roundTotal = myPicks.reduce((sum, p) => sum + (p.last_round_score || 0), 0);
@@ -791,6 +809,10 @@
       data = await res.json();
     } catch (err) {
       flashMsg(`Failed to load ${teamName}: ${err.message}`, true);
+      myPicks = [];
+      captainId = null;
+      kickerId  = null;
+      renderPicks();
       renderTable();
       return;
     }
