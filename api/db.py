@@ -219,4 +219,17 @@ def ensure_schema(conn):
         ''')
 
     conn.commit()
+
+    # Migrate existing team_selections tables that predate the is_bench / jersey columns.
+    if DB_TYPE == 'postgres':
+        cursor.execute('ALTER TABLE team_selections ADD COLUMN IF NOT EXISTS is_bench INTEGER NOT NULL DEFAULT 0')
+        cursor.execute('ALTER TABLE team_selections ADD COLUMN IF NOT EXISTS jersey INTEGER')
+    else:
+        existing_cols = {row[1] for row in cursor.execute('PRAGMA table_info(team_selections)')}
+        if 'is_bench' not in existing_cols:
+            cursor.execute('ALTER TABLE team_selections ADD COLUMN is_bench INTEGER NOT NULL DEFAULT 0')
+        if 'jersey' not in existing_cols:
+            cursor.execute('ALTER TABLE team_selections ADD COLUMN jersey INTEGER')
+
+    conn.commit()
     cursor.close()

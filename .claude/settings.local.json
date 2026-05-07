@@ -4,7 +4,8 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\andre\\\\Documents\\\\Projects\\\\prem-fantasy-rugby-app\" -Recurse -Force)",
       "Bash(Select-Object FullName, PSIsContainer)",
       "Bash(Sort-Object FullName)",
-      "Bash(Format-Table -AutoSize)"
+      "Bash(Format-Table -AutoSize)",
+      "Bash(python -c ' *)"
     ]
   }
 }

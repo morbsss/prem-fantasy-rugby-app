@@ -747,13 +747,20 @@
       isOwnTeam ? `Editing: ${teamName}` : `Viewing: ${teamName} (read-only)`;
     document.getElementById('team-info-banner').style.color = isOwnTeam ? 'var(--accent)' : 'var(--muted)';
 
-    const roundParam = '';
-    const res  = await fetch(`/api/team/${encodeURIComponent(teamName)}${roundParam}`);
-    const data = await res.json();
+    let data;
+    try {
+      const res = await fetch(`/api/team/${encodeURIComponent(teamName)}`);
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      data = await res.json();
+    } catch (err) {
+      flashMsg(`Failed to load ${teamName}: ${err.message}`, true);
+      renderTable();
+      return;
+    }
 
     // Auto-assign jerseys for picks stored without a jersey value (old data)
     const posCounters = {};
-    myPicks = data.picks.map(pk => {
+    myPicks = (data.picks || []).map(pk => {
       const full = allPlayers.find(p => p.player_id === pk.player_id) || pk;
       if (pk.jersey) return { ...full, jersey: pk.jersey };
       const pos    = full.position || pk.position;
@@ -763,8 +770,8 @@
       return { ...full, jersey: slots[idx] ?? null };
     });
 
-    captainId = (data.picks.find(pk => pk.is_captain)?.player_id) ?? null;
-    kickerId  = (data.picks.find(pk => pk.is_kicker)?.player_id)  ?? null;
+    captainId = (data.picks || []).find(pk => pk.is_captain)?.player_id ?? null;
+    kickerId  = (data.picks || []).find(pk => pk.is_kicker)?.player_id  ?? null;
     isDirty   = false;
     renderPicks();
     renderTable();
