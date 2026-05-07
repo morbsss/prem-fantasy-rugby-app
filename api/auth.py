@@ -2,6 +2,11 @@
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from .db import DB_TYPE
+
+
+def _is_postgres(conn) -> bool:
+    return DB_TYPE == 'postgres'
 
 
 def hash_password(password: str) -> str:
@@ -19,7 +24,7 @@ def create_user(conn, username: str, password: str, team_name: str) -> dict:
     cursor = conn.cursor()
 
     # Check if username already exists
-    if conn.cursor_factory.__name__ == 'RealDictCursor':  # PostgreSQL
+    if _is_postgres(conn):  # PostgreSQL
         cursor.execute('SELECT user_id FROM users WHERE username = %s', (username,))
     else:  # SQLite
         cursor.execute('SELECT user_id FROM users WHERE username = ?', (username,))
@@ -29,7 +34,7 @@ def create_user(conn, username: str, password: str, team_name: str) -> dict:
         return {'error': 'Username already taken'}
 
     # Check if team is already claimed
-    if conn.cursor_factory.__name__ == 'RealDictCursor':  # PostgreSQL
+    if _is_postgres(conn):  # PostgreSQL
         cursor.execute('SELECT user_id FROM users WHERE team_name = %s', (team_name,))
     else:  # SQLite
         cursor.execute('SELECT user_id FROM users WHERE team_name = ?', (team_name,))
@@ -43,7 +48,7 @@ def create_user(conn, username: str, password: str, team_name: str) -> dict:
     created_at = datetime.utcnow().isoformat()
 
     try:
-        if conn.cursor_factory.__name__ == 'RealDictCursor':  # PostgreSQL
+        if _is_postgres(conn):  # PostgreSQL
             cursor.execute('''
                 INSERT INTO users (username, password_hash, team_name, created_at)
                 VALUES (%s, %s, %s, %s)
@@ -57,7 +62,7 @@ def create_user(conn, username: str, password: str, team_name: str) -> dict:
         conn.commit()
 
         # Fetch the created user
-        if conn.cursor_factory.__name__ == 'RealDictCursor':  # PostgreSQL
+        if _is_postgres(conn):  # PostgreSQL
             cursor.execute('SELECT user_id, username, team_name FROM users WHERE username = %s', (username,))
         else:  # SQLite
             cursor.execute('SELECT user_id, username, team_name FROM users WHERE username = ?', (username,))
@@ -80,7 +85,7 @@ def authenticate_user(conn, username: str, password: str) -> dict:
     """Authenticate user and return user data or error."""
     cursor = conn.cursor()
 
-    if conn.cursor_factory.__name__ == 'RealDictCursor':  # PostgreSQL
+    if _is_postgres(conn):  # PostgreSQL
         cursor.execute(
             'SELECT user_id, username, password_hash, team_name FROM users WHERE username = %s',
             (username,)
@@ -124,7 +129,7 @@ def get_available_teams(conn) -> list:
     cursor = conn.cursor()
 
     # Get all teams from team_selections that don't have a user
-    if conn.cursor_factory.__name__ == 'RealDictCursor':  # PostgreSQL
+    if _is_postgres(conn):  # PostgreSQL
         cursor.execute('''
             SELECT DISTINCT ts.team_name, u.username
             FROM team_selections ts

@@ -64,8 +64,9 @@
 
 <nav class="page-nav">
   <a href="/" {% if current_page == 'squad' %}class="active"{% endif %}>Squad Builder</a>
-  <a href="/competition" {% if current_page == 'competition' %}class="active"{% endif %}>League Table</a>
-  <a href="/fixtures" {% if current_page == 'fixtures' %}class="active"{% endif %}>Fixtures</a>
+  {# Hidden until next season — uncomment to re-enable #}
+  {# <a href="/competition" {% if current_page == 'competition' %}class="active"{% endif %}>League Table</a> #}
+  {# <a href="/fixtures" {% if current_page == 'fixtures' %}class="active"{% endif %}>Fixtures</a> #}
 </nav>
 
 {% block content %}{% endblock %}
