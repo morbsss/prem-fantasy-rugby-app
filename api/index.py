@@ -409,8 +409,13 @@ def my_picks():
     return jsonify({'team_name': team_name, 'picks': picks, 'round': next_round})
 
 
-@app.route('/api/team/<team_name>')
-def get_team(team_name):
+@app.route('/api/team-view')
+def get_team_view():
+    """View another team's picks. Uses query param to avoid Vercel path-variable routing issues."""
+    team_name = request.args.get('name', '').strip()
+    if not team_name:
+        return jsonify({'error': 'name param required'}), 400
+
     conn = get_db()
     ensure_schema(conn)
 
@@ -438,6 +443,34 @@ def get_team(team_name):
         'round':     next_round,
         'picks':     picks,
     })
+
+
+@app.route('/api/team/<team_name>')
+def get_team(team_name):
+    """Path-variable route kept for backward compat (save picks still uses /api/team/<name>/picks)."""
+    conn = get_db()
+    ensure_schema(conn)
+
+    cursor = _get_cursor(conn)
+    cursor.execute('''
+        SELECT
+            p.player_id, p.name, p.position, p.team AS real_team,
+            ts.is_captain, ts.is_kicker, ts.is_bench, ts.jersey
+        FROM team_selections ts
+        JOIN players p ON p.player_id = ts.player_id
+        WHERE ts.team_name = ?
+          AND ts.round = (
+              SELECT MAX(round) FROM team_selections WHERE team_name = ?
+          )
+        ORDER BY ts.is_bench, ts.jersey
+    ''', (team_name, team_name))
+
+    picks = [dict(r) for r in cursor.fetchall()]
+    cursor.close()
+    next_round = get_next_round(conn)
+    conn.close()
+
+    return jsonify({'team_name': team_name, 'round': next_round, 'picks': picks})
 
 
 

@@ -499,11 +499,7 @@
     let rows = allPlayers.filter(p => {
       if (activePos !== 'ALL' && p.position !== activePos) return false;
       if (search && !p.name.toLowerCase().includes(search)) return false;
-      if (showAvailableOnly) {
-        // Edit mode: hide anyone taken by any team or already in myPicks
-        // View mode: hide only players already in the viewed squad
-        if (canEdit ? (p.fantasy_team || myPickIds.has(p.player_id)) : myPickIds.has(p.player_id)) return false;
-      }
+      if (showAvailableOnly && (p.fantasy_team || myPickIds.has(p.player_id))) return false;
       return true;
     });
 
@@ -518,19 +514,21 @@
     tbody.innerHTML = '';
 
     rows.forEach(p => {
-      const inMyTeam  = myPickIds.has(p.player_id);
-      const taken     = p.fantasy_team && p.fantasy_team !== teamName;
-      const quotaFull = !inMyTeam && !taken && posQuotaFull(p.position);
+      const inMyTeam   = myPickIds.has(p.player_id);
+      // In view mode also mark player as "in squad" if state says they belong to this team
+      const inViewTeam = !canEdit && p.fantasy_team === teamName;
+      const taken      = p.fantasy_team && p.fantasy_team !== teamName;
+      const quotaFull  = !inMyTeam && !inViewTeam && !taken && posQuotaFull(p.position);
       const tr = document.createElement('tr');
-      if (taken)     tr.classList.add('unavailable');
-      if (inMyTeam)  tr.classList.add('in-my-team');
-      if (quotaFull) tr.classList.add('pos-full');
+      if (taken)                   tr.classList.add('unavailable');
+      if (inMyTeam || inViewTeam)  tr.classList.add('in-my-team');
+      if (quotaFull)               tr.classList.add('pos-full');
 
       let statusHtml;
       if (inMyTeam) {
-        statusHtml = canEdit
-          ? `<span class="status-badge mine">My Team</span>`
-          : `<span class="status-badge mine">In Squad</span>`;
+        statusHtml = `<span class="status-badge mine">My Team</span>`;
+      } else if (inViewTeam) {
+        statusHtml = `<span class="status-badge mine">In Squad</span>`;
       } else if (taken) {
         statusHtml = `<span class="status-badge taken">${p.fantasy_team}</span>`;
       } else if (quotaFull) {
@@ -801,10 +799,10 @@
       return;
     }
 
-    // Other team: load by name for viewing
+    // Other team: load by name for viewing (query-param endpoint avoids Vercel path routing issues)
     let data;
     try {
-      const res = await fetch(`/api/team/${encodeURIComponent(teamName)}`);
+      const res = await fetch(`/api/team-view?name=${encodeURIComponent(teamName)}`);
       if (!res.ok) throw new Error(`Server error ${res.status}`);
       data = await res.json();
     } catch (err) {
