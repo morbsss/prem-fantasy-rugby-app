@@ -380,6 +380,35 @@ def state():
     })
 
 
+@app.route('/api/my-picks')
+def my_picks():
+    """Load the logged-in user's squad using their session team — no URL team_name matching."""
+    team_name = session.get('team_name')
+    if not team_name:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    conn = get_db()
+    ensure_schema(conn)
+    cursor = _get_cursor(conn)
+    cursor.execute('''
+        SELECT
+            p.player_id, p.name, p.position, p.team AS real_team,
+            ts.is_captain, ts.is_kicker, ts.is_bench, ts.jersey
+        FROM team_selections ts
+        JOIN players p ON p.player_id = ts.player_id
+        WHERE ts.team_name = ?
+          AND ts.round = (
+              SELECT MAX(round) FROM team_selections WHERE team_name = ?
+          )
+        ORDER BY ts.is_bench, ts.jersey
+    ''', (team_name, team_name))
+    picks = [dict(r) for r in cursor.fetchall()]
+    cursor.close()
+    next_round = get_next_round(conn)
+    conn.close()
+    return jsonify({'team_name': team_name, 'picks': picks, 'round': next_round})
+
+
 @app.route('/api/team/<team_name>')
 def get_team(team_name):
     conn = get_db()
@@ -427,11 +456,11 @@ def save_picks(team_name):
     row = cursor.fetchone()
     cursor.close()
 
-    if not row:
+    # Fall back to session team_name when users table has no matching row
+    user_team = (row['team_name'] if isinstance(row, dict) else row[0]) if row else session.get('team_name')
+    if not user_team:
         conn.close()
-        return jsonify({'error': 'User not found'}), 401
-
-    user_team = row['team_name'] if isinstance(row, dict) else row[0]
+        return jsonify({'error': 'No team associated with your account'}), 401
 
     # Use user_team from database, ignore URL team_name - this prevents any typo/mismatch issues
     if is_locked():

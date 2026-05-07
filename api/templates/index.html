@@ -409,19 +409,49 @@
       sel.appendChild(opt);
     });
 
-    // Auto-select the logged-in user's own team
+    // Auto-select and load the logged-in user's own team
     if (userTeam) {
       if (!data.teams.includes(userTeam)) {
-        // New user with no picks yet — add their team to the dropdown
         const opt = document.createElement('option');
         opt.value = userTeam; opt.textContent = userTeam;
         sel.appendChild(opt);
       }
       sel.value = userTeam;
-      sel.dispatchEvent(new Event('change'));
+      document.getElementById('team-info-banner').textContent = `Editing: ${userTeam}`;
+      document.getElementById('team-info-banner').style.color = 'var(--accent)';
+      await loadMyPicks();
     } else {
       renderTable();
     }
+  }
+
+  // ── Load the current user's picks via session (no URL team_name matching) ──
+  async function loadMyPicks() {
+    let data;
+    try {
+      const res = await fetch('/api/my-picks');
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      data = await res.json();
+    } catch (err) {
+      flashMsg(`Could not load your squad: ${err.message}`, true);
+      renderTable();
+      return;
+    }
+    const posCounters = {};
+    myPicks = (data.picks || []).map(pk => {
+      const full = allPlayers.find(p => p.player_id === pk.player_id) || pk;
+      if (pk.jersey) return { ...full, jersey: pk.jersey };
+      const pos   = full.position || pk.position;
+      const slots = SLOT_ORDER[pos] || [];
+      const idx   = posCounters[pos] = (posCounters[pos] ?? 0);
+      posCounters[pos]++;
+      return { ...full, jersey: slots[idx] ?? null };
+    });
+    captainId = (data.picks || []).find(pk => pk.is_captain)?.player_id ?? null;
+    kickerId  = (data.picks || []).find(pk => pk.is_kicker)?.player_id  ?? null;
+    isDirty   = false;
+    renderPicks();
+    renderTable();
   }
 
   function startCountdown(cutoff, reopen) {
@@ -747,6 +777,13 @@
       isOwnTeam ? `Editing: ${teamName}` : `Viewing: ${teamName} (read-only)`;
     document.getElementById('team-info-banner').style.color = isOwnTeam ? 'var(--accent)' : 'var(--muted)';
 
+    // Own team: load via session endpoint (no URL team_name matching)
+    if (isOwnTeam) {
+      await loadMyPicks();
+      return;
+    }
+
+    // Other team: load by name for viewing
     let data;
     try {
       const res = await fetch(`/api/team/${encodeURIComponent(teamName)}`);
@@ -758,7 +795,6 @@
       return;
     }
 
-    // Auto-assign jerseys for picks stored without a jersey value (old data)
     const posCounters = {};
     myPicks = (data.picks || []).map(pk => {
       const full = allPlayers.find(p => p.player_id === pk.player_id) || pk;
