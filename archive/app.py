@@ -1,6 +1,6 @@
 """
-Fantasy Draft Web App — run with: python -m flask --app api.index run
-Or on Vercel: automatically deployed as serverless function at /
+Fantasy Draft Web App — run with: python app.py
+Open http://localhost:5000 in your browser.
 
 DEPLOYMENT CONFIGURATION
 ========================
@@ -10,53 +10,27 @@ Control pick locking behavior via environment variables:
   - 'true': All picks can be edited anytime (development mode)
   - 'false' or unset: Picks locked Friday 19:30-Tuesday 23:59 UTC (production mode)
 
-  DB_TYPE
-  - 'sqlite': Uses local SQLite database (development, default)
-  - 'postgres': Uses Vercel Postgres (production)
+  Example:
+    ALLOW_UNRESTRICTED_EDITS=false python app.py    # Production (default)
+    ALLOW_UNRESTRICTED_EDITS=true python app.py     # Development (no locking)
 
-  Example (local development):
-    DB_TYPE=sqlite ALLOW_UNRESTRICTED_EDITS=true python -m flask --app api.index run
-
-  Example (Vercel production):
-    DB_TYPE=postgres (auto-configured)
-    DATABASE_URL=postgres://... (auto-injected by Vercel)
+The edit mode feature allows users to edit previous round squad selections. This is
+controlled independently by the query parameter ?round=N in the UI.
 """
 
 import os
 import sqlite3
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from flask import Flask, jsonify, render_template, request, session, redirect
-
-from .db import get_connection, ensure_schema, DB_TYPE
-from .auth import create_user, authenticate_user, get_available_teams
-from .competition import (
+from flask import Flask, jsonify, render_template, request
+from competition import (
     parse_fixtures, calculate_table, get_team_score,
     WINNER_BP_MARGIN, LOSER_BP_MARGIN,
 )
 
-app = Flask(__name__, template_folder='templates')
-
-# Configure session
-app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV', 'development') == 'production'
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-
-# Get database type and fixture path
-DB_TYPE_LOCAL = os.getenv('DB_TYPE', 'sqlite').lower()
-
-# For Vercel: fixtures.csv is in api/data/
-# For local: bespoke-scripts/fixtures.csv
-api_data = os.path.join(os.path.dirname(__file__), 'data', 'fixtures.csv')
-bespoke_data = os.path.join(os.path.dirname(__file__), '..', 'bespoke-scripts', 'fixtures.csv')
-
-if os.path.exists(api_data):
-    FIXTURES_CSV = api_data
-elif os.path.exists(bespoke_data):
-    FIXTURES_CSV = bespoke_data
-else:
-    FIXTURES_CSV = api_data  # Default to api/data/
+app = Flask(__name__)
+DB_PATH      = 'prem_rugby_25_26_test.db'
+FIXTURES_CSV = os.path.join(os.path.dirname(__file__), 'bespoke-scripts', 'fixtures.csv')
 
 # Squad composition rules
 SQUAD_QUOTAS  = {'PR': 3, 'HK': 2, 'LK': 3, 'LF': 4, 'SH': 2, 'FH': 2, 'MID': 3, 'OBK': 4}
@@ -64,96 +38,34 @@ SQUAD_STARTERS = {'PR': 2, 'HK': 1, 'LK': 2, 'LF': 3, 'SH': 1, 'FH': 1, 'MID': 2
 TOTAL_SQUAD   = sum(SQUAD_QUOTAS.values())   # 23
 
 
-def _convert_placeholders(query: str) -> str:
-    """Convert ? to %s for PostgreSQL if needed."""
-    if DB_TYPE == 'postgres':
-        parts = []
-        in_string = False
-        quote_char = None
-        i = 0
-        while i < len(query):
-            char = query[i]
-            if char in ('"', "'") and (i == 0 or query[i-1] != '\\'):
-                if not in_string:
-                    in_string = True
-                    quote_char = char
-                elif char == quote_char:
-                    in_string = False
-            if not in_string and char == '?':
-                parts.append('%s')
-            else:
-                parts.append(char)
-            i += 1
-        return ''.join(parts)
-    return query
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 def get_db():
-    """Get a database connection using the abstraction layer."""
-    conn = get_connection()
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     return conn
 
 
-class _CursorWrapper:
-    """Wrapper that auto-converts ? to %s for PostgreSQL."""
-    def __init__(self, cursor):
-        self._cursor = cursor
-
-    def execute(self, query, params=None):
-        converted = _convert_placeholders(query)
-        if params:
-            self._cursor.execute(converted, params)
-        else:
-            self._cursor.execute(converted)
-        return self
-
-    def fetchone(self):
-        return self._cursor.fetchone()
-
-    def fetchall(self):
-        return self._cursor.fetchall()
-
-    def close(self):
-        return self._cursor.close()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        self.close()
-
-
-def _get_cursor(conn):
-    """Get a wrapped cursor that handles placeholder conversion."""
-    return _CursorWrapper(conn.cursor())
+def ensure_schema(conn):
+    """Add any missing columns to team_selections for schema migrations."""
+    cols = {row[1] for row in conn.execute('PRAGMA table_info(team_selections)')}
+    if 'is_bench' not in cols:
+        conn.execute('ALTER TABLE team_selections ADD COLUMN is_bench INTEGER NOT NULL DEFAULT 0')
+    if 'jersey' not in cols:
+        conn.execute('ALTER TABLE team_selections ADD COLUMN jersey INTEGER')
+    conn.commit()
 
 
 def get_next_round(conn) -> int:
-    cursor = _get_cursor(conn)
-    cursor.execute('SELECT MAX(round) FROM weekly_stats')
-    row = cursor.fetchone()
-    cursor.close()
-    if DB_TYPE == 'postgres':
-        result = row['max'] if row and row.get('max') else None
-    else:
-        result = row[0] if row else None
-    return 1 if result is None else result + 1
+    row = conn.execute('SELECT MAX(round) FROM weekly_stats').fetchone()
+    return 1 if row[0] is None else row[0] + 1
 
 
 def get_last_round(conn) -> int:
-    cursor = _get_cursor(conn)
-    cursor.execute('SELECT MAX(round) FROM weekly_stats')
-    row = cursor.fetchone()
-    cursor.close()
-    if DB_TYPE == 'postgres':
-        result = row['max'] if row and row.get('max') else None
-    else:
-        result = row[0] if row else None
-    return result or 1
+    row = conn.execute('SELECT MAX(round) FROM weekly_stats').fetchone()
+    return row[0] or 1
 
 
 # DEPLOYMENT MODE TOGGLE
@@ -163,7 +75,7 @@ ALLOW_UNRESTRICTED_EDITS = os.getenv('ALLOW_UNRESTRICTED_EDITS', 'false').lower(
 
 # Lock window: Friday 19:30 UTC → Tuesday 23:59 UTC
 LOCK_HOUR, LOCK_MIN     = 19, 30   # Friday lock time (start of lock window)
-REOPEN_HOUR, REOPEN_MIN = 14, 00   # Tuesday reopen time (end of lock window)
+REOPEN_HOUR, REOPEN_MIN = 23, 59   # Tuesday reopen time (end of lock window)
 
 
 def _lock_window():
@@ -172,9 +84,9 @@ def _lock_window():
     days_since_friday = (now.weekday() - 4) % 7
     last_friday = (now - timedelta(days=days_since_friday)).replace(
         hour=LOCK_HOUR, minute=LOCK_MIN, second=0, microsecond=0)
-    next_monday = (last_friday + timedelta(days=3)).replace(
+    next_tuesday = (last_friday + timedelta(days=4)).replace(
         hour=REOPEN_HOUR, minute=REOPEN_MIN, second=0, microsecond=0)
-    return last_friday, next_monday
+    return last_friday, next_tuesday
 
 
 def is_locked() -> bool:
@@ -212,104 +124,6 @@ def reopen_time() -> str:
 # Routes
 # ---------------------------------------------------------------------------
 
-# AUTH ENDPOINTS
-
-@app.route('/auth')
-def auth_page():
-    if session.get('user_id'):
-        return redirect('/')
-    return render_template('auth.html', current_page='auth')
-
-
-@app.route('/api/auth/register', methods=['POST'])
-def register():
-    """Register a new user."""
-    data = request.get_json()
-    username = data.get('username', '').strip()
-    password = data.get('password', '')
-    team_name = data.get('team_name', '').strip()
-
-    if not username or len(username) < 3:
-        return jsonify({'error': 'Username must be at least 3 characters'}), 400
-
-    if not password or len(password) < 6:
-        return jsonify({'error': 'Password must be at least 6 characters'}), 400
-
-    if not team_name:
-        return jsonify({'error': 'Team selection required'}), 400
-
-    conn = get_db()
-    ensure_schema(conn)
-    result = create_user(conn, username, password, team_name)
-    conn.close()
-
-    if 'error' in result:
-        return jsonify(result), 400
-
-    session['user_id'] = result['user_id']
-    session['username'] = result['username']
-    session['team_name'] = result['team_name']
-
-    return jsonify({'status': 'success', 'message': 'Account created', **result}), 201
-
-
-@app.route('/api/auth/login', methods=['POST'])
-def login():
-    """Login user."""
-    data = request.get_json()
-    username = data.get('username', '').strip()
-    password = data.get('password', '')
-
-    if not username or not password:
-        return jsonify({'error': 'Username and password required'}), 400
-
-    conn = get_db()
-    ensure_schema(conn)
-    result = authenticate_user(conn, username, password)
-    conn.close()
-
-    if 'error' in result:
-        return jsonify(result), 401
-
-    session['user_id'] = result['user_id']
-    session['username'] = result['username']
-    session['team_name'] = result['team_name']
-
-    return jsonify({'status': 'success', 'message': 'Logged in', **result}), 200
-
-
-@app.route('/api/auth/logout', methods=['POST'])
-def logout():
-    """Logout user."""
-    session.clear()
-    return jsonify({'status': 'success', 'message': 'Logged out'}), 200
-
-
-@app.route('/api/auth/user')
-def get_user():
-    """Get current logged-in user."""
-    if not session.get('user_id'):
-        return jsonify({'error': 'Not logged in'}), 401
-
-    return jsonify({
-        'user_id': session['user_id'],
-        'username': session['username'],
-        'team_name': session['team_name'],
-    }), 200
-
-
-@app.route('/api/auth/teams')
-def list_teams():
-    """Get available teams for registration."""
-    conn = get_db()
-    ensure_schema(conn)
-    teams = get_available_teams(conn)
-    conn.close()
-    return jsonify(teams), 200
-
-
-# MAIN ROUTES
-
 @app.route('/')
 def index():
     return render_template('index.html', current_page='squad')
@@ -320,63 +134,85 @@ def state():
     conn = get_db()
     ensure_schema(conn)
 
-    last_round = get_last_round(conn)
-    next_round = last_round + 1
+    edit_round = request.args.get('round', type=int)
+    if edit_round:
+        last_round = edit_round
+        next_round = edit_round          # save target = the round being edited
+    else:
+        last_round = get_last_round(conn)
+        next_round = last_round + 1
 
-    cursor = _get_cursor(conn)
-    cursor.execute('''
-        WITH team_latest AS (
-            SELECT team_name, MAX(round) AS latest_round
-            FROM team_selections
-            GROUP BY team_name
-        ),
-        current_picks AS (
-            SELECT ts.player_id, MIN(ts.team_name) AS team_name
-            FROM team_selections ts
-            JOIN team_latest tl
-                ON ts.team_name = tl.team_name AND ts.round = tl.latest_round
-            GROUP BY ts.player_id
-        )
-        SELECT
-            p.player_id,
-            p.name,
-            p.position,
-            p.team AS real_team,
-            ws.price,
-            ws.total_points - COALESCE(ws_prev.total_points, 0) AS last_round_score,
-            cp.team_name AS fantasy_team
-        FROM players p
-        JOIN weekly_stats ws
-            ON ws.player_id = p.player_id AND ws.round = ?
-        LEFT JOIN weekly_stats ws_prev
-            ON ws_prev.player_id = p.player_id AND ws_prev.round = ?
-        LEFT JOIN current_picks cp ON cp.player_id = p.player_id
-        ORDER BY p.position, ws.total_points DESC
-    ''', (last_round, last_round - 1))
-    players = [dict(r) for r in cursor.fetchall()]
-    for p in players:
-        if p.get('last_round_score') is not None:
-            p['last_round_score'] = round(p['last_round_score'], 1)
-    cursor.close()
+    # In edit mode, show who's picked for that specific round (not latest round)
+    if edit_round:
+        players = conn.execute('''
+            SELECT
+                p.player_id,
+                p.name,
+                p.position,
+                p.team AS real_team,
+                ws.price,
+                ROUND(ws.total_points - COALESCE(ws_prev.total_points, 0), 1) AS last_round_score,
+                ts_edit.team_name AS fantasy_team
+            FROM players p
+            JOIN weekly_stats ws
+                ON ws.player_id = p.player_id AND ws.round = ?
+            LEFT JOIN weekly_stats ws_prev
+                ON ws_prev.player_id = p.player_id AND ws_prev.round = ?
+            LEFT JOIN (
+                SELECT player_id, MIN(team_name) AS team_name
+                FROM team_selections WHERE round = ?
+                GROUP BY player_id
+            ) ts_edit ON ts_edit.player_id = p.player_id
+            ORDER BY p.position, ws.total_points DESC
+        ''', (last_round, last_round - 1, edit_round)).fetchall()
+    else:
+        players = conn.execute('''
+            WITH team_latest AS (
+                SELECT team_name, MAX(round) AS latest_round
+                FROM team_selections
+                GROUP BY team_name
+            ),
+            current_picks AS (
+                SELECT ts.player_id, MIN(ts.team_name) AS team_name
+                FROM team_selections ts
+                JOIN team_latest tl
+                    ON ts.team_name = tl.team_name AND ts.round = tl.latest_round
+                GROUP BY ts.player_id
+            )
+            SELECT
+                p.player_id,
+                p.name,
+                p.position,
+                p.team AS real_team,
+                ws.price,
+                ROUND(ws.total_points - COALESCE(ws_prev.total_points, 0), 1) AS last_round_score,
+                cp.team_name AS fantasy_team
+            FROM players p
+            JOIN weekly_stats ws
+                ON ws.player_id = p.player_id AND ws.round = ?
+            LEFT JOIN weekly_stats ws_prev
+                ON ws_prev.player_id = p.player_id AND ws_prev.round = ?
+            LEFT JOIN current_picks cp ON cp.player_id = p.player_id
+            ORDER BY p.position, ws.total_points DESC
+        ''', (last_round, last_round - 1)).fetchall()
 
-    cursor = _get_cursor(conn)
-    cursor.execute('''
+    teams = conn.execute('''
         SELECT DISTINCT team_name FROM team_selections ORDER BY team_name
-    ''')
-    teams = [r['team_name'] if isinstance(r, dict) else r[0] for r in cursor.fetchall()]
-    cursor.close()
+    ''').fetchall()
 
     conn.close()
     return jsonify({
         'round':       next_round,
         'last_round':  last_round,
+        'is_locked':   is_locked() and not edit_round,
         'cutoff':      next_lock_time(),
         'reopen':      reopen_time(),
-        'players':     players,
-        'teams':       teams,
+        'players':     [dict(r) for r in players],
+        'teams':       [r['team_name'] for r in teams],
         'quotas':      SQUAD_QUOTAS,
         'starters':    SQUAD_STARTERS,
         'total_squad': TOTAL_SQUAD,
+        'edit_round':  edit_round,
     })
 
 
@@ -385,57 +221,46 @@ def get_team(team_name):
     conn = get_db()
     ensure_schema(conn)
 
-    cursor = _get_cursor(conn)
-    cursor.execute('''
-        SELECT
-            p.player_id, p.name, p.position, p.team AS real_team,
-            ts.is_captain, ts.is_kicker, ts.is_bench, ts.jersey
-        FROM team_selections ts
-        JOIN players p ON p.player_id = ts.player_id
-        WHERE ts.team_name = ?
-          AND ts.round = (
-              SELECT MAX(round) FROM team_selections WHERE team_name = ?
-          )
-        ORDER BY ts.is_bench, ts.jersey
-    ''', (team_name, team_name))
+    edit_round = request.args.get('round', type=int)
 
-    picks = [dict(r) for r in cursor.fetchall()]
-    cursor.close()
-    next_round = get_next_round(conn)
+    if edit_round:
+        picks = conn.execute('''
+            SELECT
+                p.player_id, p.name, p.position, p.team AS real_team,
+                ts.is_captain, ts.is_kicker, ts.is_bench, ts.jersey
+            FROM team_selections ts
+            JOIN players p ON p.player_id = ts.player_id
+            WHERE ts.team_name = ? AND ts.round = ?
+            ORDER BY ts.is_bench, ts.jersey
+        ''', (team_name, edit_round)).fetchall()
+        round_label = edit_round
+    else:
+        picks = conn.execute('''
+            SELECT
+                p.player_id, p.name, p.position, p.team AS real_team,
+                ts.is_captain, ts.is_kicker, ts.is_bench, ts.jersey
+            FROM team_selections ts
+            JOIN players p ON p.player_id = ts.player_id
+            WHERE ts.team_name = ?
+              AND ts.round = (
+                  SELECT MAX(round) FROM team_selections WHERE team_name = ?
+              )
+            ORDER BY ts.is_bench, ts.jersey
+        ''', (team_name, team_name)).fetchall()
+        round_label = get_next_round(conn)
+
     conn.close()
-
     return jsonify({
         'team_name': team_name,
-        'round':     next_round,
-        'picks':     picks,
+        'round':     round_label,
+        'picks':     [dict(r) for r in picks],
     })
-
 
 
 @app.route('/api/team/<team_name>/picks', methods=['POST'])
 def save_picks(team_name):
-    # Check user is logged in
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'error': 'Not logged in'}), 401
-
-    # Look up user's team from database using user_id (not session)
-    conn = get_db()
-    ensure_schema(conn)
-    cursor = _get_cursor(conn)
-    cursor.execute('SELECT team_name FROM users WHERE user_id = ?', (user_id,))
-    row = cursor.fetchone()
-    cursor.close()
-
-    if not row:
-        conn.close()
-        return jsonify({'error': 'User not found'}), 401
-
-    user_team = row['team_name'] if isinstance(row, dict) else row[0]
-
-    # Use user_team from database, ignore URL team_name - this prevents any typo/mismatch issues
-    if is_locked():
-        conn.close()
+    edit_round = request.args.get('round', type=int)
+    if not edit_round and is_locked():
         return jsonify({'error': 'Deadline has passed — picks are locked until next round.'}), 403
 
     data = request.get_json()
@@ -446,19 +271,18 @@ def save_picks(team_name):
     kicker_id  = data.get('kicker_id')
 
     if not player_ids:
-        conn.close()
         return jsonify({'error': 'No players selected.'}), 400
 
-    next_round = get_next_round(conn)
+    conn = get_db()
+    ensure_schema(conn)
+    next_round = edit_round if edit_round else get_next_round(conn)
 
     # Validate position quotas
-    cursor = _get_cursor(conn)
-    placeholders = ','.join(['?'] * len(player_ids))
-    cursor.execute(
+    placeholders = ','.join('?' * len(player_ids))
+    pos_rows = conn.execute(
         f'SELECT player_id, position FROM players WHERE player_id IN ({placeholders})',
         player_ids,
-    )
-    pos_rows = [dict(r) for r in cursor.fetchall()]
+    ).fetchall()
     pos_map = {r['player_id']: r['position'] for r in pos_rows}
     pos_counts = {}
     for pos in pos_map.values():
@@ -470,42 +294,39 @@ def save_picks(team_name):
         if actual != required:
             errors.append(f'{pos}: need {required}, got {actual}')
     if errors:
-        cursor.close()
         conn.close()
         return jsonify({'error': f'Invalid squad: {"; ".join(errors)}'}), 400
 
     # Check none of the selected players are claimed by a different team
-    cursor.execute(f'''
+    conflicts = conn.execute(f'''
         SELECT p.name, ts.team_name
         FROM team_selections ts
         JOIN players p ON p.player_id = ts.player_id
         WHERE ts.round = ?
           AND ts.player_id IN ({placeholders})
           AND ts.team_name != ?
-    ''', [next_round, *player_ids, user_team])
-    conflicts = [dict(r) for r in cursor.fetchall()]
+    ''', [next_round, *player_ids, team_name]).fetchall()
 
     if conflicts:
         msgs = [f"{r['name']} (already in {r['team_name']})" for r in conflicts]
-        cursor.close()
         conn.close()
         return jsonify({'error': f"Player conflict: {', '.join(msgs)}"}), 409
 
     now = datetime.now(timezone.utc).isoformat()
 
     # Replace this team's picks for the round
-    cursor.execute(
+    conn.execute(
         'DELETE FROM team_selections WHERE team_name = ? AND round = ?',
-        (user_team, next_round),
+        (team_name, next_round),
     )
     for pid in player_ids:
         jnum = jerseys.get(str(pid)) or jerseys.get(pid)
-        cursor.execute('''
+        conn.execute('''
             INSERT INTO team_selections
                 (round, team_name, player_id, is_captain, is_kicker, is_bench, jersey, scraped_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            next_round, user_team, pid,
+            next_round, team_name, pid,
             1 if pid == captain_id else 0,
             1 if pid == kicker_id  else 0,
             1 if pid in bench_ids  else 0,
@@ -513,11 +334,9 @@ def save_picks(team_name):
             now,
         ))
     conn.commit()
-    cursor.close()
     conn.close()
 
     return jsonify({'status': 'saved', 'round': next_round, 'count': len(player_ids)})
-
 
 
 # ---------------------------------------------------------------------------

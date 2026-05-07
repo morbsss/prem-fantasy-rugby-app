@@ -321,16 +321,6 @@
       <div id="team-info-banner" style="margin-bottom: 8px; font-size: 12px; color: var(--accent); font-weight: 600; height: 18px;">
         <!-- Shows "Editing: Pizza Morahana" or similar -->
       </div>
-      <div id="view-round-wrap" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center;">
-        <label for="view-round-select" style="font-size: 12px; color: var(--muted); white-space: nowrap;">Round:</label>
-        <select id="view-round-select" style="flex: 1; padding: 6px 10px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 13px;">
-          <option value="">Current</option>
-        </select>
-        <div id="round-total" style="font-size: 12px; color: var(--muted); white-space: nowrap;"></div>
-      </div>
-      <div id="view-only-banner" style="display: none; background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.4); border-radius: var(--radius); padding: 6px 10px; margin-bottom: 8px; font-size: 12px; color: #60a5fa;">
-        Viewing <span id="viewing-team-name"></span> — read-only
-      </div>
       <div id="team-select-wrap">
         <select id="team-select">
           <option value="">— select team —</option>
@@ -362,7 +352,6 @@
   let isLocked    = false;
   let nextRound   = null;
   let lastRound   = null;
-  let viewRound   = null;  // null = latest, otherwise specific round number
   let userTeam    = null;  // current user's team name
   let QUOTAS      = {};
   let STARTERS    = {};
@@ -411,33 +400,28 @@
       startCountdown(cut, data.reopen);
     }
 
-    // Populate view-round dropdown
-    const viewRoundSelect = document.getElementById('view-round-select');
-    [...viewRoundSelect.options].slice(1).forEach(o => o.remove()); // Remove all except first
-
-    // Add Round 15 as default (for saving)
-    const currentOpt = viewRoundSelect.options[0];
-    currentOpt.value = '';
-    currentOpt.textContent = `Round ${nextRound} (saving)`;
-
-    // Add previous rounds for viewing
-    for (let r = lastRound; r >= 1; r--) {
-      const opt = document.createElement('option');
-      opt.value = r;
-      opt.textContent = `Round ${r}`;
-      viewRoundSelect.appendChild(opt);
-    }
-
     const sel = document.getElementById('team-select');
-    // Clear existing team options (except placeholder and __new__)
-    [...sel.options].filter(o => o.value && o.value !== '__new__').forEach(o => o.remove());
+    // Clear all options except the placeholder
+    [...sel.options].filter(o => o.value).forEach(o => o.remove());
     data.teams.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t; opt.textContent = t;
-      sel.insertBefore(opt, sel.lastElementChild);
+      sel.appendChild(opt);
     });
 
-    renderTable();
+    // Auto-select the logged-in user's own team
+    if (userTeam) {
+      if (!data.teams.includes(userTeam)) {
+        // New user with no picks yet — add their team to the dropdown
+        const opt = document.createElement('option');
+        opt.value = userTeam; opt.textContent = userTeam;
+        sel.appendChild(opt);
+      }
+      sel.value = userTeam;
+      sel.dispatchEvent(new Event('change'));
+    } else {
+      renderTable();
+    }
   }
 
   function startCountdown(cutoff, reopen) {
@@ -751,18 +735,11 @@
       captainId = null;
       kickerId = null;
       isDirty = false;
-      document.getElementById('view-round-select').value = '';
-      viewRound = null;
-      document.getElementById('round-total').textContent = '';
       document.getElementById('team-info-banner').textContent = '';
       renderPicks();
       renderTable();
       return;
     }
-
-    document.getElementById('view-round-select').value = '';
-    viewRound = null;
-    document.getElementById('round-total').textContent = '';
 
     const teamName = this.value;
     const isOwnTeam = teamName === userTeam;
@@ -791,45 +768,6 @@
     isDirty   = false;
     renderPicks();
     renderTable();
-  });
-
-  // ── View Round selector ──
-  document.getElementById('view-round-select').addEventListener('change', async function () {
-    viewRound = this.value ? parseInt(this.value) : null;
-    const teamName = activeTeamName();
-    if (!teamName) { return; }
-
-    const roundParam = viewRound ? `?round=${viewRound}` : '';
-    const res = await fetch(`/api/team/${encodeURIComponent(teamName)}${roundParam}`);
-    const data = await res.json();
-
-    // Load picks for this round (view-only, don't allow editing)
-    const posCounters = {};
-    myPicks = data.picks.map(pk => {
-      const full = allPlayers.find(p => p.player_id === pk.player_id) || pk;
-      if (pk.jersey) return { ...full, jersey: pk.jersey };
-      const pos = full.position || pk.position;
-      const slots = SLOT_ORDER[pos] || [];
-      const idx = posCounters[pos] = (posCounters[pos] ?? 0);
-      posCounters[pos]++;
-      return { ...full, jersey: slots[idx] ?? null };
-    });
-
-    captainId = (data.picks.find(pk => pk.is_captain)?.player_id) ?? null;
-    kickerId = (data.picks.find(pk => pk.is_kicker)?.player_id) ?? null;
-    isDirty = false;
-
-    // Calculate round total
-    if (viewRound) {
-      const roundTotal = myPicks.reduce((sum, p) => sum + (p.last_round_score || 0), 0);
-      document.getElementById('round-total').textContent = `Round total: ${roundTotal.toFixed(1)}`;
-      document.getElementById('save-btn').disabled = true;
-    } else {
-      document.getElementById('round-total').textContent = '';
-      document.getElementById('save-btn').disabled = isLocked || !activeTeamName() || !squadIsComplete() || !isDirty;
-    }
-
-    renderPicks();
   });
 
   // ── Filters / search / sort ──

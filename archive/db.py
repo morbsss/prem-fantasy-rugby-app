@@ -51,7 +51,7 @@ def get_connection():
 
 def _get_sqlite_connection():
     """SQLite connection for local development."""
-    db_path = os.getenv('DB_PATH', 'prem_rugby_25_26.db')
+    db_path = os.getenv('DB_PATH', 'prem_rugby_25_26_test.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -196,27 +196,6 @@ def ensure_schema(conn):
             )
         ''')
 
-    # Users table
-    if DB_TYPE == 'postgres':
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                user_id SERIAL PRIMARY KEY,
-                username TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                team_name TEXT UNIQUE,
-                created_at TEXT NOT NULL
-            )
-        ''')
-    else:
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                team_name TEXT UNIQUE,
-                created_at TEXT NOT NULL
-            )
-        ''')
-
     conn.commit()
     cursor.close()
+
