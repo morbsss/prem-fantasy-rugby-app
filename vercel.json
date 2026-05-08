@@ -10,6 +10,18 @@
     {
       "path": "/api/cron/player-data",
       "schedule": "0 12 * * 2"
+    },
+    {
+      "path": "/api/cron/lineups",
+      "schedule": "0 12 * * 4,5,6,0"
+    },
+    {
+      "path": "/api/cron/lineups",
+      "schedule": "0 18 * * 4,5,6,0"
+    },
+    {
+      "path": "/api/cron/sync-rounds",
+      "schedule": "0 9 * * 1"
     }
   ]
 }

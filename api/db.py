@@ -218,6 +218,52 @@ def ensure_schema(conn):
             )
         ''')
 
+    # Rounds table — stores first/last kickoff per round (populated by sync_rounds.py)
+    if DB_TYPE == 'postgres':
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS rounds (
+                round_number INTEGER PRIMARY KEY,
+                first_kickoff TEXT NOT NULL,
+                last_kickoff TEXT NOT NULL
+            )
+        ''')
+    else:
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS rounds (
+                round_number INTEGER PRIMARY KEY,
+                first_kickoff TEXT NOT NULL,
+                last_kickoff TEXT NOT NULL
+            )
+        ''')
+
+    # Match lineups table (populated by real_lineups.py)
+    if DB_TYPE == 'postgres':
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS match_lineups (
+                id SERIAL PRIMARY KEY,
+                round INTEGER NOT NULL,
+                player_name TEXT NOT NULL,
+                real_team TEXT NOT NULL,
+                jersey INTEGER,
+                is_bench INTEGER NOT NULL DEFAULT 0,
+                scraped_at TEXT NOT NULL,
+                UNIQUE(round, player_name, real_team)
+            )
+        ''')
+    else:
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS match_lineups (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                round INTEGER NOT NULL,
+                player_name TEXT NOT NULL,
+                real_team TEXT NOT NULL,
+                jersey INTEGER,
+                is_bench INTEGER NOT NULL DEFAULT 0,
+                scraped_at TEXT NOT NULL,
+                UNIQUE(round, player_name, real_team)
+            )
+        ''')
+
     conn.commit()
 
     # Migrate existing team_selections tables that predate the is_bench / jersey columns.

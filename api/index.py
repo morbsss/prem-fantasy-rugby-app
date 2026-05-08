@@ -27,6 +27,8 @@ import sqlite3
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from flask import Flask, jsonify, render_template, request, session, redirect
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from .db import get_connection, ensure_schema, DB_TYPE
 from .auth import create_user, authenticate_user, get_available_teams
@@ -156,56 +158,69 @@ def get_last_round(conn) -> int:
     return result or 1
 
 
-# DEPLOYMENT MODE TOGGLE
-# Read from environment variable, default to False (locked/production mode)
-# Set ALLOW_UNRESTRICTED_EDITS=true to allow picks to be edited anytime
 ALLOW_UNRESTRICTED_EDITS = os.getenv('ALLOW_UNRESTRICTED_EDITS', 'false').lower() == 'true'
 
-# Lock window: Friday 19:30 UTC → Tuesday 23:59 UTC
-LOCK_HOUR, LOCK_MIN     = 19, 30   # Friday lock time (start of lock window)
-REOPEN_HOUR, REOPEN_MIN = 14, 00   # Tuesday reopen time (end of lock window)
+
+def _round_kickoffs(conn, round_num):
+    """Return (first_kickoff, last_kickoff) datetimes for round_num, or (None, None)."""
+    cursor = _get_cursor(conn)
+    cursor.execute(
+        'SELECT first_kickoff, last_kickoff FROM rounds WHERE round_number = ?',
+        (round_num,)
+    )
+    row = cursor.fetchone()
+    cursor.close()
+    if not row:
+        return None, None
+    first_str = row['first_kickoff'] if isinstance(row, dict) else row[0]
+    last_str  = row['last_kickoff']  if isinstance(row, dict) else row[1]
+    return datetime.fromisoformat(first_str), datetime.fromisoformat(last_str)
 
 
-def _lock_window():
-    """Return (lock_start, lock_end) datetimes for the current week's lock window."""
-    now = datetime.now(timezone.utc)
-    days_since_friday = (now.weekday() - 4) % 7
-    last_friday = (now - timedelta(days=days_since_friday)).replace(
-        hour=LOCK_HOUR, minute=LOCK_MIN, second=0, microsecond=0)
-    next_monday = (last_friday + timedelta(days=3)).replace(
-        hour=REOPEN_HOUR, minute=REOPEN_MIN, second=0, microsecond=0)
-    return last_friday, next_monday
-
-
-def is_locked() -> bool:
-    """
-    Determine if picks are currently locked based on the lock window (Friday 19:30 - Tuesday 23:59 UTC).
-
-    Returns False if ALLOW_UNRESTRICTED_EDITS env var is 'true', allowing unrestricted editing.
-    Returns True if we are within the Friday 19:30 - Tuesday 23:59 UTC lock window.
-    """
+def is_locked(conn=None) -> bool:
+    """Picks lock at the first kickoff of the round being picked for."""
     if ALLOW_UNRESTRICTED_EDITS:
         return False
-    now = datetime.now(timezone.utc)
-    lock_start, lock_end = _lock_window()
-    return lock_start <= now <= lock_end
+    _owned = conn is None
+    if _owned:
+        conn = get_db()
+        ensure_schema(conn)
+    next_round = get_next_round(conn)
+    first_ko, _ = _round_kickoffs(conn, next_round)
+    if _owned:
+        conn.close()
+    if first_ko is None:
+        return False
+    return datetime.now(timezone.utc) >= first_ko
 
 
-def next_lock_time() -> str:
-    """Return ISO string of the next Friday 7:30pm UTC (when picks lock)."""
+def next_lock_time(conn, next_round) -> str:
+    """ISO string of when picks lock: first kickoff of next_round."""
+    first_ko, _ = _round_kickoffs(conn, next_round)
+    if first_ko:
+        return first_ko.isoformat()
+    # Fallback: next Friday 19:30 UTC
     now = datetime.now(timezone.utc)
     days_until_friday = (4 - now.weekday()) % 7
     friday = (now + timedelta(days=days_until_friday)).replace(
-        hour=LOCK_HOUR, minute=LOCK_MIN, second=0, microsecond=0)
+        hour=19, minute=30, second=0, microsecond=0)
     if friday <= now:
         friday += timedelta(days=7)
     return friday.isoformat()
 
 
-def reopen_time() -> str:
-    """Return ISO string of Tuesday 11:59pm UTC (when picks reopen)."""
-    _, lock_end = _lock_window()
-    return lock_end.isoformat()
+def reopen_time(conn, next_round) -> str:
+    """ISO string of estimated unlock: last kickoff of next_round (round ends)."""
+    _, last_ko = _round_kickoffs(conn, next_round)
+    if last_ko:
+        return last_ko.isoformat()
+    # Fallback: next Tuesday 23:59 UTC
+    now = datetime.now(timezone.utc)
+    days_since_friday = (now.weekday() - 4) % 7
+    last_friday = (now - timedelta(days=days_since_friday)).replace(
+        hour=19, minute=30, second=0, microsecond=0)
+    return (last_friday + timedelta(days=4)).replace(
+        hour=23, minute=59, second=0, microsecond=0).isoformat()
 
 
 # ---------------------------------------------------------------------------
@@ -336,6 +351,9 @@ def state():
             JOIN team_latest tl
                 ON ts.team_name = tl.team_name AND ts.round = tl.latest_round
             GROUP BY ts.player_id
+        ),
+        lineup_round AS (
+            SELECT MAX(round) AS max_round FROM match_lineups
         )
         SELECT
             p.player_id,
@@ -344,13 +362,21 @@ def state():
             p.team AS real_team,
             ws.price,
             ws.total_points - COALESCE(ws_prev.total_points, 0) AS last_round_score,
-            cp.team_name AS fantasy_team
+            cp.team_name AS fantasy_team,
+            CASE
+                WHEN ml.player_name IS NOT NULL AND ml.is_bench = 0 THEN 'S'
+                WHEN ml.player_name IS NOT NULL AND ml.is_bench = 1 THEN 'B'
+                ELSE NULL
+            END AS lineup_status
         FROM players p
         JOIN weekly_stats ws
             ON ws.player_id = p.player_id AND ws.round = ?
         LEFT JOIN weekly_stats ws_prev
             ON ws_prev.player_id = p.player_id AND ws_prev.round = ?
         LEFT JOIN current_picks cp ON cp.player_id = p.player_id
+        LEFT JOIN match_lineups ml
+            ON REPLACE(p.name, "'", '') = ml.player_name
+            AND ml.round = (SELECT max_round FROM lineup_round)
         ORDER BY p.position, ws.total_points DESC
     ''', (last_round, last_round - 1))
     players = [dict(r) for r in cursor.fetchall()]
@@ -366,12 +392,16 @@ def state():
     teams = [r['team_name'] if isinstance(r, dict) else r[0] for r in cursor.fetchall()]
     cursor.close()
 
+    locked  = is_locked(conn)
+    cutoff  = next_lock_time(conn, next_round)
+    reopen  = reopen_time(conn, next_round)
     conn.close()
     return jsonify({
         'round':       next_round,
         'last_round':  last_round,
-        'cutoff':      next_lock_time(),
-        'reopen':      reopen_time(),
+        'is_locked':   locked,
+        'cutoff':      cutoff,
+        'reopen':      reopen,
         'players':     players,
         'teams':       teams,
         'quotas':      SQUAD_QUOTAS,
@@ -496,7 +526,7 @@ def save_picks(team_name):
         return jsonify({'error': 'No team associated with your account'}), 401
 
     # Use user_team from database, ignore URL team_name - this prevents any typo/mismatch issues
-    if is_locked():
+    if is_locked(conn):
         conn.close()
         return jsonify({'error': 'Deadline has passed — picks are locked until next round.'}), 403
 
@@ -688,6 +718,264 @@ def competition_data():
             for w, m in sorted(all_weeks.items())
         ],
     })
+
+
+# ---------------------------------------------------------------------------
+# Cron helpers
+# ---------------------------------------------------------------------------
+
+CRON_SECRET = os.getenv('CRON_SECRET', '')
+
+_SUPERBRU_POS = {1: 'PR', 2: 'HK', 3: 'LK', 4: 'LF', 5: 'SH', 6: 'FH', 7: 'MID', 8: 'OBK'}
+_SUPERBRU_URL = 'https://www.superbru.com/premiershiprugbyfantasy/ajax/f_write_player_stats.php?'
+_SCRAPE_HEADERS = {
+    'User-Agent': (
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+        'AppleWebKit/537.36 (KHTML, like Gecko) '
+        'Chrome/124.0.0.0 Safari/537.36'
+    ),
+}
+
+
+def _cron_auth_ok() -> bool:
+    """Accept requests from Vercel's cron runner. Skip check when no secret is configured (local dev)."""
+    if not CRON_SECRET:
+        return True
+    return request.headers.get('Authorization') == f'Bearer {CRON_SECRET}'
+
+
+def _to_float(val):
+    try:
+        return float(str(val).replace('£', '').replace('m', '').strip())
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def _to_price(val):
+    try:
+        return float(str(val).replace('£', '').replace('m', '').strip()) * 1_000_000
+    except (ValueError, TypeError):
+        return 0.0
+
+
+# ---------------------------------------------------------------------------
+# Cron: sync round schedule from ESPN
+# ---------------------------------------------------------------------------
+
+@app.route('/api/cron/sync-rounds')
+def cron_sync_rounds():
+    if not _cron_auth_ok():
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        from .sync_rounds import fetch_rounds
+        rounds = fetch_rounds()
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    conn = get_db()
+    ensure_schema(conn)
+    cursor = _get_cursor(conn)
+    for round_num, first_ko, last_ko, _ in rounds:
+        cursor.execute('''
+            INSERT INTO rounds (round_number, first_kickoff, last_kickoff)
+            VALUES (?, ?, ?)
+            ON CONFLICT (round_number) DO UPDATE SET
+                first_kickoff = excluded.first_kickoff,
+                last_kickoff  = excluded.last_kickoff
+        ''', (round_num, first_ko, last_ko))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'status': 'ok', 'rounds_synced': len(rounds)})
+
+
+# ---------------------------------------------------------------------------
+# Cron: fetch ESPN lineups for the current round
+# ---------------------------------------------------------------------------
+
+@app.route('/api/cron/lineups')
+def cron_lineups():
+    if not _cron_auth_ok():
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    from .real_lineups import fetch_json, get_round_events, extract_lineups, format_name
+
+    conn = get_db()
+    ensure_schema(conn)
+    next_round = get_next_round(conn)
+
+    try:
+        events = get_round_events(next_round)
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e), 'round': next_round}), 500
+
+    cursor = _get_cursor(conn)
+    now = datetime.now(timezone.utc).isoformat()
+    written = 0
+    skipped = []
+
+    for event in events:
+        game_id = event['id']
+        comp = event['competitions'][0]
+        home = next((c for c in comp['competitors'] if c['homeAway'] == 'home'), {})
+        away = next((c for c in comp['competitors'] if c['homeAway'] == 'away'), {})
+        label = f"{home.get('team',{}).get('abbreviation','?')} v {away.get('team',{}).get('abbreviation','?')}"
+
+        summary_url = (
+            f'https://site.api.espn.com/apis/site/v2/sports/rugby'
+            f'/267979/summary?event={game_id}'
+        )
+        try:
+            summary = fetch_json(summary_url)
+            teams   = extract_lineups(summary)
+        except Exception:
+            skipped.append(label)
+            continue
+
+        for team in teams:
+            for p in team['players']:
+                if not p['name']:
+                    continue
+                cursor.execute('''
+                    INSERT INTO match_lineups
+                        (round, player_name, real_team, jersey, is_bench, scraped_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT (round, player_name, real_team) DO UPDATE SET
+                        jersey     = excluded.jersey,
+                        is_bench   = excluded.is_bench,
+                        scraped_at = excluded.scraped_at
+                ''', (
+                    next_round, format_name(p['name']), team['name'],
+                    p['jersey'], 1 if p['is_bench'] else 0, now,
+                ))
+                written += 1
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({
+        'status':          'ok',
+        'round':           next_round,
+        'entries_written': written,
+        'no_lineup_yet':   skipped,
+    })
+
+
+# ---------------------------------------------------------------------------
+# Cron: scrape SuperBru player stats for the completed round
+# ---------------------------------------------------------------------------
+
+@app.route('/api/cron/player-data')
+def cron_player_data():
+    if not _cron_auth_ok():
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    import requests
+    from bs4 import BeautifulSoup
+
+    conn = get_db()
+    ensure_schema(conn)
+    round_num  = get_next_round(conn)
+    scraped_at = datetime.now(timezone.utc).isoformat()
+
+    # Scrape all 8 position pages from SuperBru
+    players = []
+    try:
+        for page in range(1, 9):
+            resp = requests.get(
+                f'{_SUPERBRU_URL}pg={page}&tbl=2017',
+                headers=_SCRAPE_HEADERS,
+                timeout=10,
+                verify=False,
+            )
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            tbl  = soup.find('tbody')
+            if not tbl:
+                continue
+            for row in tbl.find_all('tr'):
+                cells = [td.get_text(strip=True) for td in row.find_all('td')]
+                if len(cells) < 8:
+                    cells.insert(5, '0')
+                players.append({
+                    'team':          cells[0],
+                    'name':          cells[1][:-1] if cells[1] else '',
+                    'position':      _SUPERBRU_POS[page],
+                    'total_points':  _to_float(cells[3]),
+                    'price':         _to_price(cells[4]),
+                    'kicking':       _to_float(cells[5]),
+                    'ppg':           cells[6],
+                    'popularity':    cells[7],
+                    'form':          cells[8] if len(cells) > 8 else '',
+                })
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': f'Scrape failed: {e}'}), 500
+
+    # Persist to DB
+    cursor   = _get_cursor(conn)
+    upserted = 0
+
+    for p in players:
+        if not p['name']:
+            continue
+
+        # Upsert player record
+        cursor.execute('''
+            INSERT INTO players (name, team, position)
+            VALUES (?, ?, ?)
+            ON CONFLICT (name, team, position) DO UPDATE SET
+                team     = excluded.team,
+                position = excluded.position
+        ''', (p['name'], p['team'], p['position']))
+
+        cursor.execute(
+            'SELECT player_id FROM players WHERE name = ? AND team = ? AND position = ?',
+            (p['name'], p['team'], p['position']),
+        )
+        row       = cursor.fetchone()
+        player_id = row['player_id'] if isinstance(row, dict) else row[0]
+
+        # Upsert weekly stats
+        cursor.execute('''
+            INSERT INTO weekly_stats
+                (player_id, round, total_points, price, kicking,
+                 points_per_game, popularity, form, scraped_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (player_id, round) DO UPDATE SET
+                total_points    = excluded.total_points,
+                price           = excluded.price,
+                kicking         = excluded.kicking,
+                points_per_game = excluded.points_per_game,
+                popularity      = excluded.popularity,
+                form            = excluded.form,
+                scraped_at      = excluded.scraped_at
+        ''', (
+            player_id, round_num,
+            p['total_points'], p['price'], p['kicking'],
+            p['ppg'], p['popularity'], p['form'], scraped_at,
+        ))
+        upserted += 1
+
+    # Copy last round's picks forward as defaults for teams that haven't updated yet
+    if round_num > 1:
+        cursor.execute('''
+            INSERT INTO team_selections
+                (round, team_name, player_id, is_captain, is_kicker,
+                 is_bench, jersey, scraped_at)
+            SELECT ?, team_name, player_id, is_captain, is_kicker,
+                   is_bench, jersey, ?
+            FROM team_selections
+            WHERE round = ?
+            ON CONFLICT (round, team_name, player_id) DO NOTHING
+        ''', (round_num, scraped_at, round_num - 1))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({'status': 'ok', 'round': round_num, 'players_upserted': upserted})
 
 
 # ---------------------------------------------------------------------------

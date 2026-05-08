@@ -118,6 +118,8 @@
     .status-badge.taken     { background: rgba(239,68,68,.15);  color: var(--red);   }
     .status-badge.mine      { background: rgba(91,106,245,.2);  color: #a0aaff;      }
     .status-badge.pos-full  { background: rgba(245,158,11,.15); color: var(--gold); }
+    .lineup-s { font-weight: 700; color: var(--green); }
+    .lineup-b { font-weight: 700; color: var(--gold); }
 
     /* ── Right panel (team builder) ── */
     .team-panel {
@@ -304,6 +306,7 @@
             <th data-col="name">Player</th>
             <th data-col="position">Pos</th>
             <th data-col="real_team">Club</th>
+            <th data-col="lineup_status">Lineup</th>
             <th data-col="price">Price</th>
             <th data-col="last_round_score">Round <span id="last-rnd-label">—</span> Score</th>
             <th data-col="fantasy_team">Status</th>
@@ -391,7 +394,7 @@
     const lockEl = document.getElementById('lock-banner');
     if (isLocked) {
       const reopen = new Date(data.reopen);
-      lockEl.innerHTML = `🔒 Locked • Results for Round ${lastRound} below • Reopens ${reopen.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}`;
+      lockEl.innerHTML = `🔒 Round ${nextRound} locked · Results available after ${reopen.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})} UTC`;
       lockEl.classList.add('locked');
       document.getElementById('save-btn').disabled = true;
     } else {
@@ -460,7 +463,7 @@
       const diff = cutoff - Date.now();
       if (diff <= 0) {
         const reopenDate = new Date(reopen);
-        el.innerHTML = `🔒 Locked • Results for Round ${lastRound} below • Reopens ${reopenDate.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}`;
+        el.innerHTML = `🔒 Round ${nextRound} locked · Results available after ${reopenDate.toLocaleString('en-GB', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})} UTC`;
         el.classList.add('locked');
         return;
       }
@@ -537,10 +540,16 @@
         statusHtml = `<span class="status-badge available">Available</span>`;
       }
 
+      const lineupHtml = p.lineup_status === 'S'
+        ? '<span class="lineup-s">S</span>'
+        : p.lineup_status === 'B'
+        ? '<span class="lineup-b">B</span>'
+        : '—';
       tr.innerHTML = `
         <td class="name-cell">${formatName(p.name)}</td>
         <td><span class="pos-badge">${p.position ?? '?'}</span></td>
         <td>${p.real_team ?? '—'}</td>
+        <td>${lineupHtml}</td>
         <td>${formatPrice(p.price)}</td>
         <td>${p.last_round_score ?? '—'}</td>
         <td>${statusHtml}</td>
@@ -625,11 +634,18 @@
     const score    = p.last_round_score ?? 0;
     const scoreColor = score > 0 ? 'var(--green)' : score < 0 ? 'var(--red)' : 'var(--muted)';
 
+    const lineupBadge = p.lineup_status === 'S'
+      ? '<span class="lineup-s">S</span>'
+      : p.lineup_status === 'B'
+      ? '<span class="lineup-b">B</span>'
+      : '';
+
     if (canEdit) {
       div.innerHTML = `
         <span class="jersey-badge ${isBench ? 'bench' : 'starter'}">${p.jersey}</span>
         <span class="pick-pos">${p.position ?? '?'}</span>
         <span class="pick-name">${formatName(p.name)}</span>
+        ${lineupBadge}
         <span class="pick-score" style="font-size: 12px; color: ${scoreColor}; min-width: 30px; text-align: right;">${score.toFixed(1)}</span>
         <button class="icon-btn swap-btn ${isBench ? 'to-start' : 'to-bench'}"
                 title="${isBench ? 'Move to Starting XV' : 'Move to Bench'}"
@@ -643,6 +659,7 @@
         <span class="jersey-badge ${isBench ? 'bench' : 'starter'}">${p.jersey}</span>
         <span class="pick-pos">${p.position ?? '?'}</span>
         <span class="pick-name">${formatName(p.name)}</span>
+        ${lineupBadge}
         <span class="pick-score" style="font-size: 12px; color: ${scoreColor}; min-width: 30px; text-align: right;">${score.toFixed(1)}</span>
         ${isCap  ? '<span class="icon-btn active-c" title="Captain">C</span>' : ''}
         ${isKick ? '<span class="icon-btn active-k" title="Kicker">K</span>'  : ''}
