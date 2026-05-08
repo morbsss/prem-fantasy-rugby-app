@@ -23,7 +23,6 @@ Control pick locking behavior via environment variables:
 """
 
 import os
-import sqlite3
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from flask import Flask, jsonify, render_template, request, session, redirect
