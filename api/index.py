@@ -338,7 +338,7 @@ def state():
     next_round = last_round + 1
 
     cursor = _get_cursor(conn)
-    cursor.execute('''
+    cursor.execute("""
         WITH team_latest AS (
             SELECT team_name, MAX(round) AS latest_round
             FROM team_selections
@@ -374,10 +374,10 @@ def state():
             ON ws_prev.player_id = p.player_id AND ws_prev.round = ?
         LEFT JOIN current_picks cp ON cp.player_id = p.player_id
         LEFT JOIN match_lineups ml
-            ON REPLACE(p.name, "'", '') = ml.player_name
+            ON REPLACE(p.name, '''', '') = ml.player_name
             AND ml.round = (SELECT max_round FROM lineup_round)
         ORDER BY p.position, ws.total_points DESC
-    ''', (last_round, last_round - 1))
+    """, (last_round, last_round - 1))
     players = [dict(r) for r in cursor.fetchall()]
     for p in players:
         if p.get('last_round_score') is not None:
