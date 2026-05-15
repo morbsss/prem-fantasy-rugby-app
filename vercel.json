@@ -9,7 +9,7 @@
   "crons": [
     {
       "path": "/api/cron/player-data",
-      "schedule": "0 12 * * 2"
+      "schedule": "0 17 * * 1"
     },
     {
       "path": "/api/cron/lineups",
