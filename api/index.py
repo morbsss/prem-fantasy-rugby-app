@@ -358,7 +358,7 @@ def state():
     ensure_schema(conn)
 
     last_round = get_last_round(conn)
-    next_round = last_round + 1
+    next_round = get_next_round(conn)
 
     cursor = _get_cursor(conn)
     cursor.execute("""
