@@ -389,7 +389,7 @@
     TOTAL_SQUAD = data.total_squad;
 
     document.getElementById('round-badge').innerHTML = `Picking for Round: <strong>${nextRound}</strong>`;
-    document.getElementById('last-rnd-label').textContent = lastRound;
+    document.getElementById('last-rnd-label').textContent = nextRound - 1;
 
     const lockEl = document.getElementById('lock-banner');
     if (isLocked) {
