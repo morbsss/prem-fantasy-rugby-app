@@ -134,6 +134,29 @@ def _get_cursor(conn):
 
 
 def get_next_round(conn) -> int:
+    """The round users are currently picking for (or playing in).
+
+    Time-based: smallest round_number in `rounds` whose last_kickoff is in
+    the future. Falls back to MAX(weekly_stats.round) + 1 when the rounds
+    table is empty or every scheduled round has finished.
+    """
+    now_iso = datetime.now(timezone.utc).isoformat()
+    cursor = _get_cursor(conn)
+    cursor.execute(
+        'SELECT round_number FROM rounds WHERE last_kickoff > ? '
+        'ORDER BY round_number ASC LIMIT 1',
+        (now_iso,)
+    )
+    row = cursor.fetchone()
+    cursor.close()
+    if row:
+        return row['round_number'] if isinstance(row, dict) else row[0]
+    return _round_after_last_scraped(conn)
+
+
+def _round_after_last_scraped(conn) -> int:
+    """MAX(weekly_stats.round) + 1, or 1 if empty. Used by the player-data
+    cron to label the round whose stats it's about to record."""
     cursor = _get_cursor(conn)
     cursor.execute('SELECT MAX(round) FROM weekly_stats')
     row = cursor.fetchone()
@@ -876,7 +899,7 @@ def cron_player_data():
 
     conn = get_db()
     ensure_schema(conn)
-    round_num  = get_next_round(conn)
+    round_num  = _round_after_last_scraped(conn)
     scraped_at = datetime.now(timezone.utc).isoformat()
 
     # Scrape all 8 position pages from SuperBru
