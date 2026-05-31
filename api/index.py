@@ -373,9 +373,6 @@ def state():
             JOIN team_latest tl
                 ON ts.team_name = tl.team_name AND ts.round = tl.latest_round
             GROUP BY ts.player_id
-        ),
-        lineup_round AS (
-            SELECT MAX(round) AS max_round FROM match_lineups
         )
         SELECT
             p.player_id,
@@ -398,9 +395,9 @@ def state():
         LEFT JOIN current_picks cp ON cp.player_id = p.player_id
         LEFT JOIN match_lineups ml
             ON REPLACE(p.name, '''', '') = ml.player_name
-            AND ml.round = (SELECT max_round FROM lineup_round)
+            AND ml.round = ?
         ORDER BY p.position, ws.total_points DESC
-    """, (last_round, last_round - 1))
+    """, (last_round, last_round - 1, next_round))
     players = [dict(r) for r in cursor.fetchall()]
     for p in players:
         if p.get('last_round_score') is not None:
