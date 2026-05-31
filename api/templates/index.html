@@ -1614,7 +1614,7 @@
         <div class="pitch-chip-jersey">${j}</div>
         <div class="pitch-chip-name" title="${escapeHtml(pick.name || '')}">${formatName(pick.name)}</div>
         <div class="pitch-chip-meta">
-          <span class="ofds-fix-dot ${fixCls}" title="${fixDotLabel(pick.lineup_status)}"></span>
+          <span class="ofds-fix-dot ${fixCls}" title="${fixDotLabel(pick.lineup_status)}">${fixDotText(pick.lineup_status)}</span>
           <span class="pitch-chip-score ${score === 0 ? 'zero' : ''}">${score.toFixed(1)}</span>
         </div>
       `;
@@ -1643,6 +1643,11 @@
     if (s === 'S') return 'Starting this round';
     if (s === 'B') return 'On bench this round';
     return 'No lineup info';
+  }
+  function fixDotText(s) {
+    if (s === 'S') return 'S';
+    if (s === 'B') return 'B';
+    return 'O';
   }
 
   function renderQuotaStrip() {
@@ -1678,7 +1683,7 @@
           <div class="bench-chip-name">${formatName(p.name)}</div>
           <div class="bench-chip-meta">
             <span class="ofds-pos bench-pos">${p.position}</span>
-            <span class="ofds-fix-dot ${fixCls}" title="${fixDotLabel(p.lineup_status)}"></span>
+            <span class="ofds-fix-dot ${fixCls}" title="${fixDotLabel(p.lineup_status)}">${fixDotText(p.lineup_status)}</span>
             <span class="bench-pts">${score.toFixed(1)} pts</span>
             ${capMark}${kickMark}
           </div>
@@ -1818,7 +1823,7 @@
       <div class="pool-row-info">
         <div class="pool-row-name">${formatName(p.name)}</div>
         <div class="pool-row-sub">
-          <span class="ofds-fix-dot ${fixCls}" title="${fixDotLabel(p.lineup_status)}"></span>
+          <span class="ofds-fix-dot ${fixCls}" title="${fixDotLabel(p.lineup_status)}">${fixDotText(p.lineup_status)}</span>
           <span>${p.real_team ?? '—'}</span>
           <span>·</span>
           <span class="pool-row-ppg">${score.toFixed(1)} pts</span>
@@ -1846,6 +1851,7 @@
 
     const fixDot = document.getElementById('ps-fix');
     fixDot.className = 'ofds-fix-dot ' + fixDotClass(player.lineup_status);
+    fixDot.textContent = fixDotText(player.lineup_status);
     document.getElementById('ps-fix-label').textContent = fixDotLabel(player.lineup_status);
 
     const psJersey = document.getElementById('ps-jersey');
