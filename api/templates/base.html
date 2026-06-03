@@ -698,6 +698,7 @@
 
   <nav class="ofds-tabs" aria-label="Primary">
     <a href="/" class="ofds-tab {% if current_page == 'squad' %}is-active{% endif %}">Squad</a>
+    <a href="/grand-final" class="ofds-tab {% if current_page == 'grand-final' %}is-active{% endif %}">🏆 Grand Final</a>
     {# Tabs for Fixtures and League will be re-enabled once those screens are repainted (phases 4–5). #}
   </nav>
 
@@ -732,6 +733,13 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0zM4 4h2v3a3 3 0 0 1-3-3zM20 4h-2v3a3 3 0 0 0 3-3z"/></svg>
       </span>
       <span>League</span>
+      <span class="dot"></span>
+    </a>
+    <a href="/grand-final" class="ofds-bottom-nav-item {% if current_page == 'grand-final' %}is-active{% endif %}" data-nav="grand-final">
+      <span class="ofds-bottom-nav-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0zM4 4h2v3a3 3 0 0 1-3-3zM20 4h-2v3a3 3 0 0 0 3-3z"/></svg>
+      </span>
+      <span>Final</span>
       <span class="dot"></span>
     </a>
     <a href="#profile" class="ofds-bottom-nav-item" data-nav="profile" onclick="event.preventDefault(); document.getElementById('profile-sheet').classList.add('is-open');">

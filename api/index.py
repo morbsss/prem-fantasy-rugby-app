@@ -645,6 +645,73 @@ def fixtures():
     return render_template('fixtures.html', current_page='fixtures')
 
 
+# ---------------------------------------------------------------------------
+# Grand Final (round 18) — Championship Final + Sacko Final
+# ---------------------------------------------------------------------------
+
+GRAND_FINAL_ROUND = 18
+
+GRAND_FINAL_FIXTURES = [
+    {
+        'title': 'Championship Final',
+        'home':  'Chessums Cheerleaders',
+        'away':  'London WaspCester',
+    },
+    {
+        'title': 'Sacko Final',
+        'home':  'George XV',
+        'away':  "Eddie Jones's Barmy Army",
+    },
+]
+
+
+@app.route('/grand-final')
+def grand_final():
+    return render_template('grand-final.html', current_page='grand-final')
+
+
+@app.route('/api/grand-final')
+def grand_final_data():
+    """Live scores for the two grand-final fixtures, scored on round 18.
+
+    The player-data cron scrapes every 3 minutes during the final, so these
+    figures update roughly live as players accrue points."""
+    conn = get_db()
+    ensure_schema(conn)
+
+    last_round = get_last_round(conn)
+    round_num  = GRAND_FINAL_ROUND if last_round >= GRAND_FINAL_ROUND else last_round
+
+    cursor = _get_cursor(conn)
+    cursor.execute('SELECT MAX(scraped_at) AS last_updated FROM weekly_stats WHERE round = ?', (round_num,))
+    row = cursor.fetchone()
+    cursor.close()
+    last_updated = (row['last_updated'] if isinstance(row, dict) else row[0]) if row else None
+
+    fixtures = []
+    for fx in GRAND_FINAL_FIXTURES:
+        hs = get_team_score(conn, fx['home'], round_num)
+        aw = get_team_score(conn, fx['away'], round_num)
+        fixtures.append({
+            'title':      fx['title'],
+            'home':       fx['home'],
+            'away':       fx['away'],
+            'home_score': round(hs, 1),
+            'away_score': round(aw, 1),
+            'home_wins':  hs > aw,
+            'away_wins':  aw > hs,
+            'played':     not (hs == 0 and aw == 0),
+        })
+
+    conn.close()
+    return jsonify({
+        'round':        round_num,
+        'is_final_round': last_round >= GRAND_FINAL_ROUND,
+        'last_updated': last_updated,
+        'fixtures':     fixtures,
+    })
+
+
 @app.route('/api/competition')
 def competition_data():
     fixtures  = parse_fixtures(FIXTURES_CSV)
