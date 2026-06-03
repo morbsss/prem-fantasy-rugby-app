@@ -78,7 +78,20 @@ def player_data_cron():
 
     conn = get_connection()
     ensure_schema(conn)
-    round_num = _get_next_round(conn)
+
+    # Optional ?round=N pins the scrape to a fixed round instead of MAX+1.
+    # Used for live Grand Final scraping (repeated ticks all update round 18),
+    # and to lay a pre-kickoff baseline (round 17). When pinned we also skip
+    # the copy-forward of team_selections — those squads are already set.
+    round_override = request.args.get('round')
+    if round_override is not None:
+        try:
+            round_num = int(round_override)
+        except (TypeError, ValueError):
+            conn.close()
+            return jsonify({'error': 'round param must be an integer'}), 400
+    else:
+        round_num = _get_next_round(conn)
     scraped_at = datetime.now(timezone.utc).isoformat()
 
     players = []
@@ -154,7 +167,7 @@ def player_data_cron():
         )).close()
         upserted += 1
 
-    if round_num > 1:
+    if round_override is None and round_num > 1:
         db_execute(conn, '''
             INSERT INTO team_selections
                 (round, team_name, player_id, is_captain, is_kicker,

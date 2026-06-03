@@ -43,28 +43,36 @@ jobs:
           fi
           URL="${APP_BASE_URL%/}/api/cron/player-data"
 
+          # Scrape, pinned to a fixed round via ?round=N (live ticks all update
+          # round 18; the pre-kickoff baseline writes round 17).
           hit() {
-            local code
+            local r="$1" code
             code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' \
               -H "Authorization: Bearer ${CRON_SECRET:-}" \
-              "$URL") || code="000"
-            echo "[$(date -u '+%H:%M:%SZ')] HTTP ${code} $(head -c 200 /tmp/resp.json 2>/dev/null)"
+              "${URL}?round=${r}") || code="000"
+            echo "[$(date -u '+%H:%M:%SZ')] round=${r} HTTP ${code} $(head -c 200 /tmp/resp.json 2>/dev/null)"
             if [ "$code" != "200" ]; then
-              echo "::warning::scrape returned HTTP ${code}"
+              echo "::warning::scrape (round ${r}) returned HTTP ${code}"
             fi
           }
 
-          # 16:00 UTC today = 5pm BST. Loop only on the grand-final Saturday;
-          # any other trigger (e.g. Monday's settle update) is a single shot.
+          # 16:00 UTC today = 5pm BST.
           END=$(date -u -d '16:00:00' +%s)
           TODAY=$(date -u +%m-%d)
 
           echo "Scraping ${URL}"
-          hit
           if [ "$TODAY" = "06-06" ]; then
-            while [ "$(date -u +%s)" -lt "$END" ]; do
+            # Grand-final Saturday: lay the pre-kickoff baseline, then scrape
+            # round 18 every 3 min until 16:00 UTC.
+            echo "Baseline snapshot -> round 17"
+            hit 17
+            while true; do
+              hit 18
+              [ "$(date -u +%s)" -ge "$END" ] && break
               sleep 180
-              hit
             done
+          else
+            # Monday settle update (baseline already exists): single round-18 tick.
+            hit 18
           fi
           echo "Done."

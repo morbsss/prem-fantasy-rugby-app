@@ -674,39 +674,47 @@ def grand_final():
 def grand_final_data():
     """Live scores for the two grand-final fixtures, scored on round 18.
 
-    The player-data cron scrapes every 3 minutes during the final, so these
-    figures update roughly live as players accrue points."""
+    Always scores round 18 — it does NOT fall back to an earlier round, so the
+    page shows "Not started" (0) until the round-18 scrape lands rather than
+    silently displaying the previous round's points. The player-data cron
+    scrapes every 3 minutes during the final, so figures then update live."""
     conn = get_db()
     ensure_schema(conn)
 
-    last_round = get_last_round(conn)
-    round_num  = GRAND_FINAL_ROUND if last_round >= GRAND_FINAL_ROUND else last_round
-
     cursor = _get_cursor(conn)
-    cursor.execute('SELECT MAX(scraped_at) AS last_updated FROM weekly_stats WHERE round = ?', (round_num,))
+    cursor.execute(
+        'SELECT MAX(scraped_at) AS last_updated, COUNT(*) AS n '
+        'FROM weekly_stats WHERE round = ?',
+        (GRAND_FINAL_ROUND,),
+    )
     row = cursor.fetchone()
     cursor.close()
-    last_updated = (row['last_updated'] if isinstance(row, dict) else row[0]) if row else None
+    n = (row['n'] if isinstance(row, dict) else row[1]) if row else 0
+    started = bool(n)
+    last_updated = (row['last_updated'] if isinstance(row, dict) else row[0]) if (row and started) else None
 
     fixtures = []
     for fx in GRAND_FINAL_FIXTURES:
-        hs = get_team_score(conn, fx['home'], round_num)
-        aw = get_team_score(conn, fx['away'], round_num)
+        if started:
+            hs = get_team_score(conn, fx['home'], GRAND_FINAL_ROUND)
+            aw = get_team_score(conn, fx['away'], GRAND_FINAL_ROUND)
+        else:
+            hs = aw = 0.0
         fixtures.append({
             'title':      fx['title'],
             'home':       fx['home'],
             'away':       fx['away'],
             'home_score': round(hs, 1),
             'away_score': round(aw, 1),
-            'home_wins':  hs > aw,
-            'away_wins':  aw > hs,
-            'played':     not (hs == 0 and aw == 0),
+            'home_wins':  started and hs > aw,
+            'away_wins':  started and aw > hs,
+            'played':     started,
         })
 
     conn.close()
     return jsonify({
-        'round':        round_num,
-        'is_final_round': last_round >= GRAND_FINAL_ROUND,
+        'round':        GRAND_FINAL_ROUND,
+        'started':      started,
         'last_updated': last_updated,
         'fixtures':     fixtures,
     })
@@ -963,7 +971,20 @@ def cron_player_data():
 
     conn = get_db()
     ensure_schema(conn)
-    round_num  = _round_after_last_scraped(conn)
+
+    # Optional ?round=N pins the scrape to a fixed round instead of MAX+1
+    # (live Grand Final ticks all update round 18; baseline writes round 17).
+    # When pinned, the team_selections copy-forward is skipped — those squads
+    # are already set.
+    round_override = request.args.get('round')
+    if round_override is not None:
+        try:
+            round_num = int(round_override)
+        except (TypeError, ValueError):
+            conn.close()
+            return jsonify({'error': 'round param must be an integer'}), 400
+    else:
+        round_num = _round_after_last_scraped(conn)
     scraped_at = datetime.now(timezone.utc).isoformat()
 
     # Scrape all 8 position pages from SuperBru
@@ -1046,7 +1067,7 @@ def cron_player_data():
         upserted += 1
 
     # Copy last round's picks forward as defaults for teams that haven't updated yet
-    if round_num > 1:
+    if round_override is None and round_num > 1:
         cursor.execute('''
             INSERT INTO team_selections
                 (round, team_name, player_id, is_captain, is_kicker,

@@ -185,13 +185,13 @@
     const homeWin = fx.home_wins, awayWin = fx.away_wins;
     const statusText = fx.played
       ? (homeWin ? `${fx.home} lead` : awayWin ? `${fx.away} lead` : 'All square')
-      : 'Awaiting kickoff';
+      : 'Not started';
     const statusCls = fx.played ? 'gf-status is-live' : 'gf-status';
     return `
       <div class="gf-card">
         <div class="gf-card-head">
           <span class="gf-card-title">${esc(fx.title)}</span>
-          <span class="gf-card-tag">${fx.played ? 'Live' : 'Upcoming'}</span>
+          <span class="gf-card-tag">${fx.played ? 'Live' : 'Not started'}</span>
         </div>
         <div class="gf-match">
           <div class="gf-side gf-side-home ${homeWin ? 'is-winner' : ''}">
@@ -221,8 +221,15 @@
         `Round ${data.round} · Championship & Sacko Finals`;
 
       const upd = document.getElementById('gf-updated');
+      const dot = upd.querySelector('.gf-live-dot');
       upd.style.display = 'inline-flex';
-      document.getElementById('gf-updated-text').textContent = relativeTime(data.last_updated);
+      if (data.started) {
+        dot.style.display = '';
+        document.getElementById('gf-updated-text').textContent = relativeTime(data.last_updated);
+      } else {
+        dot.style.display = 'none';
+        document.getElementById('gf-updated-text').textContent = 'Not started — kicks off Sat 6 Jun';
+      }
 
       wrap.innerHTML = data.fixtures.map(fixtureCard).join('');
     } catch (err) {
