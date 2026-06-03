@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block page_title %}OFDS Fantasy — Finals Series{% endblock %}
+
+{% block extra_styles %}
+  /* ── Header round badge (mirrors League screen) ── */
+  .ofds-round-badge {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--cream); opacity: .85;
+  }
+  .ofds-round-badge strong { font-size: 18px; font-weight: 800; color: var(--amber); letter-spacing: .02em; }
+  @media (max-width: 768px) {
+    .ofds-round-badge { font-size: 10px; }
+    .ofds-round-badge strong { font-size: 13px; }
+    .ofds-round-badge > span:first-child { display: none; }
+  }
+
+  /* ── Layout ── */
+  .content { max-width: 960px; margin: 0 auto; padding: 22px 16px 48px; width: 100%; }
+  @media (max-width: 768px) { .content { padding: 14px 12px calc(var(--bottom-nav-h, 56px) + 28px); } }
+
+  .page-head { margin-bottom: 6px; }
+  .page-title {
+    font-family: var(--font-display); font-size: 30px; font-weight: 800;
+    letter-spacing: .02em; text-transform: uppercase; color: var(--forest); line-height: 1;
+  }
+  .page-sub {
+    margin-top: 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--ink-muted);
+  }
+  @media (max-width: 768px) { .page-title { font-size: 24px; } }
+
+  .finals-status { font-size: 11px; font-weight: 600; color: var(--ink-muted); margin: 8px 0 6px; }
+  .finals-status .dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--amber); margin-right: 6px; vertical-align: middle;
+  }
+  .finals-status.is-complete .dot { background: var(--success); }
+
+  .finals-loading, .finals-empty {
+    padding: 48px 24px; text-align: center; color: var(--ink-muted); font-size: 13px;
+  }
+  .finals-empty h3 {
+    font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--forest);
+    text-transform: uppercase; letter-spacing: .03em; margin-bottom: 6px;
+  }
+
+  /* ── Bracket ── */
+  .bracket { margin-top: 26px; }
+  .bracket-title {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-display); font-size: 18px; font-weight: 800;
+    letter-spacing: .03em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .bracket--champ .bracket-title { color: var(--success); }
+  .bracket--sacko .bracket-title { color: var(--danger); }
+
+  .bracket-row-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 8px;
+  }
+  .bracket-row-label.center { text-align: center; margin-top: 18px; }
+
+  /* Two semis side-by-side; grand final centred below */
+  .semis-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .final-row { display: flex; justify-content: center; position: relative; }
+  .final-row::before {
+    content: ''; position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    width: 2px; height: 18px; background: var(--border-strong);
+  }
+  .final-wrap { width: min(56%, 360px); }
+
+  .tie {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-md); box-shadow: var(--shadow-1); overflow: hidden;
+  }
+  .bracket--champ .tie { border-left: 3px solid var(--success); }
+  .bracket--sacko .tie { border-left: 3px solid var(--danger); }
+  .tie--final { box-shadow: var(--shadow-2); }
+  .bracket--champ .tie--final { border-left-width: 4px; }
+  .bracket--sacko .tie--final { border-left-width: 4px; }
+
+  .tie-head {
+    padding: 6px 12px; font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-faint); background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .tie-pending { color: var(--amber-deep); font-style: normal; }
+
+  .tie-side {
+    display: grid; grid-template-columns: 18px 1fr auto; align-items: center;
+    gap: 8px; padding: 9px 12px;
+  }
+  .tie-side + .tie-side { border-top: 1px solid var(--border); }
+  .tie-seed { font-family: var(--font-display); font-weight: 800; font-size: 12px; color: var(--ink-faint); text-align: center; }
+  .tie-name {
+    font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tie-score { font-family: var(--font-display); font-weight: 800; font-size: 15px; color: var(--ink-muted); white-space: nowrap; }
+  .tie-score .legs { font-size: 10px; font-weight: 600; color: var(--ink-faint); margin-right: 6px; }
+  .tie-side.is-winner { background: rgba(46,125,79,.07); }
+  .bracket--sacko .tie-side.is-winner { background: rgba(179,58,46,.06); }
+  .tie-side.is-winner .tie-name { color: var(--forest); }
+  .bracket--sacko .tie-side.is-winner .tie-name { color: var(--danger); }
+  .tie-side.is-winner .tie-score { color: var(--ink); }
+  .tie-trophy { margin-left: 6px; }
+  .tie-tbd { color: var(--ink-faint); font-style: italic; }
+
+  @media (max-width: 700px) {
+    .semis-row { grid-template-columns: 1fr; }
+    .final-wrap { width: 100%; }
+    .final-row::before { display: none; }
+    .bracket-row-label.center { margin-top: 14px; }
+  }
+{% endblock %}
+
+{% block header_controls %}
+  <span class="ofds-round-badge"><span>Round</span><strong id="round-badge">—</strong></span>
+{% endblock %}
+
+{% block content %}
+<div class="content">
+
+  <div class="page-head">
+    <div class="page-title">Finals Series</div>
+    <div class="page-sub">Two-legged semis (Wk 16-17) · Grand final (Wk 18)</div>
+  </div>
+  <div class="finals-status" id="finals-status"></div>
+
+  <div id="brackets"><div class="finals-loading">Loading…</div></div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let TABLE = [];          // league standings — used for seed numbers
+
+  async function init() {
+    let data;
+    try {
+      const res = await fetch('/api/competition');
+      data = await res.json();
+    } catch (err) {
+      document.getElementById('brackets').innerHTML =
+        '<div class="finals-loading">Failed to load — refresh to retry.</div>';
+      return;
+    }
+    const badge = document.getElementById('round-badge');
+    if (badge) badge.textContent = data.max_round ?? '—';
+    TABLE = data.table || [];
+    renderPlayoffs(data.playoffs || null);
+  }
+
+  function renderPlayoffs(pl) {
+    const brackets = document.getElementById('brackets');
+    const status = document.getElementById('finals-status');
+    if (!pl || (!pl.championship && !pl.sacko)) {
+      status.textContent = '';
+      brackets.innerHTML = '<div class="finals-empty"><h3>No finals yet</h3><p>The playoff brackets appear once the league has enough teams.</p></div>';
+      return;
+    }
+
+    status.className = 'finals-status' + (pl.complete ? ' is-complete' : '');
+    status.innerHTML = pl.complete
+      ? '<span class="dot"></span>Regular season complete — playoff seeds locked.'
+      : '<span class="dot"></span>Provisional seeds — finalised after Round 15.';
+
+    let html = '';
+    if (pl.championship) html += bracketHtml('Championship', '🏆', 'champ', pl.championship);
+    if (pl.sacko)        html += bracketHtml('Sacko', '🥄', 'sacko', pl.sacko);
+    brackets.innerHTML = html;
+  }
+
+  function bracketHtml(title, icon, kind, br) {
+    const semis = br.semis.map((s, i) => tieHtml(`Semi-final ${i + 1}`, kind, s, false)).join('');
+    const finalTie = tieHtml('Grand Final', kind, finalAsTie(br.final), true);
+    const semiNote  = kind === 'sacko' ? ' · losers advance' : '';
+    return `<section class="bracket bracket--${kind}">
+      <div class="bracket-title">${icon} ${esc(title)}</div>
+      <div class="bracket-row-label">Semi-finals · Wk 16-17 (aggregate)${semiNote}</div>
+      <div class="semis-row">${semis}</div>
+      <div class="bracket-row-label center"></div>
+      <div class="final-row"><div class="final-wrap">${finalTie}</div></div>
+    </section>`;
+  }
+
+  // Normalise a final into the same shape a semi side-render expects.
+  function finalAsTie(f) {
+    return {
+      home: f.home, away: f.away,
+      home_agg: f.home_score, away_agg: f.away_score,
+      played: f.played, winner: f.champion, _final: true,
+    };
+  }
+
+  function tieHtml(label, kind, t, isFinal) {
+    const head = `<div class="tie-head"><span>${esc(label)}</span>${
+      t.played ? '' : '<span class="tie-pending">' + (isFinal ? 'TBD' : 'awaiting') + '</span>'
+    }</div>`;
+    return `<div class="tie ${isFinal ? 'tie--final' : ''}">
+      ${head}
+      ${tieSide(kind, t, 'home', isFinal)}
+      ${tieSide(kind, t, 'away', isFinal)}
+    </div>`;
+  }
+
+  function tieSide(kind, t, side, isFinal) {
+    const name = t[side];
+    const isWin = t.played && t.winner && t.winner === name;
+    if (!name) {
+      const from = (kind === 'sacko' ? 'Loser ' : 'Winner ') + (side === 'home' ? 'SF1' : 'SF2');
+      return `<div class="tie-side"><span class="tie-seed">·</span><span class="tie-name tie-tbd">${from}</span><span class="tie-score tie-tbd">—</span></div>`;
+    }
+    const seedNo = seedNumber(name);
+    const agg = t[side + '_agg'];
+    const legs = (!isFinal && t.played)
+      ? `<span class="legs">${fmt(t[side + '_leg1'])}+${fmt(t[side + '_leg2'])}</span>`
+      : '';
+    const score = t.played ? `${legs}${fmt(agg)}` : '<span class="tie-tbd">—</span>';
+    const trophy = isWin && isFinal ? `<span class="tie-trophy">${kind === 'champ' ? '🏆' : '🥄'}</span>` : '';
+    return `<div class="tie-side ${isWin ? 'is-winner' : ''}">
+      <span class="tie-seed">${seedNo || ''}</span>
+      <span class="tie-name">${esc(name)}${trophy}</span>
+      <span class="tie-score">${score}</span>
+    </div>`;
+  }
+
+  // Seed number = league-table position (1-based) of the team.
+  function seedNumber(name) {
+    const idx = TABLE.findIndex(t => t.name === name);
+    return idx >= 0 ? idx + 1 : '';
+  }
+
+  function fmt(v) { return (v ?? 0).toFixed(1); }
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  init();
+</script>
+{% endblock %}

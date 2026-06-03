@@ -32,7 +32,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from .db import get_connection, ensure_schema, DB_TYPE
 from .auth import create_user, authenticate_user, get_available_teams
 from .competition import (
-    parse_fixtures, calculate_table, get_team_score,
+    calculate_table, get_team_score,
+    get_league_teams, generate_regular_fixtures,
+    build_playoffs, playoff_fixtures, REGULAR_ROUNDS,
     WINNER_BP_MARGIN, LOSER_BP_MARGIN,
 )
 
@@ -44,20 +46,8 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV', 'development') == 'production'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Get database type and fixture path
+# Get database type
 DB_TYPE_LOCAL = os.getenv('DB_TYPE', 'sqlite').lower()
-
-# For Vercel: fixtures.csv is in api/data/
-# For local: bespoke-scripts/fixtures.csv
-api_data = os.path.join(os.path.dirname(__file__), 'data', 'fixtures.csv')
-bespoke_data = os.path.join(os.path.dirname(__file__), '..', 'bespoke-scripts', 'fixtures.csv')
-
-if os.path.exists(api_data):
-    FIXTURES_CSV = api_data
-elif os.path.exists(bespoke_data):
-    FIXTURES_CSV = bespoke_data
-else:
-    FIXTURES_CSV = api_data  # Default to api/data/
 
 # Squad composition rules
 SQUAD_QUOTAS  = {'PR': 3, 'HK': 2, 'LK': 3, 'LF': 4, 'SH': 2, 'FH': 2, 'MID': 3, 'OBK': 4}
@@ -645,13 +635,26 @@ def fixtures():
     return render_template('fixtures.html', current_page='fixtures')
 
 
+@app.route('/finals')
+def finals():
+    return render_template('finals.html', current_page='finals')
+
+
 @app.route('/api/competition')
 def competition_data():
-    fixtures  = parse_fixtures(FIXTURES_CSV)
     conn      = get_db()
     max_round = get_last_round(conn)
 
-    table = calculate_table(fixtures, conn, max_round)
+    # Dynamic schedule: generate the regular season from the live team list,
+    # then seed playoffs (Championship top-4 + Sacko bottom-4) off the standings.
+    teams    = get_league_teams(conn)
+    regular  = generate_regular_fixtures(teams)
+    table    = calculate_table(regular, conn, min(max_round, REGULAR_ROUNDS))
+    playoffs = build_playoffs(conn, table, max_round)
+
+    # Regular fixtures + resolved playoff pairings drive the per-week results
+    # (fixtures page + weekly chart). Playoff weeks simply have no byes.
+    fixtures = regular + playoff_fixtures(playoffs)
 
     # Group fixtures by week for two-pass bye handling
     week_map: dict[int, list] = defaultdict(list)
@@ -736,6 +739,7 @@ def competition_data():
             {'week': w, 'matches': m}
             for w, m in sorted(all_weeks.items())
         ],
+        'playoffs': playoffs,
     })
 
 

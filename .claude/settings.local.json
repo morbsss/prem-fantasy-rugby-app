@@ -8,7 +8,10 @@
       "Bash(python -c ' *)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(command -v node)",
+      "Bash(node -e \"try{require.resolve\\('playwright'\\);console.log\\('playwright OK'\\)}catch\\(e\\){try{require.resolve\\('puppeteer'\\);console.log\\('puppeteer OK'\\)}catch\\(e2\\){console.log\\('no node browser lib'\\)}}\")",
+      "Read(//c/Program Files/Google/Chrome/Application/**)"
     ]
   }
 }

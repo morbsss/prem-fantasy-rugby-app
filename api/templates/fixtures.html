@@ -117,7 +117,8 @@
     allResults = data.results;
     maxRound   = data.max_round;
 
-    document.getElementById('round-badge').textContent = `Round ${maxRound}`;
+    const badge = document.getElementById('round-badge');
+    if (badge) badge.textContent = `Round ${maxRound}`;
     buildChips();
     render();
   }

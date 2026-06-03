@@ -698,7 +698,9 @@
 
   <nav class="ofds-tabs" aria-label="Primary">
     <a href="/" class="ofds-tab {% if current_page == 'squad' %}is-active{% endif %}">Squad</a>
-    {# Tabs for Fixtures and League will be re-enabled once those screens are repainted (phases 4–5). #}
+    <a href="/competition" class="ofds-tab {% if current_page == 'competition' %}is-active{% endif %}">League</a>
+    <a href="/finals" class="ofds-tab {% if current_page == 'finals' %}is-active{% endif %}">Finals</a>
+    {# Fixtures tab will be re-enabled once that screen is repainted (phase 4). #}
   </nav>
 
   <main class="ofds-main">
@@ -729,9 +731,16 @@
     </a>
     <a href="/competition" class="ofds-bottom-nav-item {% if current_page == 'competition' %}is-active{% endif %}" data-nav="league">
       <span class="ofds-bottom-nav-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0zM4 4h2v3a3 3 0 0 1-3-3zM20 4h-2v3a3 3 0 0 0 3-3z"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M5 5v6a7 7 0 0 0 14 0V5M9 19h6M12 14v5"/></svg>
       </span>
       <span>League</span>
+      <span class="dot"></span>
+    </a>
+    <a href="/finals" class="ofds-bottom-nav-item {% if current_page == 'finals' %}is-active{% endif %}" data-nav="finals">
+      <span class="ofds-bottom-nav-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0zM4 4h2v3a3 3 0 0 1-3-3zM20 4h-2v3a3 3 0 0 0 3-3z"/></svg>
+      </span>
+      <span>Finals</span>
       <span class="dot"></span>
     </a>
     <a href="#profile" class="ofds-bottom-nav-item" data-nav="profile" onclick="event.preventDefault(); document.getElementById('profile-sheet').classList.add('is-open');">

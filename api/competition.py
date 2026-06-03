@@ -30,6 +30,13 @@ BP_PTS           = 1
 WINNER_BP_MARGIN = 27   # winner gets BP if margin >= this
 LOSER_BP_MARGIN  = 11   # loser gets BP if margin <= this
 
+# Season shape (applies to any league size).
+REGULAR_ROUNDS = 15     # rounds 1..15 are the round-robin regular season
+SEMI_LEG1      = 16     # semi-final first leg
+SEMI_LEG2      = 17     # semi-final second leg
+FINAL_ROUND    = 18     # grand final
+TOTAL_ROUNDS   = FINAL_ROUND
+
 
 def _get_placeholder(conn):
     """Return the appropriate placeholder for the database type."""
@@ -281,6 +288,161 @@ def _apply_result(home: Team, away: Team, hs: float, aw: float) -> None:
         away.drawn         += 1
         home.league_points += DRAW_PTS
         away.league_points += DRAW_PTS
+
+
+# ---------------------------------------------------------------------------
+# League roster + fixture generation (dynamic: any team count)
+# ---------------------------------------------------------------------------
+
+def get_league_teams(conn) -> list[str]:
+    """Distinct fantasy team names that have a squad, sorted for a stable schedule."""
+    cursor = conn.cursor()
+    cursor.execute('SELECT DISTINCT team_name FROM team_selections')
+    rows = cursor.fetchall()
+    cursor.close()
+    names = [r['team_name'] if isinstance(r, dict) else r[0] for r in rows]
+    return sorted(n for n in names if n)
+
+
+def generate_regular_fixtures(
+    teams: list[str],
+    n_rounds: int = REGULAR_ROUNDS,
+) -> list[tuple[int, str, bool, str, bool]]:
+    """
+    Round-robin schedule via the circle method, cycled to `n_rounds`.
+
+    - Odd team counts get a rotating 'Bye' each round.
+    - Home/away alternates each full cycle so pairings even out.
+    - Returns the same tuple shape as parse_fixtures:
+      (week, home, home_bp, away, away_bp) — bp flags are always False
+      (bonus points are computed from margins in calculate_table).
+    """
+    ts = sorted(teams)
+    if not ts:
+        return []
+    if len(ts) % 2:
+        ts = ts + ['Bye']          # odd → pad with a bye sentinel
+
+    m = len(ts)                    # even
+    arr = ts[:]
+    base: list[list[tuple[str, str]]] = []   # base[r] = list of (home, away)
+    for r in range(m - 1):
+        pairs = []
+        for i in range(m // 2):
+            h, a = arr[i], arr[m - 1 - i]
+            if r % 2:              # alternate within the base block too
+                h, a = a, h
+            pairs.append((h, a))
+        base.append(pairs)
+        # rotate all but the first element (circle method)
+        arr = [arr[0]] + [arr[-1]] + arr[1:-1]
+
+    fixtures: list[tuple[int, str, bool, str, bool]] = []
+    R = len(base)                  # m-1 distinct rounds
+    for w in range(n_rounds):
+        cycle = w // R
+        for h, a in base[w % R]:
+            if cycle % 2:          # swap home/away on alternate cycles
+                h, a = a, h
+            fixtures.append((w + 1, h, False, a, False))
+    return fixtures
+
+
+# ---------------------------------------------------------------------------
+# Playoffs (Championship top-4 + Sacko bottom-4; two-legged semis + final)
+# ---------------------------------------------------------------------------
+
+def _semi(conn, home: str, away: str, max_round: int, mode: str) -> dict:
+    """
+    Two-legged aggregate semi-final (legs in SEMI_LEG1 / SEMI_LEG2).
+
+    `mode='champ'`: the WINNER advances to the final.
+    `mode='sacko'`: the LOSER advances (it's a race to the wooden spoon —
+                    winning lets you escape). `winner` here = who advances.
+    The higher seed (home) is protected on a tie.
+    """
+    h1, a1 = get_team_score(conn, home, SEMI_LEG1), get_team_score(conn, away, SEMI_LEG1)
+    h2, a2 = get_team_score(conn, home, SEMI_LEG2), get_team_score(conn, away, SEMI_LEG2)
+    agg_h, agg_a = h1 + h2, a1 + a2
+    played = max_round >= SEMI_LEG2 and not (agg_h == 0 and agg_a == 0)
+    if mode == 'sacko':
+        advancer = (home if agg_h < agg_a else away)   # loser advances; tie protects home
+    else:
+        advancer = (home if agg_h >= agg_a else away)  # winner advances; tie protects home
+    return {
+        'home': home, 'away': away,
+        'home_leg1': round(h1, 1), 'away_leg1': round(a1, 1),
+        'home_leg2': round(h2, 1), 'away_leg2': round(a2, 1),
+        'home_agg': round(agg_h, 1), 'away_agg': round(agg_a, 1),
+        'played': played, 'winner': advancer if played else None,
+    }
+
+
+def _bracket(conn, seeds: list[str], max_round: int, mode: str) -> dict:
+    """
+    4-team bracket: semis (1v4, 2v3) + final. `seeds` is best->worst.
+    `mode='champ'`: final winner is `champion`.
+    `mode='sacko'`: the two semi LOSERS contest the final and the final
+                    LOSER takes the spoon (stored in `champion`).
+    """
+    s1, s2, s3, s4 = seeds
+    semis = [_semi(conn, s1, s4, max_round, mode), _semi(conn, s2, s3, max_round, mode)]
+
+    home = semis[0]['winner']   # 'winner' = the team that advances
+    away = semis[1]['winner']
+    fh = get_team_score(conn, home, FINAL_ROUND) if home else 0.0
+    fa = get_team_score(conn, away, FINAL_ROUND) if away else 0.0
+    final_played = bool(home and away) and max_round >= FINAL_ROUND and not (fh == 0 and fa == 0)
+    if mode == 'sacko':
+        champion = (home if fh < fa else away) if final_played else None   # loser = wooden spoon
+    else:
+        champion = (home if fh >= fa else away) if final_played else None  # winner = champion
+    final = {
+        'home': home, 'away': away,
+        'home_score': round(fh, 1), 'away_score': round(fa, 1),
+        'played': final_played, 'champion': champion,
+    }
+    return {'seeds': seeds, 'semis': semis, 'final': final}
+
+
+def build_playoffs(conn, table: list[Team], max_round: int) -> dict:
+    """
+    Playoff brackets seeded off the regular-season standings.
+      Championship = top 4 (win to advance; final winner is champion).
+      Sacko        = bottom 4 (lose to advance; final loser takes the spoon).
+    Sacko needs >= 8 teams. Pre-completion seeds are provisional and all
+    matches read played=False.
+    """
+    n = len(table)
+    out = {
+        'complete': max_round >= REGULAR_ROUNDS,
+        'championship': None,
+        'sacko': None,
+    }
+    if n >= 4:
+        out['championship'] = _bracket(conn, [t.name for t in table[:4]], max_round, 'champ')
+    if n >= 8:
+        out['sacko'] = _bracket(conn, [t.name for t in table[-4:]], max_round, 'sacko')
+    return out
+
+
+def playoff_fixtures(playoffs: dict) -> list[tuple[int, str, bool, str, bool]]:
+    """
+    Emit (week, home, False, away, False) rows for the playoff weeks so the
+    fixtures page and weekly chart include them. Semis appear in both legs
+    (weeks 16 & 17); the final (week 18) only once both finalists are known.
+    """
+    rows: list[tuple[int, str, bool, str, bool]] = []
+    for bracket in (playoffs.get('championship'), playoffs.get('sacko')):
+        if not bracket:
+            continue
+        for semi in bracket['semis']:
+            for wk in (SEMI_LEG1, SEMI_LEG2):
+                rows.append((wk, semi['home'], False, semi['away'], False))
+        fin = bracket['final']
+        if fin['home'] and fin['away']:
+            rows.append((FINAL_ROUND, fin['home'], False, fin['away'], False))
+    return rows
 
 
 # ---------------------------------------------------------------------------
