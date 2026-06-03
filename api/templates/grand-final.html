@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block page_title %}OFDS Fantasy — Grand Final{% endblock %}
+
+{% block extra_styles %}
+    .gf-wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px calc(24px + var(--bottom-nav-h)); }
+
+    /* ── Hero ── */
+    .gf-hero {
+      text-align: center;
+      padding: 28px 16px 24px;
+      background:
+        radial-gradient(120% 140% at 50% 0%, var(--forest-soft) 0%, var(--forest) 45%, var(--forest-deep) 100%);
+      color: var(--cream);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-2);
+      position: relative;
+      overflow: hidden;
+    }
+    .gf-trophy {
+      font-size: 40px;
+      line-height: 1;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.3));
+    }
+    .gf-hero h1 {
+      font-family: var(--font-display);
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .gf-hero h1 .accent { color: var(--amber); }
+    .gf-hero-sub {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      opacity: .7;
+    }
+    .gf-updated {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cream);
+      background: rgba(245,241,232,.1);
+      padding: 4px 12px;
+      border-radius: var(--r-full);
+    }
+    .gf-live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 0 rgba(232,155,44,.6);
+      animation: gf-pulse 1.8s infinite;
+    }
+    @keyframes gf-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(232,155,44,.55); }
+      70%  { box-shadow: 0 0 0 8px rgba(232,155,44,0); }
+      100% { box-shadow: 0 0 0 0 rgba(232,155,44,0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .gf-live-dot { animation: none; } }
+
+    /* ── Fixture cards ── */
+    .gf-fixtures { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+
+    .gf-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-1);
+      overflow: hidden;
+    }
+    .gf-card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--forest);
+      color: var(--cream);
+    }
+    .gf-card-title {
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 800;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .gf-card-tag {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: var(--r-full);
+      background: rgba(245,241,232,.12); color: var(--amber-soft);
+    }
+
+    .gf-match {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 16px;
+    }
+    .gf-side { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; min-width: 0; }
+    .gf-side-home { }
+    .gf-team {
+      font-family: var(--font-display);
+      font-size: 17px; font-weight: 700;
+      letter-spacing: .01em; line-height: 1.1;
+      color: var(--ink);
+    }
+    .gf-score {
+      font-family: var(--font-display);
+      font-size: 38px; font-weight: 800; line-height: 1;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .gf-side.is-winner .gf-team  { color: var(--forest); }
+    .gf-side.is-winner .gf-score { color: var(--success); }
+    .gf-crown { font-size: 14px; height: 16px; line-height: 1; opacity: 0; }
+    .gf-side.is-winner .gf-crown { opacity: 1; }
+
+    .gf-vs {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 700;
+      color: var(--ink-faint);
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .gf-status {
+      text-align: center;
+      padding: 0 16px 16px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .gf-status.is-live { color: var(--warning); }
+
+    .gf-loading, .gf-error { padding: 48px 16px; text-align: center; color: var(--ink-muted); }
+    .gf-error { color: var(--danger); }
+
+    @media (max-width: 768px) {
+      .gf-hero h1 { font-size: 28px; }
+      .gf-score { font-size: 32px; }
+      .gf-team { font-size: 15px; }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="gf-wrap">
+  <section class="gf-hero">
+    <div class="gf-trophy" aria-hidden="true">🏆</div>
+    <h1>Grand <span class="accent">Final</span></h1>
+    <div class="gf-hero-sub" id="gf-round-label">Round 18 · Decider Weekend</div>
+    <div class="gf-updated" id="gf-updated" style="display:none;">
+      <span class="gf-live-dot" aria-hidden="true"></span>
+      <span id="gf-updated-text">Updating…</span>
+    </div>
+  </section>
+
+  <div class="gf-fixtures" id="gf-fixtures">
+    <div class="gf-loading">Loading the finals…</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const REFRESH_MS = 60000;
+
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function relativeTime(iso) {
+    if (!iso) return 'No data yet';
+    const then = new Date(iso);
+    if (isNaN(then)) return 'No data yet';
+    const secs = Math.max(0, Math.floor((Date.now() - then.getTime()) / 1000));
+    if (secs < 60)   return 'Updated just now';
+    if (secs < 3600) return `Updated ${Math.floor(secs / 60)} min ago`;
+    if (secs < 86400) return `Updated ${Math.floor(secs / 3600)} h ago`;
+    return `Updated ${then.toLocaleDateString()}`;
+  }
+
+  function fixtureCard(fx) {
+    const homeWin = fx.home_wins, awayWin = fx.away_wins;
+    const statusText = fx.played
+      ? (homeWin ? `${fx.home} lead` : awayWin ? `${fx.away} lead` : 'All square')
+      : 'Awaiting kickoff';
+    const statusCls = fx.played ? 'gf-status is-live' : 'gf-status';
+    return `
+      <div class="gf-card">
+        <div class="gf-card-head">
+          <span class="gf-card-title">${esc(fx.title)}</span>
+          <span class="gf-card-tag">${fx.played ? 'Live' : 'Upcoming'}</span>
+        </div>
+        <div class="gf-match">
+          <div class="gf-side gf-side-home ${homeWin ? 'is-winner' : ''}">
+            <span class="gf-crown" aria-hidden="true">👑</span>
+            <span class="gf-team">${esc(fx.home)}</span>
+            <span class="gf-score">${fx.played ? fx.home_score.toFixed(1) : '–'}</span>
+          </div>
+          <div class="gf-vs">vs</div>
+          <div class="gf-side gf-side-away ${awayWin ? 'is-winner' : ''}">
+            <span class="gf-crown" aria-hidden="true">👑</span>
+            <span class="gf-team">${esc(fx.away)}</span>
+            <span class="gf-score">${fx.played ? fx.away_score.toFixed(1) : '–'}</span>
+          </div>
+        </div>
+        <div class="${statusCls}">${esc(statusText)}</div>
+      </div>`;
+  }
+
+  async function load() {
+    const wrap = document.getElementById('gf-fixtures');
+    try {
+      const res  = await fetch('/api/grand-final');
+      if (!res.ok) throw new Error('request failed');
+      const data = await res.json();
+
+      document.getElementById('gf-round-label').textContent =
+        `Round ${data.round} · Championship & Sacko Finals`;
+
+      const upd = document.getElementById('gf-updated');
+      upd.style.display = 'inline-flex';
+      document.getElementById('gf-updated-text').textContent = relativeTime(data.last_updated);
+
+      wrap.innerHTML = data.fixtures.map(fixtureCard).join('');
+    } catch (err) {
+      wrap.innerHTML = '<div class="gf-error">Couldn’t load the finals. Retrying shortly…</div>';
+    }
+  }
+
+  load();
+  setInterval(load, REFRESH_MS);
+</script>
+{% endblock %}

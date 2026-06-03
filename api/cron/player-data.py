@@ -1,10 +1,17 @@
 """
 Vercel Cron handler for player data scraping.
-
-Runs every Tuesday at 12:00 UTC via Vercel Cron.
 Endpoint: GET /api/cron/player-data
 
 Scrapes player statistics from SuperBru and updates the database.
+
+Schedule (all times UTC):
+  - Weekly:      Mondays 17:00 UTC, via vercel.json crons -> "0 17 * * 1"
+  - Grand Final: every 3 min, Sat 6 Jun 14:00-16:00 UTC (3-5pm BST), plus a
+                 settle update Mon 8 Jun 13:00 UTC (2pm BST). Driven by the
+                 GitHub Actions workflow .github/workflows/grand-final-scrape.yml
+                 (Vercel free-tier crons can't run more than once/day), which
+                 hits this endpoint on a loop so /grand-final scores round 18
+                 near-live.
 """
 
 import os
