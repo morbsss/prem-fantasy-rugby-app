@@ -157,12 +157,59 @@ def get_team_score(conn, team_name: str, round_num: int) -> float:
     cursor.close()
 
     if not row:
-        return 0.0
-
-    if DB_TYPE == 'postgres':
-        return float(row.get('total_score', 0))
+        individuals = 0.0
+    elif DB_TYPE == 'postgres':
+        individuals = float(row.get('total_score', 0))
     else:
-        return float(row[0])
+        individuals = float(row[0])
+
+    return individuals + _front_row_score(conn, team_name, round_num)
+
+
+def _front_row_score(conn, team_name: str, round_num: int) -> float:
+    """Points from a team's club front-row unit: the club's PR/HK players who
+    were in the real matchday squad (match_lineups) that round, by points delta.
+    Falls back to all the club's front-rowers when no lineup data exists yet."""
+    ph = _get_placeholder(conn)
+    cur = conn.cursor()
+    cur.execute(f'SELECT club, league_id FROM team_front_row '
+                f'WHERE team_name = {ph} AND round = {ph}', (team_name, round_num))
+    fr = cur.fetchone()
+    if not fr:
+        cur.close()
+        return 0.0
+    club = fr['club'] if isinstance(fr, dict) else fr[0]
+    league_id = fr['league_id'] if isinstance(fr, dict) else fr[1]
+
+    cur.execute(f'SELECT COUNT(*) FROM match_lineups WHERE round = {ph} AND real_team = {ph}',
+                (round_num, club))
+    cnt_row = cur.fetchone()
+    has_lineup = ((cnt_row['count'] if isinstance(cnt_row, dict) else cnt_row[0]) or 0) > 0
+
+    matchday = ''
+    extra = []
+    if has_lineup:
+        matchday = (f"AND EXISTS (SELECT 1 FROM match_lineups ml WHERE ml.round = {ph} "
+                    f"AND ml.real_team = p.team AND REPLACE(p.name, '''', '') = ml.player_name)")
+        extra = [round_num]
+
+    cur.execute(f'''
+        SELECT COALESCE(SUM(base_delta), 0) AS s FROM (
+            SELECT MAX(ws.total_points) - COALESCE(MAX(wp.total_points), 0) AS base_delta
+            FROM players p
+            JOIN weekly_stats ws ON ws.player_id = p.player_id AND ws.round = {ph}
+            LEFT JOIN weekly_stats wp ON wp.player_id = p.player_id AND wp.round = {ph}
+            WHERE p.league_id = {ph} AND p.team = {ph} AND p.position IN ('PR', 'HK')
+            {matchday}
+            GROUP BY p.player_id
+        ) t
+    ''', (round_num, round_num - 1, league_id, club, *extra))
+    row = cur.fetchone()
+    cur.close()
+    if not row:
+        return 0.0
+    val = row['s'] if isinstance(row, dict) else row[0]
+    return float(val or 0)
 
 
 # ---------------------------------------------------------------------------
@@ -252,9 +299,10 @@ def calculate_table(
                 teams[team_name].drawn         += 1
                 teams[team_name].league_points += DRAW_PTS
 
+    # Standings order (spec §5.4): league points, then higher Points For.
     return sorted(
         teams.values(),
-        key=lambda t: (t.league_points, t.points_diff),
+        key=lambda t: (t.league_points, t.points_for),
         reverse=True,
     )
 
@@ -294,10 +342,21 @@ def _apply_result(home: Team, away: Team, hs: float, aw: float) -> None:
 # League roster + fixture generation (dynamic: any team count)
 # ---------------------------------------------------------------------------
 
-def get_league_teams(conn) -> list[str]:
-    """Distinct fantasy team names that have a squad, sorted for a stable schedule."""
+def get_league_teams(conn, league_id=None) -> list[str]:
+    """Distinct fantasy team names that have a squad, sorted for a stable schedule.
+
+    Pass `league_id` to scope to one league (required once both leagues hold
+    data); omitting it returns every team across all leagues (legacy behaviour).
+    """
     cursor = conn.cursor()
-    cursor.execute('SELECT DISTINCT team_name FROM team_selections')
+    if league_id is None:
+        cursor.execute('SELECT DISTINCT team_name FROM team_selections')
+    else:
+        ph = _get_placeholder(conn)
+        cursor.execute(
+            f'SELECT DISTINCT team_name FROM team_selections WHERE league_id = {ph}',
+            (league_id,),
+        )
     rows = cursor.fetchall()
     cursor.close()
     names = [r['team_name'] if isinstance(r, dict) else r[0] for r in rows]
@@ -424,6 +483,28 @@ def build_playoffs(conn, table: list[Team], max_round: int) -> dict:
     if n >= 8:
         out['sacko'] = _bracket(conn, [t.name for t in table[-4:]], max_round, 'sacko')
     return out
+
+
+def standings_progression(
+    regular: list[tuple[int, str, bool, str, bool]],
+    conn,
+    max_round: int,
+) -> list[dict]:
+    """Per-round regular-season standings (spec §7 movement arrows + history graph).
+
+    Returns [{'round': r, 'order': [team_name, ...]}] for r in 1..min(max_round,
+    REGULAR_ROUNDS), best-ranked first. Every team appears in every round (teams
+    yet to play are padded at the bottom) so the front-end can plot a continuous
+    rank line per team and derive week-on-week movement.
+    """
+    all_teams = sorted({t for fx in regular for t in (fx[1], fx[3]) if t != 'Bye'})
+    upto = min(max_round, REGULAR_ROUNDS)
+    history = []
+    for r in range(1, upto + 1):
+        order = [t.name for t in calculate_table(regular, conn, r)]
+        order += [t for t in all_teams if t not in order]   # pad teams not yet ranked
+        history.append({'round': r, 'order': order})
+    return history
 
 
 def playoff_fixtures(playoffs: dict) -> list[tuple[int, str, bool, str, bool]]:

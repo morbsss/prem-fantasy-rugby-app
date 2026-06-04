@@ -19,61 +19,51 @@ def verify_password(password: str, hash_str: str) -> bool:
     return check_password_hash(hash_str, password)
 
 
-def create_user(conn, username: str, password: str, team_name: str) -> dict:
-    """Create a new user account. Returns user data or error dict."""
+def create_user(conn, email: str, password: str, team_name: str, league_id) -> dict:
+    """Create a new user account (email + password, joined to one league).
+
+    `username` is set to the email for backward compatibility with the legacy
+    session/display code, which still reads session['username'].
+    """
+    ph = '%s' if _is_postgres(conn) else '?'
     cursor = conn.cursor()
 
-    # Check if username already exists
-    if _is_postgres(conn):  # PostgreSQL
-        cursor.execute('SELECT user_id FROM users WHERE username = %s', (username,))
-    else:  # SQLite
-        cursor.execute('SELECT user_id FROM users WHERE username = ?', (username,))
-
+    # Email already registered? (username mirrors email, so this also covers it.)
+    cursor.execute(f'SELECT user_id FROM users WHERE email = {ph} OR username = {ph}', (email, email))
     if cursor.fetchone():
         cursor.close()
-        return {'error': 'Username already taken'}
+        return {'error': 'An account with that email already exists'}
 
-    # Check if team is already claimed
-    if _is_postgres(conn):  # PostgreSQL
-        cursor.execute('SELECT user_id FROM users WHERE team_name = %s', (team_name,))
-    else:  # SQLite
-        cursor.execute('SELECT user_id FROM users WHERE team_name = ?', (team_name,))
-
+    # Team name already taken?
+    cursor.execute(f'SELECT user_id FROM users WHERE team_name = {ph}', (team_name,))
     if cursor.fetchone():
         cursor.close()
-        return {'error': 'Team already claimed by another user'}
+        return {'error': 'That team name is already taken'}
 
-    # Create user
     password_hash = hash_password(password)
     created_at = datetime.utcnow().isoformat()
 
     try:
-        if _is_postgres(conn):  # PostgreSQL
-            cursor.execute('''
-                INSERT INTO users (username, password_hash, team_name, created_at)
-                VALUES (%s, %s, %s, %s)
-            ''', (username, password_hash, team_name, created_at))
-        else:  # SQLite
-            cursor.execute('''
-                INSERT INTO users (username, password_hash, team_name, created_at)
-                VALUES (?, ?, ?, ?)
-            ''', (username, password_hash, team_name, created_at))
-
+        cursor.execute(
+            f'INSERT INTO users (username, email, password_hash, team_name, league_id, created_at) '
+            f'VALUES ({ph}, {ph}, {ph}, {ph}, {ph}, {ph})',
+            (email, email, password_hash, team_name, league_id, created_at),
+        )
         conn.commit()
 
-        # Fetch the created user
-        if _is_postgres(conn):  # PostgreSQL
-            cursor.execute('SELECT user_id, username, team_name FROM users WHERE username = %s', (username,))
-        else:  # SQLite
-            cursor.execute('SELECT user_id, username, team_name FROM users WHERE username = ?', (username,))
-
+        cursor.execute(
+            f'SELECT user_id, username, email, team_name, league_id FROM users WHERE email = {ph}',
+            (email,),
+        )
         user = cursor.fetchone()
         cursor.close()
-
+        u = user if isinstance(user, dict) else {
+            'user_id': user[0], 'username': user[1], 'email': user[2],
+            'team_name': user[3], 'league_id': user[4],
+        }
         return {
-            'user_id': user['user_id'] if isinstance(user, dict) else user[0],
-            'username': user['username'] if isinstance(user, dict) else user[1],
-            'team_name': user['team_name'] if isinstance(user, dict) else user[2],
+            'user_id': u['user_id'], 'username': u['username'], 'email': u['email'],
+            'team_name': u['team_name'], 'league_id': u['league_id'],
         }
     except Exception as e:
         cursor.close()
@@ -81,68 +71,61 @@ def create_user(conn, username: str, password: str, team_name: str) -> dict:
         return {'error': str(e)}
 
 
-def authenticate_user(conn, username: str, password: str) -> dict:
-    """Authenticate user and return user data or error."""
+def authenticate_user(conn, identifier: str, password: str) -> dict:
+    """Authenticate by email (or legacy username) + password."""
+    ph = '%s' if _is_postgres(conn) else '?'
     cursor = conn.cursor()
-
-    if _is_postgres(conn):  # PostgreSQL
-        cursor.execute(
-            'SELECT user_id, username, password_hash, team_name FROM users WHERE username = %s',
-            (username,)
-        )
-    else:  # SQLite
-        cursor.execute(
-            'SELECT user_id, username, password_hash, team_name FROM users WHERE username = ?',
-            (username,)
-        )
-
+    cursor.execute(
+        f'SELECT user_id, username, password_hash, team_name, league_id '
+        f'FROM users WHERE LOWER(email) = LOWER({ph}) OR LOWER(username) = LOWER({ph})',
+        (identifier, identifier),
+    )
     user = cursor.fetchone()
     cursor.close()
 
     if not user:
-        return {'error': 'Invalid username or password'}
+        return {'error': 'Invalid email or password'}
 
-    # Extract values based on row type
     if isinstance(user, dict):
         user_id = user['user_id']
         user_password_hash = user['password_hash']
         team_name = user['team_name']
         username_val = user['username']
+        league_id = user['league_id']
     else:
-        user_id = user[0]
-        username_val = user[1]
-        user_password_hash = user[2]
-        team_name = user[3]
+        user_id, username_val, user_password_hash, team_name, league_id = user
 
     if not verify_password(password, user_password_hash):
-        return {'error': 'Invalid username or password'}
+        return {'error': 'Invalid email or password'}
 
     return {
         'user_id': user_id,
         'username': username_val,
         'team_name': team_name,
+        'league_id': league_id,
     }
 
 
-def get_available_teams(conn) -> list:
-    """Get list of available teams (not claimed by any user)."""
+def get_available_teams(conn, league_id=None) -> list:
+    """Get list of teams (optionally scoped to a league) and whether claimed."""
+    ph = '%s' if _is_postgres(conn) else '?'
     cursor = conn.cursor()
 
-    # Get all teams from team_selections that don't have a user
-    if _is_postgres(conn):  # PostgreSQL
+    if league_id is None:
         cursor.execute('''
             SELECT DISTINCT ts.team_name, u.username
             FROM team_selections ts
             LEFT JOIN users u ON u.team_name = ts.team_name
             ORDER BY ts.team_name
         ''')
-    else:  # SQLite
-        cursor.execute('''
+    else:
+        cursor.execute(f'''
             SELECT DISTINCT ts.team_name, u.username
             FROM team_selections ts
             LEFT JOIN users u ON u.team_name = ts.team_name
+            WHERE ts.league_id = {ph}
             ORDER BY ts.team_name
-        ''')
+        ''', (league_id,))
 
     teams = []
     for row in cursor.fetchall():

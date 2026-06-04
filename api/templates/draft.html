@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block page_title %}Draft — {{ brand }} Fantasy{% endblock %}
+
+{% block extra_styles %}
+  .draft-wrap { max-width: 1100px; margin: 0 auto; padding: 16px; width: 100%; }
+  .draft-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .draft-grid { grid-template-columns: 1fr 340px; } }
+
+  .draft-status {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    padding: 14px 16px; margin-bottom: 16px;
+  }
+  .draft-status .pill {
+    font-family: var(--font-display); font-weight: 800; letter-spacing: .04em;
+    text-transform: uppercase; font-size: 13px; padding: 4px 12px;
+    border-radius: var(--r-full); background: var(--surface-2); color: var(--ink-muted);
+  }
+  .draft-status .pill.live { background: var(--success); color: #fff; }
+  .draft-status .pill.complete { background: var(--forest); color: var(--cream); }
+  .on-clock { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--ink); }
+  .on-clock .accent { color: var(--amber); }
+  .clock { margin-left: auto; font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--forest); }
+  .clock.warn { color: var(--danger); }
+
+  .section-title { font-family: var(--font-display); font-weight: 800; letter-spacing: .04em;
+    text-transform: uppercase; font-size: 13px; color: var(--ink-muted); margin: 4px 0 8px; }
+
+  .pool { padding: 12px; }
+  .pool-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .player-row { display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+  .player-row:last-child { border-bottom: none; }
+  .player-row .nm { font-weight: 600; flex: 1; min-width: 0; }
+  .player-row .nm small { color: var(--ink-faint); font-weight: 500; }
+  .player-row .rk { font-family: var(--font-display); font-weight: 800; color: var(--forest); min-width: 44px; text-align: right; }
+
+  .roster-list { padding: 12px; }
+  .roster-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; }
+  .needs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .need-chip { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: var(--r-full);
+    background: rgba(201,122,31,.16); color: var(--warning); }
+
+  .board { padding: 12px; max-height: 320px; overflow-y: auto; }
+  .board-row { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .board-row .pk { color: var(--ink-faint); min-width: 34px; font-variant-numeric: tabular-nums; }
+  .board-row .tm { font-weight: 600; min-width: 120px; }
+  .board-row .auto { font-size: 10px; color: var(--ink-faint); text-transform: uppercase; }
+
+  .commish { padding: 14px; margin-bottom: 16px; border: 1px dashed var(--amber); }
+  .order-team { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+  .order-team .idx { font-family: var(--font-display); font-weight: 800; color: var(--ink-faint); min-width: 22px; }
+  .order-team .nm { flex: 1; }
+  .order-team button { font-size: 16px; padding: 2px 8px; }
+  .muted { color: var(--ink-muted); font-size: 13px; }
+  .row-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  input[type="datetime-local"] { padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--r-md); }
+{% endblock %}
+
+{% block content %}
+<div class="draft-wrap">
+  <div class="ofds-card draft-status" id="status-bar">
+    <span class="muted">Loading draft…</span>
+  </div>
+
+  <div id="commish-panel"></div>
+
+  <div class="draft-grid">
+    <div>
+      <div class="section-title">Available players</div>
+      <div class="ofds-card pool">
+        <div class="pool-filters" id="pool-filters"></div>
+        <div id="pool-list"></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">Your squad <span id="roster-count" class="muted"></span></div>
+      <div class="ofds-card roster-list">
+        <div id="roster-list"></div>
+        <div class="needs" id="needs"></div>
+      </div>
+      <div class="section-title" style="margin-top:16px;">Draft board</div>
+      <div class="ofds-card board" id="board"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const POSITIONS = ['ALL','FR','LK','LF','SH','FH','MID','OBK'];
+  let posFilter = 'ALL';
+  let state = null;
+  let autoFiring = false;
+  let orderDraft = null;   // commissioner working copy of the order
+  let commishBuilt = false; // setup form already on screen (don't clobber on poll)
+
+  async function api(path, body) {
+    const opt = body ? { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) }
+                      : {};
+    const res = await fetch(path, opt);
+    return { ok: res.ok, data: await res.json() };
+  }
+
+  async function load() {
+    const { data } = await api('/api/draft');
+    state = data;
+    render();
+    // Drive auto-draft for an absent/expired pick (spec §6.2). Any open client
+    // can trigger it; the server only allows it once the clock has expired.
+    if (state.status === 'live' && state.auto_due && !autoFiring) {
+      autoFiring = true;
+      await api('/api/draft/autopick', {});
+      autoFiring = false;
+      load();
+    }
+  }
+
+  function fmtClock() {
+    if (state.status !== 'live' || !state.pick_deadline) return '';
+    const ms = new Date(state.pick_deadline) - new Date();
+    const s = Math.max(0, Math.round(ms / 1000));
+    return `${s}s`;
+  }
+
+  function render() {
+    renderStatus();
+    renderCommish();
+    renderPool();
+    renderRoster();
+    renderBoard();
+  }
+
+  function renderStatus() {
+    const bar = document.getElementById('status-bar');
+    const lg = state.league ? state.league.name : '';
+    let pill = `<span class="pill ${state.status}">${state.status}</span>`;
+    let mid = '';
+    if (state.status === 'pending') {
+      mid = `<span class="muted">Draft not started${state.draft_at ? ' · scheduled ' + new Date(state.draft_at).toLocaleString() : ''}.</span>`;
+    } else if (state.status === 'live') {
+      mid = `<span class="on-clock">On the clock: <span class="accent">${state.on_clock || '—'}</span></span>
+             <span class="muted">Pick ${state.current_pick} / ${state.total_picks} · Round ${state.round}</span>`;
+    } else if (state.status === 'complete') {
+      mid = `<span class="on-clock">Draft complete 🎉</span>`;
+    }
+    const clk = state.status === 'live' ? `<span class="clock ${ (new Date(state.pick_deadline)-new Date())<10000 ? 'warn':''}">${fmtClock()}</span>` : '';
+    bar.innerHTML = `${pill} ${mid} ${clk}`;
+  }
+
+  function renderCommish(force = false) {
+    const wrap = document.getElementById('commish-panel');
+    if (!state.is_commissioner || state.status === 'complete') {
+      wrap.innerHTML = ''; commishBuilt = false; return;
+    }
+
+    if (state.status === 'live') {
+      commishBuilt = false;
+      wrap.innerHTML = `<div class="ofds-card commish">
+        <div class="section-title">Commissioner</div>
+        <div class="muted">Each pick has a 60-second clock — when it runs out the team on the
+          clock is auto-drafted a valid player. You can also force the current pick now.</div>
+        <div class="row-actions">
+          <button class="ofds-btn ofds-btn--secondary ofds-btn--sm" onclick="autopickNow()">Auto-pick current</button>
+        </div></div>`;
+      return;
+    }
+
+    // pending → setup. Don't rebuild on background polls (that wiped the typed
+    // date and dropped focus); only build on first render or an explicit action.
+    if (commishBuilt && !force) return;
+    const cur = document.getElementById('draft-at');
+    const dateVal = cur ? cur.value : toLocalInput(state.draft_at);   // keep typed value across rebuilds
+    if (orderDraft === null) orderDraft = state.order.slice();
+    const rows = orderDraft.map((t, i) => `
+      <div class="order-team">
+        <span class="idx">${i+1}</span><span class="nm">${t}</span>
+        <button class="ofds-btn ofds-btn--ghost ofds-btn--sm" onclick="moveTeam(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="ofds-btn ofds-btn--ghost ofds-btn--sm" onclick="moveTeam(${i},1)" ${i===orderDraft.length-1?'disabled':''}>↓</button>
+      </div>`).join('');
+    wrap.innerHTML = `<div class="ofds-card commish">
+      <div class="section-title">Commissioner — set up the draft</div>
+      <div style="margin-bottom:10px;">
+        <label class="muted">Draft date &amp; time (must be before the season starts)</label><br>
+        <input type="datetime-local" id="draft-at" value="${dateVal}">
+      </div>
+      <div class="muted">Snake order</div>
+      ${rows}
+      <div class="row-actions">
+        <button class="ofds-btn ofds-btn--ghost ofds-btn--sm" onclick="shuffleOrder()">Shuffle</button>
+        <button class="ofds-btn ofds-btn--primary ofds-btn--sm" onclick="saveSetup()">Save setup</button>
+        <button class="ofds-btn ofds-btn--secondary ofds-btn--sm" onclick="startDraft()">Start draft</button>
+      </div>
+    </div>`;
+    commishBuilt = true;
+  }
+
+  function toLocalInput(iso) {
+    if (!iso) return '';
+    const d = new Date(iso); if (isNaN(d)) return '';
+    const pad = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  window.moveTeam = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= orderDraft.length) return;
+    [orderDraft[i], orderDraft[j]] = [orderDraft[j], orderDraft[i]];
+    renderCommish(true);
+  };
+  window.shuffleOrder = () => {
+    for (let i = orderDraft.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [orderDraft[i],orderDraft[j]]=[orderDraft[j],orderDraft[i]]; }
+    renderCommish(true);
+  };
+  window.saveSetup = async () => {
+    const at = document.getElementById('draft-at').value;
+    const iso = at ? new Date(at).toISOString() : '';
+    const { ok, data } = await api('/api/draft/setup', { draft_at: iso, order: orderDraft });
+    ofdsToast(ok ? 'Draft setup saved' : (data.error || 'Failed'), ok ? 'ok' : 'err');
+    if (ok) load();
+  };
+  window.startDraft = async () => {
+    const { ok, data } = await api('/api/draft/start', {});
+    ofdsToast(ok ? 'Draft started!' : (data.error || 'Failed'), ok ? 'ok' : 'err');
+    if (ok) { orderDraft = null; load(); }
+  };
+  window.autopickNow = async () => {
+    const { ok, data } = await api('/api/draft/autopick', {});
+    ofdsToast(ok ? `Auto-picked ${data.player || ''}` : (data.error || 'Failed'), ok ? 'ok' : 'err');
+    load();
+  };
+
+  function renderPool() {
+    const filters = document.getElementById('pool-filters');
+    filters.innerHTML = POSITIONS.map(p =>
+      `<button class="ofds-chip ${p===posFilter?'is-active':''}" onclick="setFilter('${p}')">${p}</button>`).join('');
+    const list = document.getElementById('pool-list');
+    const canPick = state.status === 'live' && state.is_on_clock;
+
+    // Front-row units (clubs) — shown first when you still need one.
+    let frHtml = '';
+    if (state.need_fr && (posFilter === 'ALL' || posFilter === 'PR' || posFilter === 'HK')) {
+      const clubs = (state.available_fr || []).slice(0, 40);
+      if (clubs.length) {
+        frHtml = `<div class="muted" style="padding:6px;font-weight:700;">FR (clubs)</div>`
+          + clubs.map(c => `<div class="player-row">
+              <span class="ofds-pos">FR</span>
+              <span class="nm">${esc(c.club)} FR</span>
+              <span class="rk">${(c.rank||0).toFixed ? c.rank.toFixed(0) : c.rank}</span>
+              ${canPick ? `<button class="ofds-btn ofds-btn--primary ofds-btn--sm" onclick="pickFr('${escAttr(c.club)}')">Draft</button>` : ''}
+            </div>`).join('')
+          + `<div class="muted" style="padding:6px;font-weight:700;">Players</div>`;
+      }
+    }
+
+    let players = state.available || [];
+    if (posFilter !== 'ALL') players = players.filter(p => p.position === posFilter);
+    players = players.slice(0, 60);
+    const playersHtml = players.map(p => `
+      <div class="player-row">
+        <span class="ofds-pos">${p.position}</span>
+        <span class="nm">${esc(p.name)} <small>${esc(p.real_team)}</small></span>
+        <span class="rk">${(p.rank||0).toFixed ? p.rank.toFixed(0) : p.rank}</span>
+        ${canPick ? `<button class="ofds-btn ofds-btn--primary ofds-btn--sm" onclick="pick(${p.id})">Draft</button>` : ''}
+      </div>`).join('');
+    list.innerHTML = (frHtml + playersHtml) || '<div class="muted" style="padding:8px;">No players.</div>';
+  }
+  window.setFilter = (p) => { posFilter = p; renderPool(); };
+
+  window.pick = async (id) => {
+    const { ok, data } = await api('/api/draft/pick', { player_id: id });
+    ofdsToast(ok ? `Drafted ${data.player}` : (data.error || 'Failed'), ok ? 'ok' : 'err');
+    load();
+  };
+  window.pickFr = async (club) => {
+    const { ok, data } = await api('/api/draft/pick', { fr_club: club });
+    ofdsToast(ok ? `Drafted ${data.player}` : (data.error || 'Failed'), ok ? 'ok' : 'err');
+    load();
+  };
+
+  function renderRoster() {
+    document.getElementById('roster-count').textContent =
+      state.your_team ? `(${(state.your_roster||[]).length}/${state.roster_size} + FR) · ${state.your_team}` : '';
+    const list = document.getElementById('roster-list');
+    const r = state.your_roster || [];
+    let html = state.your_fr
+      ? `<div class="roster-item"><span class="ofds-pos">FR</span> <b>${esc(state.your_fr)} FR</b></div>`
+      : (state.your_team ? `<div class="roster-item" style="color:var(--danger)">No FR</div>` : '');
+    html += r.length
+      ? r.map(p => `<div class="roster-item"><span class="ofds-pos">${p.position}</span> ${esc(p.name)}</div>`).join('')
+      : (state.your_team ? '' : '<div class="muted">No players drafted yet.</div>');
+    list.innerHTML = html || '<div class="muted">No players drafted yet.</div>';
+    const needs = document.getElementById('needs');
+    const n = state.your_needs || {};
+    const chips = Object.entries(n).map(([slot,c]) => `<span class="need-chip">Need ${slot} ×${c}</span>`);
+    if (state.need_fr) chips.unshift('<span class="need-chip">Need FR</span>');
+    needs.innerHTML = chips.length ? chips.join('')
+      : (r.length ? '<span class="muted">Squad requirements met.</span>' : '');
+  }
+
+  function esc(s){ return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function escAttr(s){ return esc(s).replace(/'/g,'&#39;'); }
+
+  function renderBoard() {
+    const b = document.getElementById('board');
+    const rows = (state.board || []).slice().reverse();
+    b.innerHTML = rows.length
+      ? rows.map(p => `<div class="board-row"><span class="pk">#${p.pick_number}</span>
+          <span class="tm">${p.team_name}</span>
+          <span>${p.name || '—'} <span class="ofds-pos">${p.position||''}</span></span>
+          ${p.is_auto ? '<span class="auto">auto</span>' : ''}</div>`).join('')
+      : '<div class="muted">No picks yet.</div>';
+  }
+
+  load();
+  setInterval(load, 1000);
+</script>
+{% endblock %}

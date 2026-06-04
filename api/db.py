@@ -10,6 +10,8 @@ Environment variables:
 import os
 import sqlite3
 
+from .leagues import LEAGUES, DEFAULT_LEAGUE
+
 
 DB_TYPE = os.getenv('DB_TYPE', 'sqlite').lower()
 
@@ -218,23 +220,17 @@ def ensure_schema(conn):
             )
         ''')
 
-    # Rounds table — stores first/last kickoff per round (populated by sync_rounds.py)
-    if DB_TYPE == 'postgres':
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS rounds (
-                round_number INTEGER PRIMARY KEY,
-                first_kickoff TEXT NOT NULL,
-                last_kickoff TEXT NOT NULL
-            )
-        ''')
-    else:
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS rounds (
-                round_number INTEGER PRIMARY KEY,
-                first_kickoff TEXT NOT NULL,
-                last_kickoff TEXT NOT NULL
-            )
-        ''')
+    # Rounds table — stores first/last kickoff per round (populated by sync_rounds.py).
+    # No sole PK on round_number: round numbers repeat across leagues, so
+    # uniqueness is enforced per-league via idx_rounds_league_round (added in
+    # _ensure_league_schema). Legacy DBs keep their original round_number PK.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS rounds (
+            round_number INTEGER NOT NULL,
+            first_kickoff TEXT NOT NULL,
+            last_kickoff TEXT NOT NULL
+        )
+    ''')
 
     # Match lineups table (populated by real_lineups.py)
     if DB_TYPE == 'postgres':
@@ -278,4 +274,187 @@ def ensure_schema(conn):
             cursor.execute('ALTER TABLE team_selections ADD COLUMN jersey INTEGER')
 
     conn.commit()
+
+    # Two-league support (spec §1, §5.1) + draft engine tables.
+    _ensure_league_schema(conn, cursor)
+
+    conn.commit()
     cursor.close()
+
+
+# ---------------------------------------------------------------------------
+# Two-league + draft schema
+# ---------------------------------------------------------------------------
+
+# Tables that gain a league_id discriminator. Existing single-league rows are
+# backfilled to DEFAULT_LEAGUE (the original Premiership / OFDS data).
+_LEAGUE_SCOPED_TABLES = (
+    'players', 'weekly_stats', 'team_selections', 'rounds', 'match_lineups', 'users',
+)
+
+
+def _column_exists(cursor, table: str, column: str) -> bool:
+    if DB_TYPE == 'postgres':
+        cursor.execute(
+            'SELECT 1 FROM information_schema.columns '
+            'WHERE table_name = %s AND column_name = %s',
+            (table, column),
+        )
+        return cursor.fetchone() is not None
+    return column in {row[1] for row in cursor.execute(f'PRAGMA table_info({table})')}
+
+
+def _ensure_league_schema(conn, cursor) -> None:
+    """Create the leagues + draft tables, add league_id to scoped tables, and
+    seed the two leagues. Idempotent and non-destructive: existing rows are
+    backfilled to the default (Premiership / OFDS) league."""
+    serial = 'SERIAL PRIMARY KEY' if DB_TYPE == 'postgres' else 'INTEGER PRIMARY KEY AUTOINCREMENT'
+
+    # Leagues registry table — mirrors api/leagues.py so the DB is queryable.
+    cursor.execute(f'''
+        CREATE TABLE IF NOT EXISTS leagues (
+            league_id {serial},
+            slug TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            competition TEXT NOT NULL,
+            theme TEXT NOT NULL,
+            timezone TEXT NOT NULL,
+            commissioner_user_id INTEGER,
+            draft_at TEXT,
+            draft_order TEXT,
+            season_start TEXT
+        )
+    ''')
+
+    # Draft order + live-draft state, one row per league.
+    cursor.execute(f'''
+        CREATE TABLE IF NOT EXISTS draft_state (
+            league_id INTEGER PRIMARY KEY,
+            status TEXT NOT NULL DEFAULT 'pending',
+            current_pick INTEGER NOT NULL DEFAULT 0,
+            started_at TEXT,
+            completed_at TEXT,
+            pick_deadline TEXT
+        )
+    ''')
+
+    # One row per drafted entity — a player_id, OR a club front-row unit (fr_club).
+    cursor.execute(f'''
+        CREATE TABLE IF NOT EXISTS draft_picks (
+            id {serial},
+            league_id INTEGER NOT NULL,
+            pick_number INTEGER NOT NULL,
+            round_number INTEGER NOT NULL,
+            team_name TEXT NOT NULL,
+            player_id INTEGER,
+            fr_club TEXT,
+            is_auto INTEGER NOT NULL DEFAULT 0,
+            picked_at TEXT,
+            UNIQUE(league_id, pick_number)
+        )
+    ''')
+
+    # Each fantasy team's owned club front-row unit, per round (spec follow-up:
+    # front row is drafted/owned as a club unit, scored from the real matchday).
+    cursor.execute(f'''
+        CREATE TABLE IF NOT EXISTS team_front_row (
+            id {serial},
+            league_id INTEGER NOT NULL,
+            team_name TEXT NOT NULL,
+            round INTEGER NOT NULL,
+            club TEXT NOT NULL,
+            scraped_at TEXT,
+            UNIQUE(league_id, team_name, round)
+        )
+    ''')
+
+    # Trades log — free-agent pickups and inter-team (user↔user) trades.
+    # free_agent: from_team picks up in_player_id and drops out_player_id (→ FA),
+    #             status 'completed' immediately.
+    # player_trade: from_team offers out_player_id for to_team's in_player_id,
+    #               status 'pending' until the responder accepts/rejects.
+    cursor.execute(f'''
+        CREATE TABLE IF NOT EXISTS trades (
+            id {serial},
+            league_id INTEGER NOT NULL,
+            type TEXT NOT NULL,
+            status TEXT NOT NULL,
+            from_team TEXT NOT NULL,
+            to_team TEXT,
+            out_player_id INTEGER,
+            in_player_id INTEGER,
+            created_at TEXT NOT NULL,
+            resolved_at TEXT
+        )
+    ''')
+
+    # Ingestion job-run log (spec §3: each job logs its run; drives cadence
+    # + finalize idempotency in the scheduler).
+    cursor.execute(f'''
+        CREATE TABLE IF NOT EXISTS job_runs (
+            id {serial},
+            league_id INTEGER NOT NULL,
+            job TEXT NOT NULL,
+            round_number INTEGER,
+            status TEXT NOT NULL,
+            detail TEXT,
+            run_at TEXT NOT NULL
+        )
+    ''')
+
+    conn.commit()
+
+    # Seed the two leagues (idempotent upsert on slug).
+    for cfg in LEAGUES.values():
+        cursor.execute('SELECT league_id FROM leagues WHERE slug = ?'.replace('?', _ph()),
+                       (cfg['slug'],))
+        if cursor.fetchone() is None:
+            cursor.execute(
+                'INSERT INTO leagues (slug, name, competition, theme, timezone) '
+                f'VALUES ({_ph()}, {_ph()}, {_ph()}, {_ph()}, {_ph()})',
+                (cfg['slug'], cfg['name'], cfg['competition'], cfg['theme'], cfg['timezone']),
+            )
+    conn.commit()
+
+    default_league_id = _league_id_for_slug(cursor, DEFAULT_LEAGUE)
+
+    # Add league_id to each scoped table and backfill existing rows.
+    for table in _LEAGUE_SCOPED_TABLES:
+        if not _column_exists(cursor, table, 'league_id'):
+            cursor.execute(f'ALTER TABLE {table} ADD COLUMN league_id INTEGER')
+        cursor.execute(
+            f'UPDATE {table} SET league_id = {_ph()} WHERE league_id IS NULL',
+            (default_league_id,),
+        )
+    conn.commit()
+
+    # Per-league uniqueness for rounds (round numbers repeat across leagues).
+    # Works on both fresh DBs and legacy DBs that already have league_id backfilled.
+    cursor.execute(
+        'CREATE UNIQUE INDEX IF NOT EXISTS idx_rounds_league_round '
+        'ON rounds (league_id, round_number)'
+    )
+
+    # Email-based auth (spec §6.1). Added as a column so legacy username rows
+    # keep working; new sign-ups populate it.
+    if not _column_exists(cursor, 'users', 'email'):
+        cursor.execute('ALTER TABLE users ADD COLUMN email TEXT')
+    # Per-pick draft clock (spec §6.2 auto-draft).
+    if not _column_exists(cursor, 'draft_state', 'pick_deadline'):
+        cursor.execute('ALTER TABLE draft_state ADD COLUMN pick_deadline TEXT')
+    # Club front-row unit picks (front-row redesign).
+    if not _column_exists(cursor, 'draft_picks', 'fr_club'):
+        cursor.execute('ALTER TABLE draft_picks ADD COLUMN fr_club TEXT')
+    conn.commit()
+
+
+def _ph() -> str:
+    return '%s' if DB_TYPE == 'postgres' else '?'
+
+
+def _league_id_for_slug(cursor, slug: str) -> int:
+    cursor.execute(f'SELECT league_id FROM leagues WHERE slug = {_ph()}', (slug,))
+    row = cursor.fetchone()
+    if row is None:
+        raise ValueError(f'League {slug!r} not seeded')
+    return row['league_id'] if isinstance(row, dict) else row[0]

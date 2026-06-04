@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="{{ theme | default('forest') }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -66,6 +66,32 @@
       --bottom-nav-h: 64px;
       --bottom-nav-h-mobile: 56px;
     }
+
+    /* ============================================================
+       LEAGUE THEMES (spec §7)
+       meatyboys / Super Rugby Pacific → default "forest" tokens above.
+       OFDS / English Premiership      → "union" red / blue / white.
+       ============================================================ */
+    :root[data-theme="union"] {
+      --forest:        #0A2472;   /* navy blue — used for header, primary */
+      --forest-deep:   #061539;
+      --forest-soft:   #173A8A;
+      --cream:         #FFFFFF;
+      --cream-warm:    #EEF1F8;
+      --amber:         #C8102E;   /* red — used for accents */
+      --amber-deep:    #9E0C24;
+      --amber-soft:    #E8627A;
+
+      --bg:            #F4F6FB;
+      --surface:       #FFFFFF;
+      --surface-2:     #EEF1F8;
+      --border:        #D5DBEA;
+      --border-strong: #B3BCD6;
+    }
+
+    /* League-selection state: render everything desaturated until a league is
+       chosen (set client-side via data-theme="grayscale"). */
+    :root[data-theme="grayscale"] body { filter: grayscale(1); }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -680,9 +706,9 @@
 <div class="ofds-app">
 
   <header class="ofds-header">
-    <a href="/" class="ofds-brand" aria-label="OFDS Fantasy home">
-      <span class="ofds-brand-mark">OFDS<span class="accent">.</span></span>
-      <span class="ofds-brand-sub">Fantasy Rugby</span>
+    <a href="/" class="ofds-brand" aria-label="{{ brand | default('Meatyboys') }} Fantasy home">
+      <span class="ofds-brand-mark">{{ brand | default('Meatyboys') }}<span class="accent">.</span></span>
+      <span class="ofds-brand-sub">{{ brand_sub | default('Rugby Fantasy') }}</span>
     </a>
     <div class="ofds-header-center">
       {% block header_controls %}{% endblock %}
@@ -697,10 +723,17 @@
   </header>
 
   <nav class="ofds-tabs" aria-label="Primary">
+    {# Primary tabs (spec §7): Squad · Fixtures · League Table · Player Hub · Transfers #}
     <a href="/" class="ofds-tab {% if current_page == 'squad' %}is-active{% endif %}">Squad</a>
-    <a href="/competition" class="ofds-tab {% if current_page == 'competition' %}is-active{% endif %}">League</a>
+    <a href="/matchup" class="ofds-tab {% if current_page == 'matchup' %}is-active{% endif %}">Match Up</a>
+    <a href="/competition" class="ofds-tab {% if current_page == 'competition' %}is-active{% endif %}">League Table</a>
+    <a href="/fixtures" class="ofds-tab {% if current_page == 'fixtures' %}is-active{% endif %}">Fixtures</a>
     <a href="/finals" class="ofds-tab {% if current_page == 'finals' %}is-active{% endif %}">Finals</a>
-    {# Fixtures tab will be re-enabled once that screen is repainted (phase 4). #}
+    <a href="/players" class="ofds-tab {% if current_page == 'players' %}is-active{% endif %}">Player Hub</a>
+    <a href="/transfers" class="ofds-tab {% if current_page == 'transfers' %}is-active{% endif %}">Transfers</a>
+    {# Secondary screens #}
+    <a href="/draft" class="ofds-tab {% if current_page == 'draft' %}is-active{% endif %}">Draft</a>
+    
   </nav>
 
   <main class="ofds-main">
@@ -713,13 +746,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 4 7l2 3 1.5-.5V20h9V9.5L18 10l2-3-3-3-2.5 1a3 3 0 0 1-5 0z"/></svg>
       </span>
       <span>Squad</span>
-      <span class="dot"></span>
-    </a>
-    <a href="/#pool" class="ofds-bottom-nav-item" data-nav="pool" onclick="if(window.ofdsSwitchTab){event.preventDefault(); window.ofdsSwitchTab('pool');}">
-      <span class="ofds-bottom-nav-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      </span>
-      <span>Pool</span>
       <span class="dot"></span>
     </a>
     <a href="/fixtures" class="ofds-bottom-nav-item {% if current_page == 'fixtures' %}is-active{% endif %}" data-nav="fixtures">
@@ -736,11 +762,25 @@
       <span>League</span>
       <span class="dot"></span>
     </a>
-    <a href="/finals" class="ofds-bottom-nav-item {% if current_page == 'finals' %}is-active{% endif %}" data-nav="finals">
+    <a href="/players" class="ofds-bottom-nav-item {% if current_page == 'players' %}is-active{% endif %}" data-nav="players">
       <span class="ofds-bottom-nav-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0zM4 4h2v3a3 3 0 0 1-3-3zM20 4h-2v3a3 3 0 0 0 3-3z"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6a3 3 0 0 1 0 6M21 20a6 6 0 0 0-5-5.9"/></svg>
       </span>
-      <span>Finals</span>
+      <span>Players</span>
+      <span class="dot"></span>
+    </a>
+    <a href="/matchup" class="ofds-bottom-nav-item {% if current_page == 'matchup' %}is-active{% endif %}" data-nav="matchup">
+      <span class="ofds-bottom-nav-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v14M20 5v14M4 12h6M14 12h6M10 8v8M14 8v8"/></svg>
+      </span>
+      <span>Match Up</span>
+      <span class="dot"></span>
+    </a>
+    <a href="/transfers" class="ofds-bottom-nav-item {% if current_page == 'transfers' %}is-active{% endif %}" data-nav="transfers">
+      <span class="ofds-bottom-nav-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
+      </span>
+      <span>Transfers</span>
       <span class="dot"></span>
     </a>
     <a href="#profile" class="ofds-bottom-nav-item" data-nav="profile" onclick="event.preventDefault(); document.getElementById('profile-sheet').classList.add('is-open');">

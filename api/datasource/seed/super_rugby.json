@@ -1,0 +1,3127 @@
+{
+  "competition": "super_rugby",
+  "league_slug": "meatyboys",
+  "season": "2026-27",
+  "n_rounds": 18,
+  "real_teams": [
+    {
+      "name": "Blues",
+      "abbr": "BLU"
+    },
+    {
+      "name": "Chiefs",
+      "abbr": "CHI"
+    },
+    {
+      "name": "Crusaders",
+      "abbr": "CRU"
+    },
+    {
+      "name": "Highlanders",
+      "abbr": "HIG"
+    },
+    {
+      "name": "Hurricanes",
+      "abbr": "HUR"
+    },
+    {
+      "name": "Moana Pasifika",
+      "abbr": "MOA"
+    },
+    {
+      "name": "ACT Brumbies",
+      "abbr": "BRU"
+    },
+    {
+      "name": "Queensland Reds",
+      "abbr": "RED"
+    },
+    {
+      "name": "NSW Waratahs",
+      "abbr": "WAR"
+    },
+    {
+      "name": "Western Force",
+      "abbr": "FOR"
+    },
+    {
+      "name": "Fijian Drua",
+      "abbr": "DRU"
+    }
+  ],
+  "fantasy_teams": [
+    "Auckland Anchors",
+    "Canterbury Crushers",
+    "Wellington Warriors",
+    "Otago Outlaws",
+    "Waikato Wreckers",
+    "Pasifika Pythons",
+    "Brumby Bruisers",
+    "Reef Sharks",
+    "Drua Dynamos"
+  ],
+  "players": [
+    {
+      "id": "sup000",
+      "name": "Tuipulotu,T",
+      "team": "Blues",
+      "position": "PR",
+      "rate": 8.5,
+      "vol": 0.5,
+      "price": 9.1
+    },
+    {
+      "id": "sup001",
+      "name": "Brown,G",
+      "team": "Blues",
+      "position": "PR",
+      "rate": 5.8,
+      "vol": 0.4,
+      "price": 7.5
+    },
+    {
+      "id": "sup002",
+      "name": "Wilkin,A",
+      "team": "Blues",
+      "position": "PR",
+      "rate": 6.6,
+      "vol": 0.7,
+      "price": 8.0
+    },
+    {
+      "id": "sup003",
+      "name": "Roberts,L",
+      "team": "Blues",
+      "position": "PR",
+      "rate": 6.2,
+      "vol": 0.5,
+      "price": 7.7
+    },
+    {
+      "id": "sup004",
+      "name": "Wilkin,S",
+      "team": "Blues",
+      "position": "HK",
+      "rate": 5.1,
+      "vol": 0.4,
+      "price": 7.1
+    },
+    {
+      "id": "sup005",
+      "name": "Mapimpi,C",
+      "team": "Blues",
+      "position": "HK",
+      "rate": 5.5,
+      "vol": 0.6,
+      "price": 7.3
+    },
+    {
+      "id": "sup006",
+      "name": "Bennett,L",
+      "team": "Blues",
+      "position": "LK",
+      "rate": 6.8,
+      "vol": 0.7,
+      "price": 8.1
+    },
+    {
+      "id": "sup007",
+      "name": "Cole,K",
+      "team": "Blues",
+      "position": "LK",
+      "rate": 6.4,
+      "vol": 0.5,
+      "price": 7.8
+    },
+    {
+      "id": "sup008",
+      "name": "van Rhyn,O",
+      "team": "Blues",
+      "position": "LK",
+      "rate": 6.8,
+      "vol": 0.6,
+      "price": 8.1
+    },
+    {
+      "id": "sup009",
+      "name": "Nawaqanitawase,H",
+      "team": "Blues",
+      "position": "LF",
+      "rate": 6.9,
+      "vol": 0.6,
+      "price": 8.1
+    },
+    {
+      "id": "sup010",
+      "name": "Wood,C",
+      "team": "Blues",
+      "position": "LF",
+      "rate": 6.5,
+      "vol": 0.6,
+      "price": 7.9
+    },
+    {
+      "id": "sup011",
+      "name": "Ward,P",
+      "team": "Blues",
+      "position": "LF",
+      "rate": 9.3,
+      "vol": 0.6,
+      "price": 9.6
+    },
+    {
+      "id": "sup012",
+      "name": "Tupou,P",
+      "team": "Blues",
+      "position": "LF",
+      "rate": 10.8,
+      "vol": 0.6,
+      "price": 10.5
+    },
+    {
+      "id": "sup013",
+      "name": "van Rhyn,H",
+      "team": "Blues",
+      "position": "LF",
+      "rate": 9.6,
+      "vol": 0.7,
+      "price": 9.8
+    },
+    {
+      "id": "sup014",
+      "name": "Taylor,E",
+      "team": "Blues",
+      "position": "SH",
+      "rate": 9.3,
+      "vol": 0.4,
+      "price": 9.6
+    },
+    {
+      "id": "sup015",
+      "name": "Lewis,T",
+      "team": "Blues",
+      "position": "SH",
+      "rate": 10.6,
+      "vol": 0.8,
+      "price": 10.4
+    },
+    {
+      "id": "sup016",
+      "name": "Thompson,W",
+      "team": "Blues",
+      "position": "FH",
+      "rate": 11.2,
+      "vol": 0.7,
+      "price": 10.7
+    },
+    {
+      "id": "sup017",
+      "name": "Latu,A",
+      "team": "Blues",
+      "position": "FH",
+      "rate": 9.9,
+      "vol": 0.3,
+      "price": 9.9
+    },
+    {
+      "id": "sup018",
+      "name": "Bennett,O",
+      "team": "Blues",
+      "position": "MID",
+      "rate": 9.0,
+      "vol": 0.5,
+      "price": 9.4
+    },
+    {
+      "id": "sup019",
+      "name": "Havili,D",
+      "team": "Blues",
+      "position": "MID",
+      "rate": 10.7,
+      "vol": 0.3,
+      "price": 10.4
+    },
+    {
+      "id": "sup020",
+      "name": "Suaalii,G",
+      "team": "Blues",
+      "position": "MID",
+      "rate": 8.9,
+      "vol": 0.8,
+      "price": 9.3
+    },
+    {
+      "id": "sup021",
+      "name": "Ioane,P",
+      "team": "Blues",
+      "position": "OBK",
+      "rate": 7.0,
+      "vol": 0.7,
+      "price": 8.2
+    },
+    {
+      "id": "sup022",
+      "name": "Fihaki,C",
+      "team": "Blues",
+      "position": "OBK",
+      "rate": 7.0,
+      "vol": 0.7,
+      "price": 8.2
+    },
+    {
+      "id": "sup023",
+      "name": "Smith,B",
+      "team": "Blues",
+      "position": "OBK",
+      "rate": 9.0,
+      "vol": 0.5,
+      "price": 9.4
+    },
+    {
+      "id": "sup024",
+      "name": "Price,M",
+      "team": "Blues",
+      "position": "OBK",
+      "rate": 7.9,
+      "vol": 0.8,
+      "price": 8.7
+    },
+    {
+      "id": "sup025",
+      "name": "Petaia,F",
+      "team": "Blues",
+      "position": "OBK",
+      "rate": 10.8,
+      "vol": 0.4,
+      "price": 10.5
+    },
+    {
+      "id": "sup026",
+      "name": "Slipper,A",
+      "team": "Chiefs",
+      "position": "PR",
+      "rate": 9.3,
+      "vol": 0.4,
+      "price": 9.6
+    },
+    {
+      "id": "sup027",
+      "name": "Jones,O",
+      "team": "Chiefs",
+      "position": "PR",
+      "rate": 8.5,
+      "vol": 0.4,
+      "price": 9.1
+    },
+    {
+      "id": "sup028",
+      "name": "Fox,P",
+      "team": "Chiefs",
+      "position": "PR",
+      "rate": 8.1,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "sup029",
+      "name": "Fihaki,F",
+      "team": "Chiefs",
+      "position": "PR",
+      "rate": 5.4,
+      "vol": 0.8,
+      "price": 7.2
+    },
+    {
+      "id": "sup030",
+      "name": "Roberts,B",
+      "team": "Chiefs",
+      "position": "HK",
+      "rate": 7.5,
+      "vol": 0.3,
+      "price": 8.5
+    },
+    {
+      "id": "sup031",
+      "name": "Carter,L",
+      "team": "Chiefs",
+      "position": "HK",
+      "rate": 8.1,
+      "vol": 0.8,
+      "price": 8.9
+    },
+    {
+      "id": "sup032",
+      "name": "Vermeulen,K",
+      "team": "Chiefs",
+      "position": "LK",
+      "rate": 5.9,
+      "vol": 0.3,
+      "price": 7.5
+    },
+    {
+      "id": "sup033",
+      "name": "Bennett,C",
+      "team": "Chiefs",
+      "position": "LK",
+      "rate": 10.2,
+      "vol": 0.4,
+      "price": 10.1
+    },
+    {
+      "id": "sup034",
+      "name": "Burns,E",
+      "team": "Chiefs",
+      "position": "LK",
+      "rate": 7.7,
+      "vol": 0.8,
+      "price": 8.6
+    },
+    {
+      "id": "sup035",
+      "name": "Ioane,F",
+      "team": "Chiefs",
+      "position": "LF",
+      "rate": 6.0,
+      "vol": 0.7,
+      "price": 7.6
+    },
+    {
+      "id": "sup036",
+      "name": "Tupou,R",
+      "team": "Chiefs",
+      "position": "LF",
+      "rate": 10.1,
+      "vol": 0.8,
+      "price": 10.1
+    },
+    {
+      "id": "sup037",
+      "name": "Williams,K",
+      "team": "Chiefs",
+      "position": "LF",
+      "rate": 9.2,
+      "vol": 0.7,
+      "price": 9.5
+    },
+    {
+      "id": "sup038",
+      "name": "Edwards,T",
+      "team": "Chiefs",
+      "position": "LF",
+      "rate": 10.3,
+      "vol": 0.4,
+      "price": 10.2
+    },
+    {
+      "id": "sup039",
+      "name": "Marsh,J",
+      "team": "Chiefs",
+      "position": "LF",
+      "rate": 9.6,
+      "vol": 0.6,
+      "price": 9.8
+    },
+    {
+      "id": "sup040",
+      "name": "Reid,C",
+      "team": "Chiefs",
+      "position": "SH",
+      "rate": 10.1,
+      "vol": 0.5,
+      "price": 10.1
+    },
+    {
+      "id": "sup041",
+      "name": "Davies,O",
+      "team": "Chiefs",
+      "position": "SH",
+      "rate": 7.9,
+      "vol": 0.4,
+      "price": 8.7
+    },
+    {
+      "id": "sup042",
+      "name": "Clarke,A",
+      "team": "Chiefs",
+      "position": "FH",
+      "rate": 12.0,
+      "vol": 0.5,
+      "price": 11.2
+    },
+    {
+      "id": "sup043",
+      "name": "Roberts,W",
+      "team": "Chiefs",
+      "position": "FH",
+      "rate": 8.2,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "sup044",
+      "name": "Wood,T",
+      "team": "Chiefs",
+      "position": "MID",
+      "rate": 6.8,
+      "vol": 0.4,
+      "price": 8.1
+    },
+    {
+      "id": "sup045",
+      "name": "Suaalii,K",
+      "team": "Chiefs",
+      "position": "MID",
+      "rate": 9.1,
+      "vol": 0.5,
+      "price": 9.5
+    },
+    {
+      "id": "sup046",
+      "name": "Smith,S",
+      "team": "Chiefs",
+      "position": "MID",
+      "rate": 7.6,
+      "vol": 0.7,
+      "price": 8.6
+    },
+    {
+      "id": "sup047",
+      "name": "Bell,E",
+      "team": "Chiefs",
+      "position": "OBK",
+      "rate": 11.4,
+      "vol": 0.2,
+      "price": 10.8
+    },
+    {
+      "id": "sup048",
+      "name": "Slipper,K",
+      "team": "Chiefs",
+      "position": "OBK",
+      "rate": 8.4,
+      "vol": 0.5,
+      "price": 9.0
+    },
+    {
+      "id": "sup049",
+      "name": "Taylor,S",
+      "team": "Chiefs",
+      "position": "OBK",
+      "rate": 8.4,
+      "vol": 0.6,
+      "price": 9.0
+    },
+    {
+      "id": "sup050",
+      "name": "Thompson,L",
+      "team": "Chiefs",
+      "position": "OBK",
+      "rate": 11.8,
+      "vol": 0.4,
+      "price": 11.1
+    },
+    {
+      "id": "sup051",
+      "name": "Suaalii,D",
+      "team": "Chiefs",
+      "position": "OBK",
+      "rate": 11.7,
+      "vol": 0.8,
+      "price": 11.0
+    },
+    {
+      "id": "sup052",
+      "name": "Cooper,B",
+      "team": "Crusaders",
+      "position": "PR",
+      "rate": 6.6,
+      "vol": 0.6,
+      "price": 8.0
+    },
+    {
+      "id": "sup053",
+      "name": "Cooper,C",
+      "team": "Crusaders",
+      "position": "PR",
+      "rate": 8.5,
+      "vol": 0.4,
+      "price": 9.1
+    },
+    {
+      "id": "sup054",
+      "name": "Salakaia-Loto,D",
+      "team": "Crusaders",
+      "position": "PR",
+      "rate": 9.3,
+      "vol": 0.5,
+      "price": 9.6
+    },
+    {
+      "id": "sup055",
+      "name": "Thomas,T",
+      "team": "Crusaders",
+      "position": "PR",
+      "rate": 7.5,
+      "vol": 0.6,
+      "price": 8.5
+    },
+    {
+      "id": "sup056",
+      "name": "Frost,A",
+      "team": "Crusaders",
+      "position": "HK",
+      "rate": 7.5,
+      "vol": 0.4,
+      "price": 8.5
+    },
+    {
+      "id": "sup057",
+      "name": "Carter,W",
+      "team": "Crusaders",
+      "position": "HK",
+      "rate": 9.5,
+      "vol": 0.6,
+      "price": 9.7
+    },
+    {
+      "id": "sup058",
+      "name": "Murphy,B",
+      "team": "Crusaders",
+      "position": "LK",
+      "rate": 8.7,
+      "vol": 0.4,
+      "price": 9.2
+    },
+    {
+      "id": "sup059",
+      "name": "Fox,O",
+      "team": "Crusaders",
+      "position": "LK",
+      "rate": 7.5,
+      "vol": 0.4,
+      "price": 8.5
+    },
+    {
+      "id": "sup060",
+      "name": "Kolbe,A",
+      "team": "Crusaders",
+      "position": "LK",
+      "rate": 7.8,
+      "vol": 0.4,
+      "price": 8.7
+    },
+    {
+      "id": "sup061",
+      "name": "Roberts,T",
+      "team": "Crusaders",
+      "position": "LF",
+      "rate": 10.7,
+      "vol": 0.3,
+      "price": 10.4
+    },
+    {
+      "id": "sup062",
+      "name": "Marsh,E",
+      "team": "Crusaders",
+      "position": "LF",
+      "rate": 6.3,
+      "vol": 0.4,
+      "price": 7.8
+    },
+    {
+      "id": "sup063",
+      "name": "White,W",
+      "team": "Crusaders",
+      "position": "LF",
+      "rate": 8.8,
+      "vol": 0.2,
+      "price": 9.3
+    },
+    {
+      "id": "sup064",
+      "name": "Walker,D",
+      "team": "Crusaders",
+      "position": "LF",
+      "rate": 9.4,
+      "vol": 0.8,
+      "price": 9.6
+    },
+    {
+      "id": "sup065",
+      "name": "Morgan,K",
+      "team": "Crusaders",
+      "position": "LF",
+      "rate": 7.4,
+      "vol": 0.7,
+      "price": 8.4
+    },
+    {
+      "id": "sup066",
+      "name": "Thompson,N",
+      "team": "Crusaders",
+      "position": "SH",
+      "rate": 10.9,
+      "vol": 0.4,
+      "price": 10.5
+    },
+    {
+      "id": "sup067",
+      "name": "Smith,W",
+      "team": "Crusaders",
+      "position": "SH",
+      "rate": 7.9,
+      "vol": 0.4,
+      "price": 8.7
+    },
+    {
+      "id": "sup068",
+      "name": "Reece,D",
+      "team": "Crusaders",
+      "position": "FH",
+      "rate": 9.8,
+      "vol": 0.4,
+      "price": 9.9
+    },
+    {
+      "id": "sup069",
+      "name": "Latu,R",
+      "team": "Crusaders",
+      "position": "FH",
+      "rate": 9.9,
+      "vol": 0.5,
+      "price": 9.9
+    },
+    {
+      "id": "sup070",
+      "name": "Bennett,R",
+      "team": "Crusaders",
+      "position": "MID",
+      "rate": 8.5,
+      "vol": 0.7,
+      "price": 9.1
+    },
+    {
+      "id": "sup071",
+      "name": "Latu,T",
+      "team": "Crusaders",
+      "position": "MID",
+      "rate": 8.6,
+      "vol": 0.3,
+      "price": 9.2
+    },
+    {
+      "id": "sup072",
+      "name": "Roberts,E",
+      "team": "Crusaders",
+      "position": "MID",
+      "rate": 6.6,
+      "vol": 0.3,
+      "price": 8.0
+    },
+    {
+      "id": "sup073",
+      "name": "Evans,D",
+      "team": "Crusaders",
+      "position": "OBK",
+      "rate": 10.9,
+      "vol": 0.2,
+      "price": 10.5
+    },
+    {
+      "id": "sup074",
+      "name": "Phillips,G",
+      "team": "Crusaders",
+      "position": "OBK",
+      "rate": 7.5,
+      "vol": 0.5,
+      "price": 8.5
+    },
+    {
+      "id": "sup075",
+      "name": "van Rhyn,T",
+      "team": "Crusaders",
+      "position": "OBK",
+      "rate": 7.4,
+      "vol": 0.5,
+      "price": 8.4
+    },
+    {
+      "id": "sup076",
+      "name": "Suaalii,E",
+      "team": "Crusaders",
+      "position": "OBK",
+      "rate": 9.5,
+      "vol": 0.6,
+      "price": 9.7
+    },
+    {
+      "id": "sup077",
+      "name": "Kolbe,T",
+      "team": "Crusaders",
+      "position": "OBK",
+      "rate": 11.6,
+      "vol": 0.5,
+      "price": 11.0
+    },
+    {
+      "id": "sup078",
+      "name": "Murphy,P",
+      "team": "Highlanders",
+      "position": "PR",
+      "rate": 7.5,
+      "vol": 0.7,
+      "price": 8.5
+    },
+    {
+      "id": "sup079",
+      "name": "Cooper,A",
+      "team": "Highlanders",
+      "position": "PR",
+      "rate": 4.7,
+      "vol": 0.5,
+      "price": 6.8
+    },
+    {
+      "id": "sup080",
+      "name": "Wood,S",
+      "team": "Highlanders",
+      "position": "PR",
+      "rate": 4.8,
+      "vol": 0.2,
+      "price": 6.9
+    },
+    {
+      "id": "sup081",
+      "name": "Stone,A",
+      "team": "Highlanders",
+      "position": "PR",
+      "rate": 5.4,
+      "vol": 0.6,
+      "price": 7.2
+    },
+    {
+      "id": "sup082",
+      "name": "Frost,N",
+      "team": "Highlanders",
+      "position": "HK",
+      "rate": 5.5,
+      "vol": 0.8,
+      "price": 7.3
+    },
+    {
+      "id": "sup083",
+      "name": "Reid,G",
+      "team": "Highlanders",
+      "position": "HK",
+      "rate": 6.3,
+      "vol": 0.4,
+      "price": 7.8
+    },
+    {
+      "id": "sup084",
+      "name": "Green,B",
+      "team": "Highlanders",
+      "position": "LK",
+      "rate": 9.8,
+      "vol": 0.8,
+      "price": 9.9
+    },
+    {
+      "id": "sup085",
+      "name": "Gordon,L",
+      "team": "Highlanders",
+      "position": "LK",
+      "rate": 8.5,
+      "vol": 0.5,
+      "price": 9.1
+    },
+    {
+      "id": "sup086",
+      "name": "Shaw,H",
+      "team": "Highlanders",
+      "position": "LK",
+      "rate": 5.7,
+      "vol": 0.4,
+      "price": 7.4
+    },
+    {
+      "id": "sup087",
+      "name": "Morgan,J",
+      "team": "Highlanders",
+      "position": "LF",
+      "rate": 10.7,
+      "vol": 0.5,
+      "price": 10.4
+    },
+    {
+      "id": "sup088",
+      "name": "Slipper,E",
+      "team": "Highlanders",
+      "position": "LF",
+      "rate": 7.5,
+      "vol": 0.8,
+      "price": 8.5
+    },
+    {
+      "id": "sup089",
+      "name": "Petaia,B",
+      "team": "Highlanders",
+      "position": "LF",
+      "rate": 8.1,
+      "vol": 0.3,
+      "price": 8.9
+    },
+    {
+      "id": "sup090",
+      "name": "Edwards,W",
+      "team": "Highlanders",
+      "position": "LF",
+      "rate": 8.7,
+      "vol": 0.2,
+      "price": 9.2
+    },
+    {
+      "id": "sup091",
+      "name": "Davies,S",
+      "team": "Highlanders",
+      "position": "LF",
+      "rate": 10.4,
+      "vol": 0.7,
+      "price": 10.2
+    },
+    {
+      "id": "sup092",
+      "name": "Clarke,O",
+      "team": "Highlanders",
+      "position": "SH",
+      "rate": 8.3,
+      "vol": 0.2,
+      "price": 9.0
+    },
+    {
+      "id": "sup093",
+      "name": "Latu,C",
+      "team": "Highlanders",
+      "position": "SH",
+      "rate": 8.1,
+      "vol": 0.4,
+      "price": 8.9
+    },
+    {
+      "id": "sup094",
+      "name": "Evans,J",
+      "team": "Highlanders",
+      "position": "FH",
+      "rate": 10.0,
+      "vol": 0.4,
+      "price": 10.0
+    },
+    {
+      "id": "sup095",
+      "name": "King,N",
+      "team": "Highlanders",
+      "position": "FH",
+      "rate": 12.9,
+      "vol": 0.8,
+      "price": 11.7
+    },
+    {
+      "id": "sup096",
+      "name": "Petaia,O",
+      "team": "Highlanders",
+      "position": "MID",
+      "rate": 8.2,
+      "vol": 0.4,
+      "price": 8.9
+    },
+    {
+      "id": "sup097",
+      "name": "Harris,T",
+      "team": "Highlanders",
+      "position": "MID",
+      "rate": 7.0,
+      "vol": 0.2,
+      "price": 8.2
+    },
+    {
+      "id": "sup098",
+      "name": "Cole,H",
+      "team": "Highlanders",
+      "position": "MID",
+      "rate": 7.2,
+      "vol": 0.5,
+      "price": 8.3
+    },
+    {
+      "id": "sup099",
+      "name": "Cooper,T",
+      "team": "Highlanders",
+      "position": "OBK",
+      "rate": 8.8,
+      "vol": 0.8,
+      "price": 9.3
+    },
+    {
+      "id": "sup100",
+      "name": "Wood,W",
+      "team": "Highlanders",
+      "position": "OBK",
+      "rate": 7.5,
+      "vol": 0.2,
+      "price": 8.5
+    },
+    {
+      "id": "sup101",
+      "name": "Reece,R",
+      "team": "Highlanders",
+      "position": "OBK",
+      "rate": 9.2,
+      "vol": 0.6,
+      "price": 9.5
+    },
+    {
+      "id": "sup102",
+      "name": "Harris,W",
+      "team": "Highlanders",
+      "position": "OBK",
+      "rate": 9.8,
+      "vol": 0.3,
+      "price": 9.9
+    },
+    {
+      "id": "sup103",
+      "name": "Tupou,K",
+      "team": "Highlanders",
+      "position": "OBK",
+      "rate": 10.2,
+      "vol": 0.5,
+      "price": 10.1
+    },
+    {
+      "id": "sup104",
+      "name": "Bell,S",
+      "team": "Hurricanes",
+      "position": "PR",
+      "rate": 7.1,
+      "vol": 0.7,
+      "price": 8.3
+    },
+    {
+      "id": "sup105",
+      "name": "White,T",
+      "team": "Hurricanes",
+      "position": "PR",
+      "rate": 5.5,
+      "vol": 0.7,
+      "price": 7.3
+    },
+    {
+      "id": "sup106",
+      "name": "Watson,K",
+      "team": "Hurricanes",
+      "position": "PR",
+      "rate": 7.1,
+      "vol": 0.8,
+      "price": 8.3
+    },
+    {
+      "id": "sup107",
+      "name": "Sititi,E",
+      "team": "Hurricanes",
+      "position": "PR",
+      "rate": 9.2,
+      "vol": 0.5,
+      "price": 9.5
+    },
+    {
+      "id": "sup108",
+      "name": "Thomas,R",
+      "team": "Hurricanes",
+      "position": "HK",
+      "rate": 8.4,
+      "vol": 0.7,
+      "price": 9.0
+    },
+    {
+      "id": "sup109",
+      "name": "Suaalii,O",
+      "team": "Hurricanes",
+      "position": "HK",
+      "rate": 9.0,
+      "vol": 0.6,
+      "price": 9.4
+    },
+    {
+      "id": "sup110",
+      "name": "Carter,M",
+      "team": "Hurricanes",
+      "position": "LK",
+      "rate": 6.8,
+      "vol": 0.7,
+      "price": 8.1
+    },
+    {
+      "id": "sup111",
+      "name": "Turner,N",
+      "team": "Hurricanes",
+      "position": "LK",
+      "rate": 8.5,
+      "vol": 0.5,
+      "price": 9.1
+    },
+    {
+      "id": "sup112",
+      "name": "Kolbe,N",
+      "team": "Hurricanes",
+      "position": "LK",
+      "rate": 5.6,
+      "vol": 0.7,
+      "price": 7.4
+    },
+    {
+      "id": "sup113",
+      "name": "Fihaki,S",
+      "team": "Hurricanes",
+      "position": "LF",
+      "rate": 7.9,
+      "vol": 0.8,
+      "price": 8.7
+    },
+    {
+      "id": "sup114",
+      "name": "Cooper,D",
+      "team": "Hurricanes",
+      "position": "LF",
+      "rate": 7.7,
+      "vol": 0.7,
+      "price": 8.6
+    },
+    {
+      "id": "sup115",
+      "name": "Mauala,O",
+      "team": "Hurricanes",
+      "position": "LF",
+      "rate": 6.4,
+      "vol": 0.8,
+      "price": 7.8
+    },
+    {
+      "id": "sup116",
+      "name": "Reid,N",
+      "team": "Hurricanes",
+      "position": "LF",
+      "rate": 8.9,
+      "vol": 0.3,
+      "price": 9.3
+    },
+    {
+      "id": "sup117",
+      "name": "Havili,L",
+      "team": "Hurricanes",
+      "position": "LF",
+      "rate": 6.7,
+      "vol": 0.8,
+      "price": 8.0
+    },
+    {
+      "id": "sup118",
+      "name": "Kelly,A",
+      "team": "Hurricanes",
+      "position": "SH",
+      "rate": 9.9,
+      "vol": 0.2,
+      "price": 9.9
+    },
+    {
+      "id": "sup119",
+      "name": "Salakaia-Loto,B",
+      "team": "Hurricanes",
+      "position": "SH",
+      "rate": 11.4,
+      "vol": 0.5,
+      "price": 10.8
+    },
+    {
+      "id": "sup120",
+      "name": "Martin,E",
+      "team": "Hurricanes",
+      "position": "FH",
+      "rate": 10.2,
+      "vol": 0.2,
+      "price": 10.1
+    },
+    {
+      "id": "sup121",
+      "name": "Brown,S",
+      "team": "Hurricanes",
+      "position": "FH",
+      "rate": 11.9,
+      "vol": 0.7,
+      "price": 11.1
+    },
+    {
+      "id": "sup122",
+      "name": "Mauala,A",
+      "team": "Hurricanes",
+      "position": "MID",
+      "rate": 9.4,
+      "vol": 0.5,
+      "price": 9.6
+    },
+    {
+      "id": "sup123",
+      "name": "Latu,G",
+      "team": "Hurricanes",
+      "position": "MID",
+      "rate": 7.0,
+      "vol": 0.3,
+      "price": 8.2
+    },
+    {
+      "id": "sup124",
+      "name": "Sititi,C",
+      "team": "Hurricanes",
+      "position": "MID",
+      "rate": 6.9,
+      "vol": 0.7,
+      "price": 8.1
+    },
+    {
+      "id": "sup125",
+      "name": "Price,D",
+      "team": "Hurricanes",
+      "position": "OBK",
+      "rate": 9.5,
+      "vol": 0.3,
+      "price": 9.7
+    },
+    {
+      "id": "sup126",
+      "name": "Fox,B",
+      "team": "Hurricanes",
+      "position": "OBK",
+      "rate": 7.1,
+      "vol": 0.6,
+      "price": 8.3
+    },
+    {
+      "id": "sup127",
+      "name": "Harris,M",
+      "team": "Hurricanes",
+      "position": "OBK",
+      "rate": 8.6,
+      "vol": 0.4,
+      "price": 9.2
+    },
+    {
+      "id": "sup128",
+      "name": "Green,G",
+      "team": "Hurricanes",
+      "position": "OBK",
+      "rate": 10.5,
+      "vol": 0.5,
+      "price": 10.3
+    },
+    {
+      "id": "sup129",
+      "name": "Marsh,B",
+      "team": "Hurricanes",
+      "position": "OBK",
+      "rate": 11.9,
+      "vol": 0.8,
+      "price": 11.1
+    },
+    {
+      "id": "sup130",
+      "name": "Tupou,T",
+      "team": "Moana Pasifika",
+      "position": "PR",
+      "rate": 7.8,
+      "vol": 0.6,
+      "price": 8.7
+    },
+    {
+      "id": "sup131",
+      "name": "Gordon,W",
+      "team": "Moana Pasifika",
+      "position": "PR",
+      "rate": 8.1,
+      "vol": 0.5,
+      "price": 8.9
+    },
+    {
+      "id": "sup132",
+      "name": "Bennett,S",
+      "team": "Moana Pasifika",
+      "position": "PR",
+      "rate": 7.8,
+      "vol": 0.3,
+      "price": 8.7
+    },
+    {
+      "id": "sup133",
+      "name": "Holloway,W",
+      "team": "Moana Pasifika",
+      "position": "PR",
+      "rate": 4.5,
+      "vol": 0.8,
+      "price": 6.7
+    },
+    {
+      "id": "sup134",
+      "name": "Martin,K",
+      "team": "Moana Pasifika",
+      "position": "HK",
+      "rate": 7.4,
+      "vol": 0.8,
+      "price": 8.4
+    },
+    {
+      "id": "sup135",
+      "name": "Shaw,F",
+      "team": "Moana Pasifika",
+      "position": "HK",
+      "rate": 8.6,
+      "vol": 0.8,
+      "price": 9.2
+    },
+    {
+      "id": "sup136",
+      "name": "Edwards,A",
+      "team": "Moana Pasifika",
+      "position": "LK",
+      "rate": 5.6,
+      "vol": 0.8,
+      "price": 7.4
+    },
+    {
+      "id": "sup137",
+      "name": "Fox,A",
+      "team": "Moana Pasifika",
+      "position": "LK",
+      "rate": 7.5,
+      "vol": 0.2,
+      "price": 8.5
+    },
+    {
+      "id": "sup138",
+      "name": "Slipper,O",
+      "team": "Moana Pasifika",
+      "position": "LK",
+      "rate": 8.9,
+      "vol": 0.7,
+      "price": 9.3
+    },
+    {
+      "id": "sup139",
+      "name": "Wright,E",
+      "team": "Moana Pasifika",
+      "position": "LF",
+      "rate": 9.4,
+      "vol": 0.8,
+      "price": 9.6
+    },
+    {
+      "id": "sup140",
+      "name": "Slipper,W",
+      "team": "Moana Pasifika",
+      "position": "LF",
+      "rate": 6.3,
+      "vol": 0.8,
+      "price": 7.8
+    },
+    {
+      "id": "sup141",
+      "name": "Suaalii,H",
+      "team": "Moana Pasifika",
+      "position": "LF",
+      "rate": 10.3,
+      "vol": 0.6,
+      "price": 10.2
+    },
+    {
+      "id": "sup142",
+      "name": "Moore,W",
+      "team": "Moana Pasifika",
+      "position": "LF",
+      "rate": 6.4,
+      "vol": 0.8,
+      "price": 7.8
+    },
+    {
+      "id": "sup143",
+      "name": "Sititi,H",
+      "team": "Moana Pasifika",
+      "position": "LF",
+      "rate": 10.1,
+      "vol": 0.4,
+      "price": 10.1
+    },
+    {
+      "id": "sup144",
+      "name": "Evans,K",
+      "team": "Moana Pasifika",
+      "position": "SH",
+      "rate": 7.3,
+      "vol": 0.7,
+      "price": 8.4
+    },
+    {
+      "id": "sup145",
+      "name": "Wood,D",
+      "team": "Moana Pasifika",
+      "position": "SH",
+      "rate": 8.3,
+      "vol": 0.6,
+      "price": 9.0
+    },
+    {
+      "id": "sup146",
+      "name": "Wood,H",
+      "team": "Moana Pasifika",
+      "position": "FH",
+      "rate": 12.8,
+      "vol": 0.5,
+      "price": 11.7
+    },
+    {
+      "id": "sup147",
+      "name": "Clarke,B",
+      "team": "Moana Pasifika",
+      "position": "FH",
+      "rate": 12.5,
+      "vol": 0.4,
+      "price": 11.5
+    },
+    {
+      "id": "sup148",
+      "name": "Wilson,S",
+      "team": "Moana Pasifika",
+      "position": "MID",
+      "rate": 9.6,
+      "vol": 0.2,
+      "price": 9.8
+    },
+    {
+      "id": "sup149",
+      "name": "Walker,C",
+      "team": "Moana Pasifika",
+      "position": "MID",
+      "rate": 7.4,
+      "vol": 0.8,
+      "price": 8.4
+    },
+    {
+      "id": "sup150",
+      "name": "Thompson,O",
+      "team": "Moana Pasifika",
+      "position": "MID",
+      "rate": 8.4,
+      "vol": 0.7,
+      "price": 9.0
+    },
+    {
+      "id": "sup151",
+      "name": "King,K",
+      "team": "Moana Pasifika",
+      "position": "OBK",
+      "rate": 8.1,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "sup152",
+      "name": "Murphy,R",
+      "team": "Moana Pasifika",
+      "position": "OBK",
+      "rate": 10.4,
+      "vol": 0.7,
+      "price": 10.2
+    },
+    {
+      "id": "sup153",
+      "name": "Ward,O",
+      "team": "Moana Pasifika",
+      "position": "OBK",
+      "rate": 10.5,
+      "vol": 0.3,
+      "price": 10.3
+    },
+    {
+      "id": "sup154",
+      "name": "White,K",
+      "team": "Moana Pasifika",
+      "position": "OBK",
+      "rate": 11.2,
+      "vol": 0.5,
+      "price": 10.7
+    },
+    {
+      "id": "sup155",
+      "name": "Falesolo,P",
+      "team": "Moana Pasifika",
+      "position": "OBK",
+      "rate": 9.8,
+      "vol": 0.2,
+      "price": 9.9
+    },
+    {
+      "id": "sup156",
+      "name": "Taylor,F",
+      "team": "ACT Brumbies",
+      "position": "PR",
+      "rate": 7.0,
+      "vol": 0.8,
+      "price": 8.2
+    },
+    {
+      "id": "sup157",
+      "name": "Walker,E",
+      "team": "ACT Brumbies",
+      "position": "PR",
+      "rate": 4.6,
+      "vol": 0.3,
+      "price": 6.8
+    },
+    {
+      "id": "sup158",
+      "name": "Fox,T",
+      "team": "ACT Brumbies",
+      "position": "PR",
+      "rate": 6.0,
+      "vol": 0.4,
+      "price": 7.6
+    },
+    {
+      "id": "sup159",
+      "name": "Robinson,B",
+      "team": "ACT Brumbies",
+      "position": "PR",
+      "rate": 5.8,
+      "vol": 0.5,
+      "price": 7.5
+    },
+    {
+      "id": "sup160",
+      "name": "Salakaia-Loto,J",
+      "team": "ACT Brumbies",
+      "position": "HK",
+      "rate": 9.2,
+      "vol": 0.5,
+      "price": 9.5
+    },
+    {
+      "id": "sup161",
+      "name": "Price,N",
+      "team": "ACT Brumbies",
+      "position": "HK",
+      "rate": 8.9,
+      "vol": 0.6,
+      "price": 9.3
+    },
+    {
+      "id": "sup162",
+      "name": "Phillips,D",
+      "team": "ACT Brumbies",
+      "position": "LK",
+      "rate": 6.3,
+      "vol": 0.5,
+      "price": 7.8
+    },
+    {
+      "id": "sup163",
+      "name": "Brown,B",
+      "team": "ACT Brumbies",
+      "position": "LK",
+      "rate": 8.9,
+      "vol": 0.2,
+      "price": 9.3
+    },
+    {
+      "id": "sup164",
+      "name": "Phillips,W",
+      "team": "ACT Brumbies",
+      "position": "LK",
+      "rate": 9.0,
+      "vol": 0.5,
+      "price": 9.4
+    },
+    {
+      "id": "sup165",
+      "name": "Smith,G",
+      "team": "ACT Brumbies",
+      "position": "LF",
+      "rate": 9.5,
+      "vol": 0.7,
+      "price": 9.7
+    },
+    {
+      "id": "sup166",
+      "name": "Wood,P",
+      "team": "ACT Brumbies",
+      "position": "LF",
+      "rate": 10.8,
+      "vol": 0.7,
+      "price": 10.5
+    },
+    {
+      "id": "sup167",
+      "name": "Salakaia-Loto,F",
+      "team": "ACT Brumbies",
+      "position": "LF",
+      "rate": 6.1,
+      "vol": 0.5,
+      "price": 7.7
+    },
+    {
+      "id": "sup168",
+      "name": "Brown,E",
+      "team": "ACT Brumbies",
+      "position": "LF",
+      "rate": 6.0,
+      "vol": 0.6,
+      "price": 7.6
+    },
+    {
+      "id": "sup169",
+      "name": "Turner,O",
+      "team": "ACT Brumbies",
+      "position": "LF",
+      "rate": 8.4,
+      "vol": 0.8,
+      "price": 9.0
+    },
+    {
+      "id": "sup170",
+      "name": "Cooper,W",
+      "team": "ACT Brumbies",
+      "position": "SH",
+      "rate": 10.7,
+      "vol": 0.4,
+      "price": 10.4
+    },
+    {
+      "id": "sup171",
+      "name": "Havili,W",
+      "team": "ACT Brumbies",
+      "position": "SH",
+      "rate": 7.5,
+      "vol": 0.7,
+      "price": 8.5
+    },
+    {
+      "id": "sup172",
+      "name": "White,N",
+      "team": "ACT Brumbies",
+      "position": "FH",
+      "rate": 12.0,
+      "vol": 0.4,
+      "price": 11.2
+    },
+    {
+      "id": "sup173",
+      "name": "Frost,G",
+      "team": "ACT Brumbies",
+      "position": "FH",
+      "rate": 10.2,
+      "vol": 0.2,
+      "price": 10.1
+    },
+    {
+      "id": "sup174",
+      "name": "Brown,H",
+      "team": "ACT Brumbies",
+      "position": "MID",
+      "rate": 10.9,
+      "vol": 0.7,
+      "price": 10.5
+    },
+    {
+      "id": "sup175",
+      "name": "Wood,A",
+      "team": "ACT Brumbies",
+      "position": "MID",
+      "rate": 8.5,
+      "vol": 0.2,
+      "price": 9.1
+    },
+    {
+      "id": "sup176",
+      "name": "Vermeulen,P",
+      "team": "ACT Brumbies",
+      "position": "MID",
+      "rate": 7.2,
+      "vol": 0.6,
+      "price": 8.3
+    },
+    {
+      "id": "sup177",
+      "name": "Jones,A",
+      "team": "ACT Brumbies",
+      "position": "OBK",
+      "rate": 9.1,
+      "vol": 0.2,
+      "price": 9.5
+    },
+    {
+      "id": "sup178",
+      "name": "Ioane,S",
+      "team": "ACT Brumbies",
+      "position": "OBK",
+      "rate": 9.7,
+      "vol": 0.5,
+      "price": 9.8
+    },
+    {
+      "id": "sup179",
+      "name": "Watson,F",
+      "team": "ACT Brumbies",
+      "position": "OBK",
+      "rate": 10.6,
+      "vol": 0.6,
+      "price": 10.4
+    },
+    {
+      "id": "sup180",
+      "name": "Walker,F",
+      "team": "ACT Brumbies",
+      "position": "OBK",
+      "rate": 8.5,
+      "vol": 0.3,
+      "price": 9.1
+    },
+    {
+      "id": "sup181",
+      "name": "Reece,K",
+      "team": "ACT Brumbies",
+      "position": "OBK",
+      "rate": 11.8,
+      "vol": 0.8,
+      "price": 11.1
+    },
+    {
+      "id": "sup182",
+      "name": "Wilkin,T",
+      "team": "Queensland Reds",
+      "position": "PR",
+      "rate": 5.4,
+      "vol": 0.4,
+      "price": 7.2
+    },
+    {
+      "id": "sup183",
+      "name": "Shaw,S",
+      "team": "Queensland Reds",
+      "position": "PR",
+      "rate": 6.5,
+      "vol": 0.5,
+      "price": 7.9
+    },
+    {
+      "id": "sup184",
+      "name": "Ioane,G",
+      "team": "Queensland Reds",
+      "position": "PR",
+      "rate": 5.1,
+      "vol": 0.2,
+      "price": 7.1
+    },
+    {
+      "id": "sup185",
+      "name": "Hughes,B",
+      "team": "Queensland Reds",
+      "position": "PR",
+      "rate": 8.5,
+      "vol": 0.7,
+      "price": 9.1
+    },
+    {
+      "id": "sup186",
+      "name": "Naholo,L",
+      "team": "Queensland Reds",
+      "position": "HK",
+      "rate": 6.6,
+      "vol": 0.6,
+      "price": 8.0
+    },
+    {
+      "id": "sup187",
+      "name": "Roberts,C",
+      "team": "Queensland Reds",
+      "position": "HK",
+      "rate": 8.0,
+      "vol": 0.6,
+      "price": 8.8
+    },
+    {
+      "id": "sup188",
+      "name": "Wilson,K",
+      "team": "Queensland Reds",
+      "position": "LK",
+      "rate": 9.8,
+      "vol": 0.7,
+      "price": 9.9
+    },
+    {
+      "id": "sup189",
+      "name": "Moore,K",
+      "team": "Queensland Reds",
+      "position": "LK",
+      "rate": 9.5,
+      "vol": 0.6,
+      "price": 9.7
+    },
+    {
+      "id": "sup190",
+      "name": "Barrett,M",
+      "team": "Queensland Reds",
+      "position": "LK",
+      "rate": 9.3,
+      "vol": 0.5,
+      "price": 9.6
+    },
+    {
+      "id": "sup191",
+      "name": "Wilson,W",
+      "team": "Queensland Reds",
+      "position": "LF",
+      "rate": 8.3,
+      "vol": 0.6,
+      "price": 9.0
+    },
+    {
+      "id": "sup192",
+      "name": "Kelly,H",
+      "team": "Queensland Reds",
+      "position": "LF",
+      "rate": 7.2,
+      "vol": 0.4,
+      "price": 8.3
+    },
+    {
+      "id": "sup193",
+      "name": "Carter,F",
+      "team": "Queensland Reds",
+      "position": "LF",
+      "rate": 8.9,
+      "vol": 0.3,
+      "price": 9.3
+    },
+    {
+      "id": "sup194",
+      "name": "Havili,H",
+      "team": "Queensland Reds",
+      "position": "LF",
+      "rate": 8.1,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "sup195",
+      "name": "van Rhyn,L",
+      "team": "Queensland Reds",
+      "position": "LF",
+      "rate": 8.4,
+      "vol": 0.4,
+      "price": 9.0
+    },
+    {
+      "id": "sup196",
+      "name": "Fox,C",
+      "team": "Queensland Reds",
+      "position": "SH",
+      "rate": 11.2,
+      "vol": 0.2,
+      "price": 10.7
+    },
+    {
+      "id": "sup197",
+      "name": "Lewis,A",
+      "team": "Queensland Reds",
+      "position": "SH",
+      "rate": 7.1,
+      "vol": 0.3,
+      "price": 8.3
+    },
+    {
+      "id": "sup198",
+      "name": "Sititi,T",
+      "team": "Queensland Reds",
+      "position": "FH",
+      "rate": 8.8,
+      "vol": 0.5,
+      "price": 9.3
+    },
+    {
+      "id": "sup199",
+      "name": "Martin,L",
+      "team": "Queensland Reds",
+      "position": "FH",
+      "rate": 8.6,
+      "vol": 0.5,
+      "price": 9.2
+    },
+    {
+      "id": "sup200",
+      "name": "Phillips,T",
+      "team": "Queensland Reds",
+      "position": "MID",
+      "rate": 8.9,
+      "vol": 0.8,
+      "price": 9.3
+    },
+    {
+      "id": "sup201",
+      "name": "Mauala,D",
+      "team": "Queensland Reds",
+      "position": "MID",
+      "rate": 8.7,
+      "vol": 0.6,
+      "price": 9.2
+    },
+    {
+      "id": "sup202",
+      "name": "Kelly,T",
+      "team": "Queensland Reds",
+      "position": "MID",
+      "rate": 6.5,
+      "vol": 0.4,
+      "price": 7.9
+    },
+    {
+      "id": "sup203",
+      "name": "Vermeulen,L",
+      "team": "Queensland Reds",
+      "position": "OBK",
+      "rate": 11.1,
+      "vol": 0.5,
+      "price": 10.7
+    },
+    {
+      "id": "sup204",
+      "name": "Murphy,N",
+      "team": "Queensland Reds",
+      "position": "OBK",
+      "rate": 7.5,
+      "vol": 0.7,
+      "price": 8.5
+    },
+    {
+      "id": "sup205",
+      "name": "Reece,O",
+      "team": "Queensland Reds",
+      "position": "OBK",
+      "rate": 10.0,
+      "vol": 0.4,
+      "price": 10.0
+    },
+    {
+      "id": "sup206",
+      "name": "Sititi,S",
+      "team": "Queensland Reds",
+      "position": "OBK",
+      "rate": 9.1,
+      "vol": 0.2,
+      "price": 9.5
+    },
+    {
+      "id": "sup207",
+      "name": "Suaalii,F",
+      "team": "Queensland Reds",
+      "position": "OBK",
+      "rate": 11.3,
+      "vol": 0.3,
+      "price": 10.8
+    },
+    {
+      "id": "sup208",
+      "name": "Roberts,P",
+      "team": "NSW Waratahs",
+      "position": "PR",
+      "rate": 4.9,
+      "vol": 0.8,
+      "price": 6.9
+    },
+    {
+      "id": "sup209",
+      "name": "Lewis,B",
+      "team": "NSW Waratahs",
+      "position": "PR",
+      "rate": 5.0,
+      "vol": 0.3,
+      "price": 7.0
+    },
+    {
+      "id": "sup210",
+      "name": "Smith,H",
+      "team": "NSW Waratahs",
+      "position": "PR",
+      "rate": 7.4,
+      "vol": 0.2,
+      "price": 8.4
+    },
+    {
+      "id": "sup211",
+      "name": "Bennett,H",
+      "team": "NSW Waratahs",
+      "position": "PR",
+      "rate": 7.8,
+      "vol": 0.2,
+      "price": 8.7
+    },
+    {
+      "id": "sup212",
+      "name": "Mapimpi,P",
+      "team": "NSW Waratahs",
+      "position": "HK",
+      "rate": 8.2,
+      "vol": 0.4,
+      "price": 8.9
+    },
+    {
+      "id": "sup213",
+      "name": "Evans,C",
+      "team": "NSW Waratahs",
+      "position": "HK",
+      "rate": 8.3,
+      "vol": 0.6,
+      "price": 9.0
+    },
+    {
+      "id": "sup214",
+      "name": "Latu,D",
+      "team": "NSW Waratahs",
+      "position": "LK",
+      "rate": 7.8,
+      "vol": 0.7,
+      "price": 8.7
+    },
+    {
+      "id": "sup215",
+      "name": "Martin,M",
+      "team": "NSW Waratahs",
+      "position": "LK",
+      "rate": 5.5,
+      "vol": 0.7,
+      "price": 7.3
+    },
+    {
+      "id": "sup216",
+      "name": "Tupou,H",
+      "team": "NSW Waratahs",
+      "position": "LK",
+      "rate": 6.0,
+      "vol": 0.6,
+      "price": 7.6
+    },
+    {
+      "id": "sup217",
+      "name": "Cooper,E",
+      "team": "NSW Waratahs",
+      "position": "LF",
+      "rate": 6.0,
+      "vol": 0.4,
+      "price": 7.6
+    },
+    {
+      "id": "sup218",
+      "name": "Wood,E",
+      "team": "NSW Waratahs",
+      "position": "LF",
+      "rate": 10.6,
+      "vol": 0.6,
+      "price": 10.4
+    },
+    {
+      "id": "sup219",
+      "name": "Moore,D",
+      "team": "NSW Waratahs",
+      "position": "LF",
+      "rate": 8.6,
+      "vol": 0.8,
+      "price": 9.2
+    },
+    {
+      "id": "sup220",
+      "name": "Reece,P",
+      "team": "NSW Waratahs",
+      "position": "LF",
+      "rate": 6.5,
+      "vol": 0.5,
+      "price": 7.9
+    },
+    {
+      "id": "sup221",
+      "name": "Fihaki,W",
+      "team": "NSW Waratahs",
+      "position": "LF",
+      "rate": 9.7,
+      "vol": 0.5,
+      "price": 9.8
+    },
+    {
+      "id": "sup222",
+      "name": "Holloway,S",
+      "team": "NSW Waratahs",
+      "position": "SH",
+      "rate": 10.0,
+      "vol": 0.2,
+      "price": 10.0
+    },
+    {
+      "id": "sup223",
+      "name": "Tuipulotu,C",
+      "team": "NSW Waratahs",
+      "position": "SH",
+      "rate": 10.3,
+      "vol": 0.5,
+      "price": 10.2
+    },
+    {
+      "id": "sup224",
+      "name": "Phillips,S",
+      "team": "NSW Waratahs",
+      "position": "FH",
+      "rate": 12.5,
+      "vol": 0.8,
+      "price": 11.5
+    },
+    {
+      "id": "sup225",
+      "name": "Edwards,B",
+      "team": "NSW Waratahs",
+      "position": "FH",
+      "rate": 12.5,
+      "vol": 0.8,
+      "price": 11.5
+    },
+    {
+      "id": "sup226",
+      "name": "Clarke,P",
+      "team": "NSW Waratahs",
+      "position": "MID",
+      "rate": 9.0,
+      "vol": 0.2,
+      "price": 9.4
+    },
+    {
+      "id": "sup227",
+      "name": "Phillips,C",
+      "team": "NSW Waratahs",
+      "position": "MID",
+      "rate": 8.9,
+      "vol": 0.4,
+      "price": 9.3
+    },
+    {
+      "id": "sup228",
+      "name": "Lolesio,B",
+      "team": "NSW Waratahs",
+      "position": "MID",
+      "rate": 8.2,
+      "vol": 0.2,
+      "price": 8.9
+    },
+    {
+      "id": "sup229",
+      "name": "Carter,C",
+      "team": "NSW Waratahs",
+      "position": "OBK",
+      "rate": 7.2,
+      "vol": 0.3,
+      "price": 8.3
+    },
+    {
+      "id": "sup230",
+      "name": "Kelly,S",
+      "team": "NSW Waratahs",
+      "position": "OBK",
+      "rate": 9.8,
+      "vol": 0.7,
+      "price": 9.9
+    },
+    {
+      "id": "sup231",
+      "name": "Petaia,S",
+      "team": "NSW Waratahs",
+      "position": "OBK",
+      "rate": 8.0,
+      "vol": 0.3,
+      "price": 8.8
+    },
+    {
+      "id": "sup232",
+      "name": "Clarke,R",
+      "team": "NSW Waratahs",
+      "position": "OBK",
+      "rate": 10.9,
+      "vol": 0.3,
+      "price": 10.5
+    },
+    {
+      "id": "sup233",
+      "name": "Wilkin,R",
+      "team": "NSW Waratahs",
+      "position": "OBK",
+      "rate": 7.5,
+      "vol": 0.5,
+      "price": 8.5
+    },
+    {
+      "id": "sup234",
+      "name": "Evans,L",
+      "team": "Western Force",
+      "position": "PR",
+      "rate": 6.9,
+      "vol": 0.7,
+      "price": 8.1
+    },
+    {
+      "id": "sup235",
+      "name": "Robinson,S",
+      "team": "Western Force",
+      "position": "PR",
+      "rate": 5.6,
+      "vol": 0.2,
+      "price": 7.4
+    },
+    {
+      "id": "sup236",
+      "name": "Carter,D",
+      "team": "Western Force",
+      "position": "PR",
+      "rate": 7.1,
+      "vol": 0.4,
+      "price": 8.3
+    },
+    {
+      "id": "sup237",
+      "name": "Lewis,S",
+      "team": "Western Force",
+      "position": "PR",
+      "rate": 6.6,
+      "vol": 0.4,
+      "price": 8.0
+    },
+    {
+      "id": "sup238",
+      "name": "Phillips,F",
+      "team": "Western Force",
+      "position": "HK",
+      "rate": 6.6,
+      "vol": 0.6,
+      "price": 8.0
+    },
+    {
+      "id": "sup239",
+      "name": "Suaalii,J",
+      "team": "Western Force",
+      "position": "HK",
+      "rate": 8.0,
+      "vol": 0.5,
+      "price": 8.8
+    },
+    {
+      "id": "sup240",
+      "name": "Moore,G",
+      "team": "Western Force",
+      "position": "LK",
+      "rate": 8.0,
+      "vol": 0.5,
+      "price": 8.8
+    },
+    {
+      "id": "sup241",
+      "name": "Robinson,C",
+      "team": "Western Force",
+      "position": "LK",
+      "rate": 9.5,
+      "vol": 0.8,
+      "price": 9.7
+    },
+    {
+      "id": "sup242",
+      "name": "Carter,H",
+      "team": "Western Force",
+      "position": "LK",
+      "rate": 10.1,
+      "vol": 0.8,
+      "price": 10.1
+    },
+    {
+      "id": "sup243",
+      "name": "Clarke,S",
+      "team": "Western Force",
+      "position": "LF",
+      "rate": 6.3,
+      "vol": 0.2,
+      "price": 7.8
+    },
+    {
+      "id": "sup244",
+      "name": "Green,D",
+      "team": "Western Force",
+      "position": "LF",
+      "rate": 7.6,
+      "vol": 0.7,
+      "price": 8.6
+    },
+    {
+      "id": "sup245",
+      "name": "Kolbe,D",
+      "team": "Western Force",
+      "position": "LF",
+      "rate": 7.4,
+      "vol": 0.4,
+      "price": 8.4
+    },
+    {
+      "id": "sup246",
+      "name": "Walker,W",
+      "team": "Western Force",
+      "position": "LF",
+      "rate": 6.0,
+      "vol": 0.7,
+      "price": 7.6
+    },
+    {
+      "id": "sup247",
+      "name": "Watson,L",
+      "team": "Western Force",
+      "position": "LF",
+      "rate": 10.4,
+      "vol": 0.7,
+      "price": 10.2
+    },
+    {
+      "id": "sup248",
+      "name": "Tupou,W",
+      "team": "Western Force",
+      "position": "SH",
+      "rate": 10.0,
+      "vol": 0.5,
+      "price": 10.0
+    },
+    {
+      "id": "sup249",
+      "name": "van Rhyn,M",
+      "team": "Western Force",
+      "position": "SH",
+      "rate": 9.5,
+      "vol": 0.7,
+      "price": 9.7
+    },
+    {
+      "id": "sup250",
+      "name": "Wilkin,M",
+      "team": "Western Force",
+      "position": "FH",
+      "rate": 8.1,
+      "vol": 0.2,
+      "price": 8.9
+    },
+    {
+      "id": "sup251",
+      "name": "Hughes,R",
+      "team": "Western Force",
+      "position": "FH",
+      "rate": 10.9,
+      "vol": 0.8,
+      "price": 10.5
+    },
+    {
+      "id": "sup252",
+      "name": "Carter,E",
+      "team": "Western Force",
+      "position": "MID",
+      "rate": 7.6,
+      "vol": 0.3,
+      "price": 8.6
+    },
+    {
+      "id": "sup253",
+      "name": "Barrett,P",
+      "team": "Western Force",
+      "position": "MID",
+      "rate": 8.5,
+      "vol": 0.5,
+      "price": 9.1
+    },
+    {
+      "id": "sup254",
+      "name": "Clarke,T",
+      "team": "Western Force",
+      "position": "MID",
+      "rate": 8.7,
+      "vol": 0.6,
+      "price": 9.2
+    },
+    {
+      "id": "sup255",
+      "name": "Fihaki,A",
+      "team": "Western Force",
+      "position": "OBK",
+      "rate": 8.9,
+      "vol": 0.8,
+      "price": 9.3
+    },
+    {
+      "id": "sup256",
+      "name": "Wilkin,B",
+      "team": "Western Force",
+      "position": "OBK",
+      "rate": 7.6,
+      "vol": 0.2,
+      "price": 8.6
+    },
+    {
+      "id": "sup257",
+      "name": "Bennett,M",
+      "team": "Western Force",
+      "position": "OBK",
+      "rate": 9.2,
+      "vol": 0.3,
+      "price": 9.5
+    },
+    {
+      "id": "sup258",
+      "name": "Green,E",
+      "team": "Western Force",
+      "position": "OBK",
+      "rate": 7.0,
+      "vol": 0.4,
+      "price": 8.2
+    },
+    {
+      "id": "sup259",
+      "name": "Mauala,H",
+      "team": "Western Force",
+      "position": "OBK",
+      "rate": 10.4,
+      "vol": 0.7,
+      "price": 10.2
+    },
+    {
+      "id": "sup260",
+      "name": "Green,P",
+      "team": "Fijian Drua",
+      "position": "PR",
+      "rate": 7.8,
+      "vol": 0.6,
+      "price": 8.7
+    },
+    {
+      "id": "sup261",
+      "name": "Fox,G",
+      "team": "Fijian Drua",
+      "position": "PR",
+      "rate": 6.8,
+      "vol": 0.8,
+      "price": 8.1
+    },
+    {
+      "id": "sup262",
+      "name": "Hughes,K",
+      "team": "Fijian Drua",
+      "position": "PR",
+      "rate": 6.3,
+      "vol": 0.7,
+      "price": 7.8
+    },
+    {
+      "id": "sup263",
+      "name": "Ioane,N",
+      "team": "Fijian Drua",
+      "position": "PR",
+      "rate": 8.1,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "sup264",
+      "name": "King,P",
+      "team": "Fijian Drua",
+      "position": "HK",
+      "rate": 8.6,
+      "vol": 0.5,
+      "price": 9.2
+    },
+    {
+      "id": "sup265",
+      "name": "Ioane,O",
+      "team": "Fijian Drua",
+      "position": "HK",
+      "rate": 7.1,
+      "vol": 0.3,
+      "price": 8.3
+    },
+    {
+      "id": "sup266",
+      "name": "Sititi,W",
+      "team": "Fijian Drua",
+      "position": "LK",
+      "rate": 9.0,
+      "vol": 0.3,
+      "price": 9.4
+    },
+    {
+      "id": "sup267",
+      "name": "Cooper,F",
+      "team": "Fijian Drua",
+      "position": "LK",
+      "rate": 5.9,
+      "vol": 0.5,
+      "price": 7.5
+    },
+    {
+      "id": "sup268",
+      "name": "Green,W",
+      "team": "Fijian Drua",
+      "position": "LK",
+      "rate": 6.2,
+      "vol": 0.3,
+      "price": 7.7
+    },
+    {
+      "id": "sup269",
+      "name": "Marsh,A",
+      "team": "Fijian Drua",
+      "position": "LF",
+      "rate": 8.6,
+      "vol": 0.4,
+      "price": 9.2
+    },
+    {
+      "id": "sup270",
+      "name": "Wilson,B",
+      "team": "Fijian Drua",
+      "position": "LF",
+      "rate": 6.5,
+      "vol": 0.7,
+      "price": 7.9
+    },
+    {
+      "id": "sup271",
+      "name": "Nawaqanitawase,T",
+      "team": "Fijian Drua",
+      "position": "LF",
+      "rate": 10.4,
+      "vol": 0.5,
+      "price": 10.2
+    },
+    {
+      "id": "sup272",
+      "name": "Robinson,D",
+      "team": "Fijian Drua",
+      "position": "LF",
+      "rate": 10.3,
+      "vol": 0.5,
+      "price": 10.2
+    },
+    {
+      "id": "sup273",
+      "name": "Bell,O",
+      "team": "Fijian Drua",
+      "position": "LF",
+      "rate": 6.3,
+      "vol": 0.6,
+      "price": 7.8
+    },
+    {
+      "id": "sup274",
+      "name": "Marsh,T",
+      "team": "Fijian Drua",
+      "position": "SH",
+      "rate": 11.1,
+      "vol": 0.8,
+      "price": 10.7
+    },
+    {
+      "id": "sup275",
+      "name": "Moore,O",
+      "team": "Fijian Drua",
+      "position": "SH",
+      "rate": 8.5,
+      "vol": 0.5,
+      "price": 9.1
+    },
+    {
+      "id": "sup276",
+      "name": "Slipper,D",
+      "team": "Fijian Drua",
+      "position": "FH",
+      "rate": 10.5,
+      "vol": 0.2,
+      "price": 10.3
+    },
+    {
+      "id": "sup277",
+      "name": "Carter,N",
+      "team": "Fijian Drua",
+      "position": "FH",
+      "rate": 8.3,
+      "vol": 0.3,
+      "price": 9.0
+    },
+    {
+      "id": "sup278",
+      "name": "Carter,J",
+      "team": "Fijian Drua",
+      "position": "MID",
+      "rate": 7.6,
+      "vol": 0.3,
+      "price": 8.6
+    },
+    {
+      "id": "sup279",
+      "name": "du Toit,S",
+      "team": "Fijian Drua",
+      "position": "MID",
+      "rate": 10.4,
+      "vol": 0.2,
+      "price": 10.2
+    },
+    {
+      "id": "sup280",
+      "name": "Wilkin,W",
+      "team": "Fijian Drua",
+      "position": "MID",
+      "rate": 9.2,
+      "vol": 0.2,
+      "price": 9.5
+    },
+    {
+      "id": "sup281",
+      "name": "Salakaia-Loto,K",
+      "team": "Fijian Drua",
+      "position": "OBK",
+      "rate": 9.9,
+      "vol": 0.8,
+      "price": 9.9
+    },
+    {
+      "id": "sup282",
+      "name": "Bell,B",
+      "team": "Fijian Drua",
+      "position": "OBK",
+      "rate": 10.3,
+      "vol": 0.7,
+      "price": 10.2
+    },
+    {
+      "id": "sup283",
+      "name": "Falesolo,O",
+      "team": "Fijian Drua",
+      "position": "OBK",
+      "rate": 11.8,
+      "vol": 0.7,
+      "price": 11.1
+    },
+    {
+      "id": "sup284",
+      "name": "Slipper,B",
+      "team": "Fijian Drua",
+      "position": "OBK",
+      "rate": 10.9,
+      "vol": 0.2,
+      "price": 10.5
+    },
+    {
+      "id": "sup285",
+      "name": "Wright,F",
+      "team": "Fijian Drua",
+      "position": "OBK",
+      "rate": 10.2,
+      "vol": 0.2,
+      "price": 10.1
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "first_kickoff": "2026-02-13T07:00:00Z",
+      "last_kickoff": "2026-02-15T06:00:00Z",
+      "matches": [
+        {
+          "home": "Chiefs",
+          "away": "Blues"
+        },
+        {
+          "home": "Crusaders",
+          "away": "Fijian Drua"
+        },
+        {
+          "home": "Highlanders",
+          "away": "Western Force"
+        },
+        {
+          "home": "Hurricanes",
+          "away": "NSW Waratahs"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Queensland Reds"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "first_kickoff": "2026-02-20T07:00:00Z",
+      "last_kickoff": "2026-02-22T06:00:00Z",
+      "matches": [
+        {
+          "home": "Crusaders",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Highlanders",
+          "away": "Blues"
+        },
+        {
+          "home": "Hurricanes",
+          "away": "Fijian Drua"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Western Force"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "NSW Waratahs"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "first_kickoff": "2026-02-27T07:00:00Z",
+      "last_kickoff": "2026-03-01T06:00:00Z",
+      "matches": [
+        {
+          "home": "Highlanders",
+          "away": "Crusaders"
+        },
+        {
+          "home": "Hurricanes",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Blues"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "Fijian Drua"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Western Force"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "first_kickoff": "2026-03-06T07:00:00Z",
+      "last_kickoff": "2026-03-08T06:00:00Z",
+      "matches": [
+        {
+          "home": "Hurricanes",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Crusaders"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Blues"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Fijian Drua"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "first_kickoff": "2026-03-13T07:00:00Z",
+      "last_kickoff": "2026-03-15T06:00:00Z",
+      "matches": [
+        {
+          "home": "Moana Pasifika",
+          "away": "Hurricanes"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Crusaders"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Western Force",
+          "away": "Blues"
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "first_kickoff": "2026-03-20T07:00:00Z",
+      "last_kickoff": "2026-03-22T06:00:00Z",
+      "matches": [
+        {
+          "home": "ACT Brumbies",
+          "away": "Moana Pasifika"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Hurricanes"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Western Force",
+          "away": "Crusaders"
+        },
+        {
+          "home": "Fijian Drua",
+          "away": "Chiefs"
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "first_kickoff": "2026-03-27T07:00:00Z",
+      "last_kickoff": "2026-03-29T06:00:00Z",
+      "matches": [
+        {
+          "home": "Queensland Reds",
+          "away": "ACT Brumbies"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Moana Pasifika"
+        },
+        {
+          "home": "Western Force",
+          "away": "Hurricanes"
+        },
+        {
+          "home": "Fijian Drua",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Blues",
+          "away": "Crusaders"
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "first_kickoff": "2026-04-03T07:00:00Z",
+      "last_kickoff": "2026-04-05T06:00:00Z",
+      "matches": [
+        {
+          "home": "NSW Waratahs",
+          "away": "Queensland Reds"
+        },
+        {
+          "home": "Western Force",
+          "away": "ACT Brumbies"
+        },
+        {
+          "home": "Fijian Drua",
+          "away": "Moana Pasifika"
+        },
+        {
+          "home": "Blues",
+          "away": "Hurricanes"
+        },
+        {
+          "home": "Chiefs",
+          "away": "Highlanders"
+        }
+      ]
+    },
+    {
+      "round": 9,
+      "first_kickoff": "2026-04-10T07:00:00Z",
+      "last_kickoff": "2026-04-12T06:00:00Z",
+      "matches": [
+        {
+          "home": "Western Force",
+          "away": "NSW Waratahs"
+        },
+        {
+          "home": "Fijian Drua",
+          "away": "Queensland Reds"
+        },
+        {
+          "home": "Blues",
+          "away": "ACT Brumbies"
+        },
+        {
+          "home": "Chiefs",
+          "away": "Moana Pasifika"
+        },
+        {
+          "home": "Crusaders",
+          "away": "Hurricanes"
+        }
+      ]
+    },
+    {
+      "round": 10,
+      "first_kickoff": "2026-04-17T07:00:00Z",
+      "last_kickoff": "2026-04-19T06:00:00Z",
+      "matches": [
+        {
+          "home": "Fijian Drua",
+          "away": "Western Force"
+        },
+        {
+          "home": "Blues",
+          "away": "NSW Waratahs"
+        },
+        {
+          "home": "Chiefs",
+          "away": "Queensland Reds"
+        },
+        {
+          "home": "Crusaders",
+          "away": "ACT Brumbies"
+        },
+        {
+          "home": "Highlanders",
+          "away": "Moana Pasifika"
+        }
+      ]
+    },
+    {
+      "round": 11,
+      "first_kickoff": "2026-04-24T07:00:00Z",
+      "last_kickoff": "2026-04-26T06:00:00Z",
+      "matches": [
+        {
+          "home": "Blues",
+          "away": "Fijian Drua"
+        },
+        {
+          "home": "Chiefs",
+          "away": "Western Force"
+        },
+        {
+          "home": "Crusaders",
+          "away": "NSW Waratahs"
+        },
+        {
+          "home": "Highlanders",
+          "away": "Queensland Reds"
+        },
+        {
+          "home": "Hurricanes",
+          "away": "ACT Brumbies"
+        }
+      ]
+    },
+    {
+      "round": 12,
+      "first_kickoff": "2026-05-01T07:00:00Z",
+      "last_kickoff": "2026-05-03T06:00:00Z",
+      "matches": [
+        {
+          "home": "Chiefs",
+          "away": "Blues"
+        },
+        {
+          "home": "Crusaders",
+          "away": "Fijian Drua"
+        },
+        {
+          "home": "Highlanders",
+          "away": "Western Force"
+        },
+        {
+          "home": "Hurricanes",
+          "away": "NSW Waratahs"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Queensland Reds"
+        }
+      ]
+    },
+    {
+      "round": 13,
+      "first_kickoff": "2026-05-08T07:00:00Z",
+      "last_kickoff": "2026-05-10T06:00:00Z",
+      "matches": [
+        {
+          "home": "Crusaders",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Highlanders",
+          "away": "Blues"
+        },
+        {
+          "home": "Hurricanes",
+          "away": "Fijian Drua"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Western Force"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "NSW Waratahs"
+        }
+      ]
+    },
+    {
+      "round": 14,
+      "first_kickoff": "2026-05-15T07:00:00Z",
+      "last_kickoff": "2026-05-17T06:00:00Z",
+      "matches": [
+        {
+          "home": "Highlanders",
+          "away": "Crusaders"
+        },
+        {
+          "home": "Hurricanes",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Blues"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "Fijian Drua"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Western Force"
+        }
+      ]
+    },
+    {
+      "round": 15,
+      "first_kickoff": "2026-05-22T07:00:00Z",
+      "last_kickoff": "2026-05-24T06:00:00Z",
+      "matches": [
+        {
+          "home": "Hurricanes",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Moana Pasifika",
+          "away": "Crusaders"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Blues"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Fijian Drua"
+        }
+      ]
+    },
+    {
+      "round": 16,
+      "first_kickoff": "2026-05-29T07:00:00Z",
+      "last_kickoff": "2026-05-31T06:00:00Z",
+      "matches": [
+        {
+          "home": "Moana Pasifika",
+          "away": "Hurricanes"
+        },
+        {
+          "home": "ACT Brumbies",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Crusaders"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Chiefs"
+        },
+        {
+          "home": "Western Force",
+          "away": "Blues"
+        }
+      ]
+    },
+    {
+      "round": 17,
+      "first_kickoff": "2026-06-05T07:00:00Z",
+      "last_kickoff": "2026-06-07T06:00:00Z",
+      "matches": [
+        {
+          "home": "ACT Brumbies",
+          "away": "Moana Pasifika"
+        },
+        {
+          "home": "Queensland Reds",
+          "away": "Hurricanes"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Western Force",
+          "away": "Crusaders"
+        },
+        {
+          "home": "Fijian Drua",
+          "away": "Chiefs"
+        }
+      ]
+    },
+    {
+      "round": 18,
+      "first_kickoff": "2026-06-12T07:00:00Z",
+      "last_kickoff": "2026-06-14T06:00:00Z",
+      "matches": [
+        {
+          "home": "Queensland Reds",
+          "away": "ACT Brumbies"
+        },
+        {
+          "home": "NSW Waratahs",
+          "away": "Moana Pasifika"
+        },
+        {
+          "home": "Western Force",
+          "away": "Hurricanes"
+        },
+        {
+          "home": "Fijian Drua",
+          "away": "Highlanders"
+        },
+        {
+          "home": "Blues",
+          "away": "Crusaders"
+        }
+      ]
+    }
+  ]
+}

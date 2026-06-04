@@ -1,0 +1,2888 @@
+{
+  "competition": "premiership",
+  "league_slug": "ofds",
+  "season": "2026-27",
+  "n_rounds": 18,
+  "real_teams": [
+    {
+      "name": "Bath",
+      "abbr": "BAT"
+    },
+    {
+      "name": "Bristol Bears",
+      "abbr": "BRI"
+    },
+    {
+      "name": "Exeter Chiefs",
+      "abbr": "EXE"
+    },
+    {
+      "name": "Gloucester",
+      "abbr": "GLO"
+    },
+    {
+      "name": "Harlequins",
+      "abbr": "HAR"
+    },
+    {
+      "name": "Leicester Tigers",
+      "abbr": "LEI"
+    },
+    {
+      "name": "Northampton Saints",
+      "abbr": "NOR"
+    },
+    {
+      "name": "Sale Sharks",
+      "abbr": "SAL"
+    },
+    {
+      "name": "Saracens",
+      "abbr": "SAR"
+    },
+    {
+      "name": "Newcastle Red Bulls",
+      "abbr": "NEW"
+    }
+  ],
+  "fantasy_teams": [
+    "Dulwich Panthers",
+    "Bread XV",
+    "Chessums Cheerleaders",
+    "London WaspCester",
+    "George XV",
+    "Seldom",
+    "Pizza Morahana",
+    "Dirty Ruckers"
+  ],
+  "players": [
+    {
+      "id": "pre000",
+      "name": "Wood,E",
+      "team": "Bath",
+      "position": "PR",
+      "rate": 7.3,
+      "vol": 0.6,
+      "price": 8.4
+    },
+    {
+      "id": "pre001",
+      "name": "Havili,N",
+      "team": "Bath",
+      "position": "PR",
+      "rate": 8.1,
+      "vol": 0.4,
+      "price": 8.9
+    },
+    {
+      "id": "pre002",
+      "name": "Clarke,F",
+      "team": "Bath",
+      "position": "PR",
+      "rate": 4.5,
+      "vol": 0.3,
+      "price": 6.7
+    },
+    {
+      "id": "pre003",
+      "name": "Slipper,K",
+      "team": "Bath",
+      "position": "PR",
+      "rate": 5.9,
+      "vol": 0.8,
+      "price": 7.5
+    },
+    {
+      "id": "pre004",
+      "name": "Nawaqanitawase,N",
+      "team": "Bath",
+      "position": "HK",
+      "rate": 5.2,
+      "vol": 0.5,
+      "price": 7.1
+    },
+    {
+      "id": "pre005",
+      "name": "Petaia,J",
+      "team": "Bath",
+      "position": "HK",
+      "rate": 7.4,
+      "vol": 0.4,
+      "price": 8.4
+    },
+    {
+      "id": "pre006",
+      "name": "Davies,T",
+      "team": "Bath",
+      "position": "LK",
+      "rate": 6.4,
+      "vol": 0.7,
+      "price": 7.8
+    },
+    {
+      "id": "pre007",
+      "name": "Roberts,O",
+      "team": "Bath",
+      "position": "LK",
+      "rate": 8.5,
+      "vol": 0.7,
+      "price": 9.1
+    },
+    {
+      "id": "pre008",
+      "name": "du Toit,M",
+      "team": "Bath",
+      "position": "LK",
+      "rate": 9.7,
+      "vol": 0.4,
+      "price": 9.8
+    },
+    {
+      "id": "pre009",
+      "name": "Burns,R",
+      "team": "Bath",
+      "position": "LF",
+      "rate": 6.1,
+      "vol": 0.5,
+      "price": 7.7
+    },
+    {
+      "id": "pre010",
+      "name": "Bell,K",
+      "team": "Bath",
+      "position": "LF",
+      "rate": 6.7,
+      "vol": 0.2,
+      "price": 8.0
+    },
+    {
+      "id": "pre011",
+      "name": "van Rhyn,J",
+      "team": "Bath",
+      "position": "LF",
+      "rate": 10.3,
+      "vol": 0.8,
+      "price": 10.2
+    },
+    {
+      "id": "pre012",
+      "name": "Vermeulen,G",
+      "team": "Bath",
+      "position": "LF",
+      "rate": 6.5,
+      "vol": 0.4,
+      "price": 7.9
+    },
+    {
+      "id": "pre013",
+      "name": "Price,F",
+      "team": "Bath",
+      "position": "LF",
+      "rate": 8.7,
+      "vol": 0.5,
+      "price": 9.2
+    },
+    {
+      "id": "pre014",
+      "name": "Shaw,T",
+      "team": "Bath",
+      "position": "SH",
+      "rate": 11.2,
+      "vol": 0.4,
+      "price": 10.7
+    },
+    {
+      "id": "pre015",
+      "name": "Frost,T",
+      "team": "Bath",
+      "position": "SH",
+      "rate": 11.0,
+      "vol": 0.3,
+      "price": 10.6
+    },
+    {
+      "id": "pre016",
+      "name": "Stone,O",
+      "team": "Bath",
+      "position": "FH",
+      "rate": 11.2,
+      "vol": 0.4,
+      "price": 10.7
+    },
+    {
+      "id": "pre017",
+      "name": "Sititi,F",
+      "team": "Bath",
+      "position": "FH",
+      "rate": 8.1,
+      "vol": 0.2,
+      "price": 8.9
+    },
+    {
+      "id": "pre018",
+      "name": "Davies,H",
+      "team": "Bath",
+      "position": "MID",
+      "rate": 9.1,
+      "vol": 0.4,
+      "price": 9.5
+    },
+    {
+      "id": "pre019",
+      "name": "Taylor,E",
+      "team": "Bath",
+      "position": "MID",
+      "rate": 6.9,
+      "vol": 0.3,
+      "price": 8.1
+    },
+    {
+      "id": "pre020",
+      "name": "Petaia,N",
+      "team": "Bath",
+      "position": "MID",
+      "rate": 9.3,
+      "vol": 0.3,
+      "price": 9.6
+    },
+    {
+      "id": "pre021",
+      "name": "Brown,M",
+      "team": "Bath",
+      "position": "OBK",
+      "rate": 8.8,
+      "vol": 0.7,
+      "price": 9.3
+    },
+    {
+      "id": "pre022",
+      "name": "Hughes,W",
+      "team": "Bath",
+      "position": "OBK",
+      "rate": 11.5,
+      "vol": 0.3,
+      "price": 10.9
+    },
+    {
+      "id": "pre023",
+      "name": "Mapimpi,G",
+      "team": "Bath",
+      "position": "OBK",
+      "rate": 10.5,
+      "vol": 0.5,
+      "price": 10.3
+    },
+    {
+      "id": "pre024",
+      "name": "Tupou,N",
+      "team": "Bath",
+      "position": "OBK",
+      "rate": 11.3,
+      "vol": 0.2,
+      "price": 10.8
+    },
+    {
+      "id": "pre025",
+      "name": "Holloway,P",
+      "team": "Bath",
+      "position": "OBK",
+      "rate": 11.4,
+      "vol": 0.5,
+      "price": 10.8
+    },
+    {
+      "id": "pre026",
+      "name": "Thompson,G",
+      "team": "Bristol Bears",
+      "position": "PR",
+      "rate": 7.8,
+      "vol": 0.2,
+      "price": 8.7
+    },
+    {
+      "id": "pre027",
+      "name": "Hughes,L",
+      "team": "Bristol Bears",
+      "position": "PR",
+      "rate": 5.1,
+      "vol": 0.7,
+      "price": 7.1
+    },
+    {
+      "id": "pre028",
+      "name": "Kolbe,L",
+      "team": "Bristol Bears",
+      "position": "PR",
+      "rate": 8.9,
+      "vol": 0.6,
+      "price": 9.3
+    },
+    {
+      "id": "pre029",
+      "name": "Suaalii,F",
+      "team": "Bristol Bears",
+      "position": "PR",
+      "rate": 9.2,
+      "vol": 0.7,
+      "price": 9.5
+    },
+    {
+      "id": "pre030",
+      "name": "Salakaia-Loto,N",
+      "team": "Bristol Bears",
+      "position": "HK",
+      "rate": 8.6,
+      "vol": 0.5,
+      "price": 9.2
+    },
+    {
+      "id": "pre031",
+      "name": "Smith,D",
+      "team": "Bristol Bears",
+      "position": "HK",
+      "rate": 9.3,
+      "vol": 0.2,
+      "price": 9.6
+    },
+    {
+      "id": "pre032",
+      "name": "Mapimpi,F",
+      "team": "Bristol Bears",
+      "position": "LK",
+      "rate": 9.2,
+      "vol": 0.2,
+      "price": 9.5
+    },
+    {
+      "id": "pre033",
+      "name": "Mauala,G",
+      "team": "Bristol Bears",
+      "position": "LK",
+      "rate": 10.2,
+      "vol": 0.4,
+      "price": 10.1
+    },
+    {
+      "id": "pre034",
+      "name": "Jones,N",
+      "team": "Bristol Bears",
+      "position": "LK",
+      "rate": 6.1,
+      "vol": 0.2,
+      "price": 7.7
+    },
+    {
+      "id": "pre035",
+      "name": "Williams,N",
+      "team": "Bristol Bears",
+      "position": "LF",
+      "rate": 10.0,
+      "vol": 0.8,
+      "price": 10.0
+    },
+    {
+      "id": "pre036",
+      "name": "Thomas,W",
+      "team": "Bristol Bears",
+      "position": "LF",
+      "rate": 10.4,
+      "vol": 0.7,
+      "price": 10.2
+    },
+    {
+      "id": "pre037",
+      "name": "Edwards,N",
+      "team": "Bristol Bears",
+      "position": "LF",
+      "rate": 9.1,
+      "vol": 0.2,
+      "price": 9.5
+    },
+    {
+      "id": "pre038",
+      "name": "King,O",
+      "team": "Bristol Bears",
+      "position": "LF",
+      "rate": 7.7,
+      "vol": 0.4,
+      "price": 8.6
+    },
+    {
+      "id": "pre039",
+      "name": "Lolesio,J",
+      "team": "Bristol Bears",
+      "position": "LF",
+      "rate": 9.8,
+      "vol": 0.2,
+      "price": 9.9
+    },
+    {
+      "id": "pre040",
+      "name": "Vermeulen,J",
+      "team": "Bristol Bears",
+      "position": "SH",
+      "rate": 8.0,
+      "vol": 0.4,
+      "price": 8.8
+    },
+    {
+      "id": "pre041",
+      "name": "Thomas,J",
+      "team": "Bristol Bears",
+      "position": "SH",
+      "rate": 8.8,
+      "vol": 0.3,
+      "price": 9.3
+    },
+    {
+      "id": "pre042",
+      "name": "Evans,K",
+      "team": "Bristol Bears",
+      "position": "FH",
+      "rate": 11.8,
+      "vol": 0.8,
+      "price": 11.1
+    },
+    {
+      "id": "pre043",
+      "name": "Ioane,D",
+      "team": "Bristol Bears",
+      "position": "FH",
+      "rate": 9.0,
+      "vol": 0.2,
+      "price": 9.4
+    },
+    {
+      "id": "pre044",
+      "name": "Ward,K",
+      "team": "Bristol Bears",
+      "position": "MID",
+      "rate": 8.2,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "pre045",
+      "name": "Lewis,F",
+      "team": "Bristol Bears",
+      "position": "MID",
+      "rate": 10.2,
+      "vol": 0.2,
+      "price": 10.1
+    },
+    {
+      "id": "pre046",
+      "name": "Lewis,M",
+      "team": "Bristol Bears",
+      "position": "MID",
+      "rate": 6.5,
+      "vol": 0.3,
+      "price": 7.9
+    },
+    {
+      "id": "pre047",
+      "name": "Evans,S",
+      "team": "Bristol Bears",
+      "position": "OBK",
+      "rate": 11.3,
+      "vol": 0.6,
+      "price": 10.8
+    },
+    {
+      "id": "pre048",
+      "name": "Suaalii,G",
+      "team": "Bristol Bears",
+      "position": "OBK",
+      "rate": 8.2,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "pre049",
+      "name": "Phillips,N",
+      "team": "Bristol Bears",
+      "position": "OBK",
+      "rate": 9.6,
+      "vol": 0.5,
+      "price": 9.8
+    },
+    {
+      "id": "pre050",
+      "name": "Salakaia-Loto,C",
+      "team": "Bristol Bears",
+      "position": "OBK",
+      "rate": 11.6,
+      "vol": 0.4,
+      "price": 11.0
+    },
+    {
+      "id": "pre051",
+      "name": "Wilkin,M",
+      "team": "Bristol Bears",
+      "position": "OBK",
+      "rate": 11.0,
+      "vol": 0.6,
+      "price": 10.6
+    },
+    {
+      "id": "pre052",
+      "name": "Bennett,O",
+      "team": "Exeter Chiefs",
+      "position": "PR",
+      "rate": 8.1,
+      "vol": 0.4,
+      "price": 8.9
+    },
+    {
+      "id": "pre053",
+      "name": "King,F",
+      "team": "Exeter Chiefs",
+      "position": "PR",
+      "rate": 9.1,
+      "vol": 0.3,
+      "price": 9.5
+    },
+    {
+      "id": "pre054",
+      "name": "Suaalii,S",
+      "team": "Exeter Chiefs",
+      "position": "PR",
+      "rate": 5.5,
+      "vol": 0.2,
+      "price": 7.3
+    },
+    {
+      "id": "pre055",
+      "name": "Ioane,R",
+      "team": "Exeter Chiefs",
+      "position": "PR",
+      "rate": 5.1,
+      "vol": 0.5,
+      "price": 7.1
+    },
+    {
+      "id": "pre056",
+      "name": "Brown,K",
+      "team": "Exeter Chiefs",
+      "position": "HK",
+      "rate": 6.9,
+      "vol": 0.4,
+      "price": 8.1
+    },
+    {
+      "id": "pre057",
+      "name": "Cole,H",
+      "team": "Exeter Chiefs",
+      "position": "HK",
+      "rate": 7.1,
+      "vol": 0.5,
+      "price": 8.3
+    },
+    {
+      "id": "pre058",
+      "name": "Walker,C",
+      "team": "Exeter Chiefs",
+      "position": "LK",
+      "rate": 5.8,
+      "vol": 0.8,
+      "price": 7.5
+    },
+    {
+      "id": "pre059",
+      "name": "Thomas,K",
+      "team": "Exeter Chiefs",
+      "position": "LK",
+      "rate": 6.6,
+      "vol": 0.6,
+      "price": 8.0
+    },
+    {
+      "id": "pre060",
+      "name": "Thomas,L",
+      "team": "Exeter Chiefs",
+      "position": "LK",
+      "rate": 6.0,
+      "vol": 0.3,
+      "price": 7.6
+    },
+    {
+      "id": "pre061",
+      "name": "Barrett,A",
+      "team": "Exeter Chiefs",
+      "position": "LF",
+      "rate": 6.9,
+      "vol": 0.7,
+      "price": 8.1
+    },
+    {
+      "id": "pre062",
+      "name": "Mapimpi,C",
+      "team": "Exeter Chiefs",
+      "position": "LF",
+      "rate": 9.1,
+      "vol": 0.7,
+      "price": 9.5
+    },
+    {
+      "id": "pre063",
+      "name": "Morgan,O",
+      "team": "Exeter Chiefs",
+      "position": "LF",
+      "rate": 7.2,
+      "vol": 0.5,
+      "price": 8.3
+    },
+    {
+      "id": "pre064",
+      "name": "Jones,A",
+      "team": "Exeter Chiefs",
+      "position": "LF",
+      "rate": 7.7,
+      "vol": 0.4,
+      "price": 8.6
+    },
+    {
+      "id": "pre065",
+      "name": "Ward,E",
+      "team": "Exeter Chiefs",
+      "position": "LF",
+      "rate": 6.8,
+      "vol": 0.3,
+      "price": 8.1
+    },
+    {
+      "id": "pre066",
+      "name": "Williams,O",
+      "team": "Exeter Chiefs",
+      "position": "SH",
+      "rate": 10.0,
+      "vol": 0.5,
+      "price": 10.0
+    },
+    {
+      "id": "pre067",
+      "name": "Harris,R",
+      "team": "Exeter Chiefs",
+      "position": "SH",
+      "rate": 11.5,
+      "vol": 0.4,
+      "price": 10.9
+    },
+    {
+      "id": "pre068",
+      "name": "Bell,W",
+      "team": "Exeter Chiefs",
+      "position": "FH",
+      "rate": 12.3,
+      "vol": 0.7,
+      "price": 11.4
+    },
+    {
+      "id": "pre069",
+      "name": "Mauala,M",
+      "team": "Exeter Chiefs",
+      "position": "FH",
+      "rate": 12.3,
+      "vol": 0.4,
+      "price": 11.4
+    },
+    {
+      "id": "pre070",
+      "name": "Carter,K",
+      "team": "Exeter Chiefs",
+      "position": "MID",
+      "rate": 7.0,
+      "vol": 0.2,
+      "price": 8.2
+    },
+    {
+      "id": "pre071",
+      "name": "Edwards,K",
+      "team": "Exeter Chiefs",
+      "position": "MID",
+      "rate": 7.8,
+      "vol": 0.2,
+      "price": 8.7
+    },
+    {
+      "id": "pre072",
+      "name": "King,T",
+      "team": "Exeter Chiefs",
+      "position": "MID",
+      "rate": 10.0,
+      "vol": 0.8,
+      "price": 10.0
+    },
+    {
+      "id": "pre073",
+      "name": "Jones,E",
+      "team": "Exeter Chiefs",
+      "position": "OBK",
+      "rate": 7.9,
+      "vol": 0.2,
+      "price": 8.7
+    },
+    {
+      "id": "pre074",
+      "name": "Barrett,D",
+      "team": "Exeter Chiefs",
+      "position": "OBK",
+      "rate": 11.9,
+      "vol": 0.5,
+      "price": 11.1
+    },
+    {
+      "id": "pre075",
+      "name": "Shaw,B",
+      "team": "Exeter Chiefs",
+      "position": "OBK",
+      "rate": 10.4,
+      "vol": 0.2,
+      "price": 10.2
+    },
+    {
+      "id": "pre076",
+      "name": "Phillips,P",
+      "team": "Exeter Chiefs",
+      "position": "OBK",
+      "rate": 7.1,
+      "vol": 0.3,
+      "price": 8.3
+    },
+    {
+      "id": "pre077",
+      "name": "Roberts,N",
+      "team": "Exeter Chiefs",
+      "position": "OBK",
+      "rate": 10.4,
+      "vol": 0.7,
+      "price": 10.2
+    },
+    {
+      "id": "pre078",
+      "name": "Watson,M",
+      "team": "Gloucester",
+      "position": "PR",
+      "rate": 7.3,
+      "vol": 0.6,
+      "price": 8.4
+    },
+    {
+      "id": "pre079",
+      "name": "Stone,J",
+      "team": "Gloucester",
+      "position": "PR",
+      "rate": 6.3,
+      "vol": 0.3,
+      "price": 7.8
+    },
+    {
+      "id": "pre080",
+      "name": "Lolesio,K",
+      "team": "Gloucester",
+      "position": "PR",
+      "rate": 9.4,
+      "vol": 0.6,
+      "price": 9.6
+    },
+    {
+      "id": "pre081",
+      "name": "Sititi,N",
+      "team": "Gloucester",
+      "position": "PR",
+      "rate": 6.0,
+      "vol": 0.5,
+      "price": 7.6
+    },
+    {
+      "id": "pre082",
+      "name": "Bennett,H",
+      "team": "Gloucester",
+      "position": "HK",
+      "rate": 7.9,
+      "vol": 0.6,
+      "price": 8.7
+    },
+    {
+      "id": "pre083",
+      "name": "Walker,G",
+      "team": "Gloucester",
+      "position": "HK",
+      "rate": 9.7,
+      "vol": 0.5,
+      "price": 9.8
+    },
+    {
+      "id": "pre084",
+      "name": "Latu,O",
+      "team": "Gloucester",
+      "position": "LK",
+      "rate": 7.4,
+      "vol": 0.4,
+      "price": 8.4
+    },
+    {
+      "id": "pre085",
+      "name": "Petaia,K",
+      "team": "Gloucester",
+      "position": "LK",
+      "rate": 6.0,
+      "vol": 0.6,
+      "price": 7.6
+    },
+    {
+      "id": "pre086",
+      "name": "Marsh,D",
+      "team": "Gloucester",
+      "position": "LK",
+      "rate": 7.8,
+      "vol": 0.6,
+      "price": 8.7
+    },
+    {
+      "id": "pre087",
+      "name": "Sititi,G",
+      "team": "Gloucester",
+      "position": "LF",
+      "rate": 8.0,
+      "vol": 0.3,
+      "price": 8.8
+    },
+    {
+      "id": "pre088",
+      "name": "Wright,G",
+      "team": "Gloucester",
+      "position": "LF",
+      "rate": 8.1,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "pre089",
+      "name": "Reece,R",
+      "team": "Gloucester",
+      "position": "LF",
+      "rate": 8.9,
+      "vol": 0.3,
+      "price": 9.3
+    },
+    {
+      "id": "pre090",
+      "name": "Lolesio,P",
+      "team": "Gloucester",
+      "position": "LF",
+      "rate": 9.6,
+      "vol": 0.3,
+      "price": 9.8
+    },
+    {
+      "id": "pre091",
+      "name": "Ward,O",
+      "team": "Gloucester",
+      "position": "LF",
+      "rate": 6.6,
+      "vol": 0.6,
+      "price": 8.0
+    },
+    {
+      "id": "pre092",
+      "name": "Bennett,T",
+      "team": "Gloucester",
+      "position": "SH",
+      "rate": 8.6,
+      "vol": 0.7,
+      "price": 9.2
+    },
+    {
+      "id": "pre093",
+      "name": "Reid,J",
+      "team": "Gloucester",
+      "position": "SH",
+      "rate": 10.3,
+      "vol": 0.2,
+      "price": 10.2
+    },
+    {
+      "id": "pre094",
+      "name": "van Rhyn,K",
+      "team": "Gloucester",
+      "position": "FH",
+      "rate": 11.7,
+      "vol": 0.6,
+      "price": 11.0
+    },
+    {
+      "id": "pre095",
+      "name": "Petaia,M",
+      "team": "Gloucester",
+      "position": "FH",
+      "rate": 10.2,
+      "vol": 0.3,
+      "price": 10.1
+    },
+    {
+      "id": "pre096",
+      "name": "Mapimpi,T",
+      "team": "Gloucester",
+      "position": "MID",
+      "rate": 7.6,
+      "vol": 0.6,
+      "price": 8.6
+    },
+    {
+      "id": "pre097",
+      "name": "Brown,A",
+      "team": "Gloucester",
+      "position": "MID",
+      "rate": 10.5,
+      "vol": 0.5,
+      "price": 10.3
+    },
+    {
+      "id": "pre098",
+      "name": "Hill,R",
+      "team": "Gloucester",
+      "position": "MID",
+      "rate": 10.6,
+      "vol": 0.5,
+      "price": 10.4
+    },
+    {
+      "id": "pre099",
+      "name": "Marsh,A",
+      "team": "Gloucester",
+      "position": "OBK",
+      "rate": 10.0,
+      "vol": 0.6,
+      "price": 10.0
+    },
+    {
+      "id": "pre100",
+      "name": "Reid,R",
+      "team": "Gloucester",
+      "position": "OBK",
+      "rate": 11.6,
+      "vol": 0.4,
+      "price": 11.0
+    },
+    {
+      "id": "pre101",
+      "name": "Cole,M",
+      "team": "Gloucester",
+      "position": "OBK",
+      "rate": 11.7,
+      "vol": 0.5,
+      "price": 11.0
+    },
+    {
+      "id": "pre102",
+      "name": "Hill,A",
+      "team": "Gloucester",
+      "position": "OBK",
+      "rate": 8.4,
+      "vol": 0.2,
+      "price": 9.0
+    },
+    {
+      "id": "pre103",
+      "name": "Roberts,D",
+      "team": "Gloucester",
+      "position": "OBK",
+      "rate": 10.2,
+      "vol": 0.7,
+      "price": 10.1
+    },
+    {
+      "id": "pre104",
+      "name": "Suaalii,H",
+      "team": "Harlequins",
+      "position": "PR",
+      "rate": 7.1,
+      "vol": 0.4,
+      "price": 8.3
+    },
+    {
+      "id": "pre105",
+      "name": "Burns,H",
+      "team": "Harlequins",
+      "position": "PR",
+      "rate": 8.0,
+      "vol": 0.8,
+      "price": 8.8
+    },
+    {
+      "id": "pre106",
+      "name": "Petaia,T",
+      "team": "Harlequins",
+      "position": "PR",
+      "rate": 6.8,
+      "vol": 0.8,
+      "price": 8.1
+    },
+    {
+      "id": "pre107",
+      "name": "Roberts,F",
+      "team": "Harlequins",
+      "position": "PR",
+      "rate": 7.3,
+      "vol": 0.8,
+      "price": 8.4
+    },
+    {
+      "id": "pre108",
+      "name": "Edwards,L",
+      "team": "Harlequins",
+      "position": "HK",
+      "rate": 9.2,
+      "vol": 0.8,
+      "price": 9.5
+    },
+    {
+      "id": "pre109",
+      "name": "Green,K",
+      "team": "Harlequins",
+      "position": "HK",
+      "rate": 6.8,
+      "vol": 0.3,
+      "price": 8.1
+    },
+    {
+      "id": "pre110",
+      "name": "Jones,C",
+      "team": "Harlequins",
+      "position": "LK",
+      "rate": 5.8,
+      "vol": 0.4,
+      "price": 7.5
+    },
+    {
+      "id": "pre111",
+      "name": "Taylor,T",
+      "team": "Harlequins",
+      "position": "LK",
+      "rate": 9.7,
+      "vol": 0.3,
+      "price": 9.8
+    },
+    {
+      "id": "pre112",
+      "name": "Morgan,M",
+      "team": "Harlequins",
+      "position": "LK",
+      "rate": 8.5,
+      "vol": 0.4,
+      "price": 9.1
+    },
+    {
+      "id": "pre113",
+      "name": "Ioane,C",
+      "team": "Harlequins",
+      "position": "LF",
+      "rate": 6.7,
+      "vol": 0.3,
+      "price": 8.0
+    },
+    {
+      "id": "pre114",
+      "name": "Williams,J",
+      "team": "Harlequins",
+      "position": "LF",
+      "rate": 10.9,
+      "vol": 0.4,
+      "price": 10.5
+    },
+    {
+      "id": "pre115",
+      "name": "Petaia,A",
+      "team": "Harlequins",
+      "position": "LF",
+      "rate": 10.1,
+      "vol": 0.8,
+      "price": 10.1
+    },
+    {
+      "id": "pre116",
+      "name": "Naholo,S",
+      "team": "Harlequins",
+      "position": "LF",
+      "rate": 7.0,
+      "vol": 0.5,
+      "price": 8.2
+    },
+    {
+      "id": "pre117",
+      "name": "Ward,G",
+      "team": "Harlequins",
+      "position": "LF",
+      "rate": 9.4,
+      "vol": 0.6,
+      "price": 9.6
+    },
+    {
+      "id": "pre118",
+      "name": "Suaalii,C",
+      "team": "Harlequins",
+      "position": "SH",
+      "rate": 11.9,
+      "vol": 0.3,
+      "price": 11.1
+    },
+    {
+      "id": "pre119",
+      "name": "Nawaqanitawase,L",
+      "team": "Harlequins",
+      "position": "SH",
+      "rate": 10.5,
+      "vol": 0.6,
+      "price": 10.3
+    },
+    {
+      "id": "pre120",
+      "name": "Clarke,G",
+      "team": "Harlequins",
+      "position": "FH",
+      "rate": 8.6,
+      "vol": 0.2,
+      "price": 9.2
+    },
+    {
+      "id": "pre121",
+      "name": "Salakaia-Loto,O",
+      "team": "Harlequins",
+      "position": "FH",
+      "rate": 12.9,
+      "vol": 0.7,
+      "price": 11.7
+    },
+    {
+      "id": "pre122",
+      "name": "Holloway,R",
+      "team": "Harlequins",
+      "position": "MID",
+      "rate": 9.9,
+      "vol": 0.5,
+      "price": 9.9
+    },
+    {
+      "id": "pre123",
+      "name": "Kelly,G",
+      "team": "Harlequins",
+      "position": "MID",
+      "rate": 8.5,
+      "vol": 0.2,
+      "price": 9.1
+    },
+    {
+      "id": "pre124",
+      "name": "Evans,O",
+      "team": "Harlequins",
+      "position": "MID",
+      "rate": 8.1,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "pre125",
+      "name": "Morgan,F",
+      "team": "Harlequins",
+      "position": "OBK",
+      "rate": 8.2,
+      "vol": 0.5,
+      "price": 8.9
+    },
+    {
+      "id": "pre126",
+      "name": "Kolbe,T",
+      "team": "Harlequins",
+      "position": "OBK",
+      "rate": 9.4,
+      "vol": 0.4,
+      "price": 9.6
+    },
+    {
+      "id": "pre127",
+      "name": "Phillips,W",
+      "team": "Harlequins",
+      "position": "OBK",
+      "rate": 9.5,
+      "vol": 0.3,
+      "price": 9.7
+    },
+    {
+      "id": "pre128",
+      "name": "Edwards,M",
+      "team": "Harlequins",
+      "position": "OBK",
+      "rate": 8.9,
+      "vol": 0.8,
+      "price": 9.3
+    },
+    {
+      "id": "pre129",
+      "name": "Mapimpi,B",
+      "team": "Harlequins",
+      "position": "OBK",
+      "rate": 8.5,
+      "vol": 0.7,
+      "price": 9.1
+    },
+    {
+      "id": "pre130",
+      "name": "Salakaia-Loto,T",
+      "team": "Leicester Tigers",
+      "position": "PR",
+      "rate": 6.7,
+      "vol": 0.2,
+      "price": 8.0
+    },
+    {
+      "id": "pre131",
+      "name": "Wright,R",
+      "team": "Leicester Tigers",
+      "position": "PR",
+      "rate": 5.4,
+      "vol": 0.8,
+      "price": 7.2
+    },
+    {
+      "id": "pre132",
+      "name": "Reid,O",
+      "team": "Leicester Tigers",
+      "position": "PR",
+      "rate": 5.2,
+      "vol": 0.5,
+      "price": 7.1
+    },
+    {
+      "id": "pre133",
+      "name": "Clarke,M",
+      "team": "Leicester Tigers",
+      "position": "PR",
+      "rate": 5.6,
+      "vol": 0.5,
+      "price": 7.4
+    },
+    {
+      "id": "pre134",
+      "name": "Green,F",
+      "team": "Leicester Tigers",
+      "position": "HK",
+      "rate": 6.0,
+      "vol": 0.3,
+      "price": 7.6
+    },
+    {
+      "id": "pre135",
+      "name": "Price,N",
+      "team": "Leicester Tigers",
+      "position": "HK",
+      "rate": 8.5,
+      "vol": 0.8,
+      "price": 9.1
+    },
+    {
+      "id": "pre136",
+      "name": "Phillips,O",
+      "team": "Leicester Tigers",
+      "position": "LK",
+      "rate": 7.3,
+      "vol": 0.6,
+      "price": 8.4
+    },
+    {
+      "id": "pre137",
+      "name": "Brown,B",
+      "team": "Leicester Tigers",
+      "position": "LK",
+      "rate": 9.7,
+      "vol": 0.6,
+      "price": 9.8
+    },
+    {
+      "id": "pre138",
+      "name": "White,E",
+      "team": "Leicester Tigers",
+      "position": "LK",
+      "rate": 9.4,
+      "vol": 0.6,
+      "price": 9.6
+    },
+    {
+      "id": "pre139",
+      "name": "Wood,S",
+      "team": "Leicester Tigers",
+      "position": "LF",
+      "rate": 9.8,
+      "vol": 0.7,
+      "price": 9.9
+    },
+    {
+      "id": "pre140",
+      "name": "Ward,C",
+      "team": "Leicester Tigers",
+      "position": "LF",
+      "rate": 8.2,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "pre141",
+      "name": "Ward,D",
+      "team": "Leicester Tigers",
+      "position": "LF",
+      "rate": 7.3,
+      "vol": 0.8,
+      "price": 8.4
+    },
+    {
+      "id": "pre142",
+      "name": "Brown,F",
+      "team": "Leicester Tigers",
+      "position": "LF",
+      "rate": 6.4,
+      "vol": 0.3,
+      "price": 7.8
+    },
+    {
+      "id": "pre143",
+      "name": "Moore,K",
+      "team": "Leicester Tigers",
+      "position": "LF",
+      "rate": 7.1,
+      "vol": 0.6,
+      "price": 8.3
+    },
+    {
+      "id": "pre144",
+      "name": "Martin,H",
+      "team": "Leicester Tigers",
+      "position": "SH",
+      "rate": 10.5,
+      "vol": 0.7,
+      "price": 10.3
+    },
+    {
+      "id": "pre145",
+      "name": "Gordon,C",
+      "team": "Leicester Tigers",
+      "position": "SH",
+      "rate": 7.2,
+      "vol": 0.8,
+      "price": 8.3
+    },
+    {
+      "id": "pre146",
+      "name": "Morgan,R",
+      "team": "Leicester Tigers",
+      "position": "FH",
+      "rate": 12.2,
+      "vol": 0.5,
+      "price": 11.3
+    },
+    {
+      "id": "pre147",
+      "name": "Slipper,O",
+      "team": "Leicester Tigers",
+      "position": "FH",
+      "rate": 12.6,
+      "vol": 0.8,
+      "price": 11.6
+    },
+    {
+      "id": "pre148",
+      "name": "Wood,T",
+      "team": "Leicester Tigers",
+      "position": "MID",
+      "rate": 10.8,
+      "vol": 0.2,
+      "price": 10.5
+    },
+    {
+      "id": "pre149",
+      "name": "Harris,O",
+      "team": "Leicester Tigers",
+      "position": "MID",
+      "rate": 9.3,
+      "vol": 0.5,
+      "price": 9.6
+    },
+    {
+      "id": "pre150",
+      "name": "Morgan,L",
+      "team": "Leicester Tigers",
+      "position": "MID",
+      "rate": 10.5,
+      "vol": 0.7,
+      "price": 10.3
+    },
+    {
+      "id": "pre151",
+      "name": "Tupou,M",
+      "team": "Leicester Tigers",
+      "position": "OBK",
+      "rate": 9.3,
+      "vol": 0.2,
+      "price": 9.6
+    },
+    {
+      "id": "pre152",
+      "name": "Lolesio,E",
+      "team": "Leicester Tigers",
+      "position": "OBK",
+      "rate": 10.2,
+      "vol": 0.2,
+      "price": 10.1
+    },
+    {
+      "id": "pre153",
+      "name": "Wright,H",
+      "team": "Leicester Tigers",
+      "position": "OBK",
+      "rate": 11.6,
+      "vol": 0.5,
+      "price": 11.0
+    },
+    {
+      "id": "pre154",
+      "name": "Kelly,P",
+      "team": "Leicester Tigers",
+      "position": "OBK",
+      "rate": 8.3,
+      "vol": 0.4,
+      "price": 9.0
+    },
+    {
+      "id": "pre155",
+      "name": "Walker,A",
+      "team": "Leicester Tigers",
+      "position": "OBK",
+      "rate": 8.9,
+      "vol": 0.2,
+      "price": 9.3
+    },
+    {
+      "id": "pre156",
+      "name": "Naholo,D",
+      "team": "Northampton Saints",
+      "position": "PR",
+      "rate": 8.4,
+      "vol": 0.6,
+      "price": 9.0
+    },
+    {
+      "id": "pre157",
+      "name": "Turner,H",
+      "team": "Northampton Saints",
+      "position": "PR",
+      "rate": 7.4,
+      "vol": 0.5,
+      "price": 8.4
+    },
+    {
+      "id": "pre158",
+      "name": "Carter,M",
+      "team": "Northampton Saints",
+      "position": "PR",
+      "rate": 8.8,
+      "vol": 0.8,
+      "price": 9.3
+    },
+    {
+      "id": "pre159",
+      "name": "Price,M",
+      "team": "Northampton Saints",
+      "position": "PR",
+      "rate": 6.7,
+      "vol": 0.8,
+      "price": 8.0
+    },
+    {
+      "id": "pre160",
+      "name": "Smith,A",
+      "team": "Northampton Saints",
+      "position": "HK",
+      "rate": 8.5,
+      "vol": 0.2,
+      "price": 9.1
+    },
+    {
+      "id": "pre161",
+      "name": "Marsh,B",
+      "team": "Northampton Saints",
+      "position": "HK",
+      "rate": 6.8,
+      "vol": 0.8,
+      "price": 8.1
+    },
+    {
+      "id": "pre162",
+      "name": "Nawaqanitawase,A",
+      "team": "Northampton Saints",
+      "position": "LK",
+      "rate": 7.0,
+      "vol": 0.6,
+      "price": 8.2
+    },
+    {
+      "id": "pre163",
+      "name": "Cooper,O",
+      "team": "Northampton Saints",
+      "position": "LK",
+      "rate": 7.0,
+      "vol": 0.5,
+      "price": 8.2
+    },
+    {
+      "id": "pre164",
+      "name": "Roberts,P",
+      "team": "Northampton Saints",
+      "position": "LK",
+      "rate": 6.2,
+      "vol": 0.4,
+      "price": 7.7
+    },
+    {
+      "id": "pre165",
+      "name": "Fihaki,A",
+      "team": "Northampton Saints",
+      "position": "LF",
+      "rate": 7.8,
+      "vol": 0.3,
+      "price": 8.7
+    },
+    {
+      "id": "pre166",
+      "name": "Petaia,B",
+      "team": "Northampton Saints",
+      "position": "LF",
+      "rate": 6.4,
+      "vol": 0.8,
+      "price": 7.8
+    },
+    {
+      "id": "pre167",
+      "name": "Murphy,T",
+      "team": "Northampton Saints",
+      "position": "LF",
+      "rate": 6.8,
+      "vol": 0.5,
+      "price": 8.1
+    },
+    {
+      "id": "pre168",
+      "name": "Bennett,W",
+      "team": "Northampton Saints",
+      "position": "LF",
+      "rate": 6.1,
+      "vol": 0.8,
+      "price": 7.7
+    },
+    {
+      "id": "pre169",
+      "name": "Wood,P",
+      "team": "Northampton Saints",
+      "position": "LF",
+      "rate": 9.2,
+      "vol": 0.5,
+      "price": 9.5
+    },
+    {
+      "id": "pre170",
+      "name": "Roberts,A",
+      "team": "Northampton Saints",
+      "position": "SH",
+      "rate": 11.3,
+      "vol": 0.6,
+      "price": 10.8
+    },
+    {
+      "id": "pre171",
+      "name": "Cooper,G",
+      "team": "Northampton Saints",
+      "position": "SH",
+      "rate": 7.3,
+      "vol": 0.2,
+      "price": 8.4
+    },
+    {
+      "id": "pre172",
+      "name": "Kolbe,W",
+      "team": "Northampton Saints",
+      "position": "FH",
+      "rate": 9.4,
+      "vol": 0.5,
+      "price": 9.6
+    },
+    {
+      "id": "pre173",
+      "name": "Brown,O",
+      "team": "Northampton Saints",
+      "position": "FH",
+      "rate": 8.0,
+      "vol": 0.7,
+      "price": 8.8
+    },
+    {
+      "id": "pre174",
+      "name": "Kolbe,F",
+      "team": "Northampton Saints",
+      "position": "MID",
+      "rate": 9.2,
+      "vol": 0.2,
+      "price": 9.5
+    },
+    {
+      "id": "pre175",
+      "name": "Williams,P",
+      "team": "Northampton Saints",
+      "position": "MID",
+      "rate": 8.4,
+      "vol": 0.7,
+      "price": 9.0
+    },
+    {
+      "id": "pre176",
+      "name": "Roberts,G",
+      "team": "Northampton Saints",
+      "position": "MID",
+      "rate": 7.6,
+      "vol": 0.4,
+      "price": 8.6
+    },
+    {
+      "id": "pre177",
+      "name": "Brown,C",
+      "team": "Northampton Saints",
+      "position": "OBK",
+      "rate": 8.4,
+      "vol": 0.3,
+      "price": 9.0
+    },
+    {
+      "id": "pre178",
+      "name": "Lolesio,O",
+      "team": "Northampton Saints",
+      "position": "OBK",
+      "rate": 7.8,
+      "vol": 0.6,
+      "price": 8.7
+    },
+    {
+      "id": "pre179",
+      "name": "Lolesio,C",
+      "team": "Northampton Saints",
+      "position": "OBK",
+      "rate": 8.5,
+      "vol": 0.5,
+      "price": 9.1
+    },
+    {
+      "id": "pre180",
+      "name": "Marsh,C",
+      "team": "Northampton Saints",
+      "position": "OBK",
+      "rate": 8.4,
+      "vol": 0.4,
+      "price": 9.0
+    },
+    {
+      "id": "pre181",
+      "name": "Shaw,D",
+      "team": "Northampton Saints",
+      "position": "OBK",
+      "rate": 9.9,
+      "vol": 0.8,
+      "price": 9.9
+    },
+    {
+      "id": "pre182",
+      "name": "Cole,S",
+      "team": "Sale Sharks",
+      "position": "PR",
+      "rate": 5.4,
+      "vol": 0.7,
+      "price": 7.2
+    },
+    {
+      "id": "pre183",
+      "name": "Slipper,B",
+      "team": "Sale Sharks",
+      "position": "PR",
+      "rate": 8.5,
+      "vol": 0.5,
+      "price": 9.1
+    },
+    {
+      "id": "pre184",
+      "name": "Tuipulotu,C",
+      "team": "Sale Sharks",
+      "position": "PR",
+      "rate": 4.8,
+      "vol": 0.7,
+      "price": 6.9
+    },
+    {
+      "id": "pre185",
+      "name": "du Toit,L",
+      "team": "Sale Sharks",
+      "position": "PR",
+      "rate": 8.8,
+      "vol": 0.3,
+      "price": 9.3
+    },
+    {
+      "id": "pre186",
+      "name": "Wood,K",
+      "team": "Sale Sharks",
+      "position": "HK",
+      "rate": 6.9,
+      "vol": 0.4,
+      "price": 8.1
+    },
+    {
+      "id": "pre187",
+      "name": "Nawaqanitawase,W",
+      "team": "Sale Sharks",
+      "position": "HK",
+      "rate": 6.4,
+      "vol": 0.6,
+      "price": 7.8
+    },
+    {
+      "id": "pre188",
+      "name": "Mauala,W",
+      "team": "Sale Sharks",
+      "position": "LK",
+      "rate": 10.2,
+      "vol": 0.2,
+      "price": 10.1
+    },
+    {
+      "id": "pre189",
+      "name": "Cole,B",
+      "team": "Sale Sharks",
+      "position": "LK",
+      "rate": 7.6,
+      "vol": 0.4,
+      "price": 8.6
+    },
+    {
+      "id": "pre190",
+      "name": "Falesolo,E",
+      "team": "Sale Sharks",
+      "position": "LK",
+      "rate": 9.0,
+      "vol": 0.2,
+      "price": 9.4
+    },
+    {
+      "id": "pre191",
+      "name": "Moore,A",
+      "team": "Sale Sharks",
+      "position": "LF",
+      "rate": 10.5,
+      "vol": 0.4,
+      "price": 10.3
+    },
+    {
+      "id": "pre192",
+      "name": "Tuipulotu,N",
+      "team": "Sale Sharks",
+      "position": "LF",
+      "rate": 6.6,
+      "vol": 0.5,
+      "price": 8.0
+    },
+    {
+      "id": "pre193",
+      "name": "Bell,T",
+      "team": "Sale Sharks",
+      "position": "LF",
+      "rate": 9.3,
+      "vol": 0.8,
+      "price": 9.6
+    },
+    {
+      "id": "pre194",
+      "name": "Turner,B",
+      "team": "Sale Sharks",
+      "position": "LF",
+      "rate": 7.0,
+      "vol": 0.6,
+      "price": 8.2
+    },
+    {
+      "id": "pre195",
+      "name": "Mauala,H",
+      "team": "Sale Sharks",
+      "position": "LF",
+      "rate": 6.8,
+      "vol": 0.6,
+      "price": 8.1
+    },
+    {
+      "id": "pre196",
+      "name": "Havili,A",
+      "team": "Sale Sharks",
+      "position": "SH",
+      "rate": 9.2,
+      "vol": 0.4,
+      "price": 9.5
+    },
+    {
+      "id": "pre197",
+      "name": "Williams,K",
+      "team": "Sale Sharks",
+      "position": "SH",
+      "rate": 9.5,
+      "vol": 0.2,
+      "price": 9.7
+    },
+    {
+      "id": "pre198",
+      "name": "Bell,J",
+      "team": "Sale Sharks",
+      "position": "FH",
+      "rate": 12.9,
+      "vol": 0.8,
+      "price": 11.7
+    },
+    {
+      "id": "pre199",
+      "name": "Vermeulen,K",
+      "team": "Sale Sharks",
+      "position": "FH",
+      "rate": 12.3,
+      "vol": 0.7,
+      "price": 11.4
+    },
+    {
+      "id": "pre200",
+      "name": "Clarke,D",
+      "team": "Sale Sharks",
+      "position": "MID",
+      "rate": 10.3,
+      "vol": 0.8,
+      "price": 10.2
+    },
+    {
+      "id": "pre201",
+      "name": "Petaia,G",
+      "team": "Sale Sharks",
+      "position": "MID",
+      "rate": 9.5,
+      "vol": 0.8,
+      "price": 9.7
+    },
+    {
+      "id": "pre202",
+      "name": "Bennett,J",
+      "team": "Sale Sharks",
+      "position": "MID",
+      "rate": 7.7,
+      "vol": 0.3,
+      "price": 8.6
+    },
+    {
+      "id": "pre203",
+      "name": "Martin,P",
+      "team": "Sale Sharks",
+      "position": "OBK",
+      "rate": 7.3,
+      "vol": 0.6,
+      "price": 8.4
+    },
+    {
+      "id": "pre204",
+      "name": "Barrett,O",
+      "team": "Sale Sharks",
+      "position": "OBK",
+      "rate": 10.1,
+      "vol": 0.7,
+      "price": 10.1
+    },
+    {
+      "id": "pre205",
+      "name": "Latu,P",
+      "team": "Sale Sharks",
+      "position": "OBK",
+      "rate": 11.8,
+      "vol": 0.2,
+      "price": 11.1
+    },
+    {
+      "id": "pre206",
+      "name": "Reid,P",
+      "team": "Sale Sharks",
+      "position": "OBK",
+      "rate": 7.1,
+      "vol": 0.3,
+      "price": 8.3
+    },
+    {
+      "id": "pre207",
+      "name": "Phillips,E",
+      "team": "Sale Sharks",
+      "position": "OBK",
+      "rate": 8.1,
+      "vol": 0.7,
+      "price": 8.9
+    },
+    {
+      "id": "pre208",
+      "name": "Stone,K",
+      "team": "Saracens",
+      "position": "PR",
+      "rate": 6.9,
+      "vol": 0.3,
+      "price": 8.1
+    },
+    {
+      "id": "pre209",
+      "name": "Brown,D",
+      "team": "Saracens",
+      "position": "PR",
+      "rate": 6.0,
+      "vol": 0.4,
+      "price": 7.6
+    },
+    {
+      "id": "pre210",
+      "name": "Lolesio,G",
+      "team": "Saracens",
+      "position": "PR",
+      "rate": 5.9,
+      "vol": 0.4,
+      "price": 7.5
+    },
+    {
+      "id": "pre211",
+      "name": "Burns,C",
+      "team": "Saracens",
+      "position": "PR",
+      "rate": 6.6,
+      "vol": 0.7,
+      "price": 8.0
+    },
+    {
+      "id": "pre212",
+      "name": "Bell,A",
+      "team": "Saracens",
+      "position": "HK",
+      "rate": 6.7,
+      "vol": 0.4,
+      "price": 8.0
+    },
+    {
+      "id": "pre213",
+      "name": "Nawaqanitawase,P",
+      "team": "Saracens",
+      "position": "HK",
+      "rate": 8.5,
+      "vol": 0.4,
+      "price": 9.1
+    },
+    {
+      "id": "pre214",
+      "name": "Murphy,H",
+      "team": "Saracens",
+      "position": "LK",
+      "rate": 6.3,
+      "vol": 0.5,
+      "price": 7.8
+    },
+    {
+      "id": "pre215",
+      "name": "Bennett,G",
+      "team": "Saracens",
+      "position": "LK",
+      "rate": 5.8,
+      "vol": 0.2,
+      "price": 7.5
+    },
+    {
+      "id": "pre216",
+      "name": "Petaia,E",
+      "team": "Saracens",
+      "position": "LK",
+      "rate": 8.3,
+      "vol": 0.3,
+      "price": 9.0
+    },
+    {
+      "id": "pre217",
+      "name": "Tupou,L",
+      "team": "Saracens",
+      "position": "LF",
+      "rate": 6.6,
+      "vol": 0.7,
+      "price": 8.0
+    },
+    {
+      "id": "pre218",
+      "name": "Mauala,A",
+      "team": "Saracens",
+      "position": "LF",
+      "rate": 9.5,
+      "vol": 0.7,
+      "price": 9.7
+    },
+    {
+      "id": "pre219",
+      "name": "Taylor,G",
+      "team": "Saracens",
+      "position": "LF",
+      "rate": 9.8,
+      "vol": 0.8,
+      "price": 9.9
+    },
+    {
+      "id": "pre220",
+      "name": "Bell,B",
+      "team": "Saracens",
+      "position": "LF",
+      "rate": 9.7,
+      "vol": 0.2,
+      "price": 9.8
+    },
+    {
+      "id": "pre221",
+      "name": "Lewis,C",
+      "team": "Saracens",
+      "position": "LF",
+      "rate": 7.4,
+      "vol": 0.7,
+      "price": 8.4
+    },
+    {
+      "id": "pre222",
+      "name": "Marsh,H",
+      "team": "Saracens",
+      "position": "SH",
+      "rate": 9.3,
+      "vol": 0.6,
+      "price": 9.6
+    },
+    {
+      "id": "pre223",
+      "name": "Clarke,A",
+      "team": "Saracens",
+      "position": "SH",
+      "rate": 7.3,
+      "vol": 0.4,
+      "price": 8.4
+    },
+    {
+      "id": "pre224",
+      "name": "Clarke,H",
+      "team": "Saracens",
+      "position": "FH",
+      "rate": 11.2,
+      "vol": 0.7,
+      "price": 10.7
+    },
+    {
+      "id": "pre225",
+      "name": "Evans,W",
+      "team": "Saracens",
+      "position": "FH",
+      "rate": 12.0,
+      "vol": 0.2,
+      "price": 11.2
+    },
+    {
+      "id": "pre226",
+      "name": "Morgan,W",
+      "team": "Saracens",
+      "position": "MID",
+      "rate": 10.8,
+      "vol": 0.2,
+      "price": 10.5
+    },
+    {
+      "id": "pre227",
+      "name": "Salakaia-Loto,S",
+      "team": "Saracens",
+      "position": "MID",
+      "rate": 11.3,
+      "vol": 0.4,
+      "price": 10.8
+    },
+    {
+      "id": "pre228",
+      "name": "White,C",
+      "team": "Saracens",
+      "position": "MID",
+      "rate": 7.0,
+      "vol": 0.7,
+      "price": 8.2
+    },
+    {
+      "id": "pre229",
+      "name": "Ioane,A",
+      "team": "Saracens",
+      "position": "OBK",
+      "rate": 9.7,
+      "vol": 0.3,
+      "price": 9.8
+    },
+    {
+      "id": "pre230",
+      "name": "Gordon,D",
+      "team": "Saracens",
+      "position": "OBK",
+      "rate": 8.6,
+      "vol": 0.8,
+      "price": 9.2
+    },
+    {
+      "id": "pre231",
+      "name": "Frost,P",
+      "team": "Saracens",
+      "position": "OBK",
+      "rate": 8.2,
+      "vol": 0.6,
+      "price": 8.9
+    },
+    {
+      "id": "pre232",
+      "name": "Reece,F",
+      "team": "Saracens",
+      "position": "OBK",
+      "rate": 11.8,
+      "vol": 0.7,
+      "price": 11.1
+    },
+    {
+      "id": "pre233",
+      "name": "Taylor,O",
+      "team": "Saracens",
+      "position": "OBK",
+      "rate": 10.0,
+      "vol": 0.8,
+      "price": 10.0
+    },
+    {
+      "id": "pre234",
+      "name": "Sititi,D",
+      "team": "Newcastle Red Bulls",
+      "position": "PR",
+      "rate": 5.4,
+      "vol": 0.8,
+      "price": 7.2
+    },
+    {
+      "id": "pre235",
+      "name": "Wood,F",
+      "team": "Newcastle Red Bulls",
+      "position": "PR",
+      "rate": 7.4,
+      "vol": 0.6,
+      "price": 8.4
+    },
+    {
+      "id": "pre236",
+      "name": "Havili,B",
+      "team": "Newcastle Red Bulls",
+      "position": "PR",
+      "rate": 8.6,
+      "vol": 0.5,
+      "price": 9.2
+    },
+    {
+      "id": "pre237",
+      "name": "du Toit,O",
+      "team": "Newcastle Red Bulls",
+      "position": "PR",
+      "rate": 6.0,
+      "vol": 0.6,
+      "price": 7.6
+    },
+    {
+      "id": "pre238",
+      "name": "Wilkin,P",
+      "team": "Newcastle Red Bulls",
+      "position": "HK",
+      "rate": 8.0,
+      "vol": 0.8,
+      "price": 8.8
+    },
+    {
+      "id": "pre239",
+      "name": "Marsh,E",
+      "team": "Newcastle Red Bulls",
+      "position": "HK",
+      "rate": 5.9,
+      "vol": 0.6,
+      "price": 7.5
+    },
+    {
+      "id": "pre240",
+      "name": "Bennett,A",
+      "team": "Newcastle Red Bulls",
+      "position": "LK",
+      "rate": 8.5,
+      "vol": 0.6,
+      "price": 9.1
+    },
+    {
+      "id": "pre241",
+      "name": "Cole,D",
+      "team": "Newcastle Red Bulls",
+      "position": "LK",
+      "rate": 6.3,
+      "vol": 0.2,
+      "price": 7.8
+    },
+    {
+      "id": "pre242",
+      "name": "Vermeulen,M",
+      "team": "Newcastle Red Bulls",
+      "position": "LK",
+      "rate": 5.8,
+      "vol": 0.2,
+      "price": 7.5
+    },
+    {
+      "id": "pre243",
+      "name": "Bell,G",
+      "team": "Newcastle Red Bulls",
+      "position": "LF",
+      "rate": 6.6,
+      "vol": 0.3,
+      "price": 8.0
+    },
+    {
+      "id": "pre244",
+      "name": "Williams,T",
+      "team": "Newcastle Red Bulls",
+      "position": "LF",
+      "rate": 6.8,
+      "vol": 0.8,
+      "price": 8.1
+    },
+    {
+      "id": "pre245",
+      "name": "Turner,J",
+      "team": "Newcastle Red Bulls",
+      "position": "LF",
+      "rate": 8.8,
+      "vol": 0.8,
+      "price": 9.3
+    },
+    {
+      "id": "pre246",
+      "name": "Turner,O",
+      "team": "Newcastle Red Bulls",
+      "position": "LF",
+      "rate": 6.2,
+      "vol": 0.4,
+      "price": 7.7
+    },
+    {
+      "id": "pre247",
+      "name": "Wilson,J",
+      "team": "Newcastle Red Bulls",
+      "position": "LF",
+      "rate": 9.5,
+      "vol": 0.8,
+      "price": 9.7
+    },
+    {
+      "id": "pre248",
+      "name": "Latu,G",
+      "team": "Newcastle Red Bulls",
+      "position": "SH",
+      "rate": 11.2,
+      "vol": 0.7,
+      "price": 10.7
+    },
+    {
+      "id": "pre249",
+      "name": "Jones,W",
+      "team": "Newcastle Red Bulls",
+      "position": "SH",
+      "rate": 8.0,
+      "vol": 0.8,
+      "price": 8.8
+    },
+    {
+      "id": "pre250",
+      "name": "Bell,C",
+      "team": "Newcastle Red Bulls",
+      "position": "FH",
+      "rate": 12.7,
+      "vol": 0.3,
+      "price": 11.6
+    },
+    {
+      "id": "pre251",
+      "name": "Carter,N",
+      "team": "Newcastle Red Bulls",
+      "position": "FH",
+      "rate": 11.3,
+      "vol": 0.7,
+      "price": 10.8
+    },
+    {
+      "id": "pre252",
+      "name": "Bell,L",
+      "team": "Newcastle Red Bulls",
+      "position": "MID",
+      "rate": 9.0,
+      "vol": 0.4,
+      "price": 9.4
+    },
+    {
+      "id": "pre253",
+      "name": "Cole,J",
+      "team": "Newcastle Red Bulls",
+      "position": "MID",
+      "rate": 9.8,
+      "vol": 0.3,
+      "price": 9.9
+    },
+    {
+      "id": "pre254",
+      "name": "Barrett,P",
+      "team": "Newcastle Red Bulls",
+      "position": "MID",
+      "rate": 6.6,
+      "vol": 0.8,
+      "price": 8.0
+    },
+    {
+      "id": "pre255",
+      "name": "Price,G",
+      "team": "Newcastle Red Bulls",
+      "position": "OBK",
+      "rate": 7.8,
+      "vol": 0.5,
+      "price": 8.7
+    },
+    {
+      "id": "pre256",
+      "name": "Shaw,A",
+      "team": "Newcastle Red Bulls",
+      "position": "OBK",
+      "rate": 7.2,
+      "vol": 0.5,
+      "price": 8.3
+    },
+    {
+      "id": "pre257",
+      "name": "White,M",
+      "team": "Newcastle Red Bulls",
+      "position": "OBK",
+      "rate": 8.7,
+      "vol": 0.8,
+      "price": 9.2
+    },
+    {
+      "id": "pre258",
+      "name": "Gordon,F",
+      "team": "Newcastle Red Bulls",
+      "position": "OBK",
+      "rate": 9.2,
+      "vol": 0.7,
+      "price": 9.5
+    },
+    {
+      "id": "pre259",
+      "name": "Nawaqanitawase,M",
+      "team": "Newcastle Red Bulls",
+      "position": "OBK",
+      "rate": 7.8,
+      "vol": 0.4,
+      "price": 8.7
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "first_kickoff": "2026-02-27T19:00:00Z",
+      "last_kickoff": "2026-03-01T15:00:00Z",
+      "matches": [
+        {
+          "home": "Bristol Bears",
+          "away": "Bath"
+        },
+        {
+          "home": "Exeter Chiefs",
+          "away": "Newcastle Red Bulls"
+        },
+        {
+          "home": "Gloucester",
+          "away": "Saracens"
+        },
+        {
+          "home": "Harlequins",
+          "away": "Sale Sharks"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Northampton Saints"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "first_kickoff": "2026-03-06T19:00:00Z",
+      "last_kickoff": "2026-03-08T15:00:00Z",
+      "matches": [
+        {
+          "home": "Exeter Chiefs",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Gloucester",
+          "away": "Bath"
+        },
+        {
+          "home": "Harlequins",
+          "away": "Newcastle Red Bulls"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Saracens"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Sale Sharks"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "first_kickoff": "2026-03-13T19:00:00Z",
+      "last_kickoff": "2026-03-15T15:00:00Z",
+      "matches": [
+        {
+          "home": "Gloucester",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Harlequins",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Bath"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Newcastle Red Bulls"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Saracens"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "first_kickoff": "2026-03-20T19:00:00Z",
+      "last_kickoff": "2026-03-22T15:00:00Z",
+      "matches": [
+        {
+          "home": "Harlequins",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Bath"
+        },
+        {
+          "home": "Saracens",
+          "away": "Newcastle Red Bulls"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "first_kickoff": "2026-03-27T19:00:00Z",
+      "last_kickoff": "2026-03-29T15:00:00Z",
+      "matches": [
+        {
+          "home": "Leicester Tigers",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Saracens",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Bath"
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "first_kickoff": "2026-04-03T19:00:00Z",
+      "last_kickoff": "2026-04-05T15:00:00Z",
+      "matches": [
+        {
+          "home": "Northampton Saints",
+          "away": "Leicester Tigers"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Saracens",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Bath",
+          "away": "Bristol Bears"
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "first_kickoff": "2026-04-10T19:00:00Z",
+      "last_kickoff": "2026-04-12T15:00:00Z",
+      "matches": [
+        {
+          "home": "Sale Sharks",
+          "away": "Northampton Saints"
+        },
+        {
+          "home": "Saracens",
+          "away": "Leicester Tigers"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Bath",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Bristol Bears",
+          "away": "Exeter Chiefs"
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "first_kickoff": "2026-04-17T19:00:00Z",
+      "last_kickoff": "2026-04-19T15:00:00Z",
+      "matches": [
+        {
+          "home": "Saracens",
+          "away": "Sale Sharks"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Northampton Saints"
+        },
+        {
+          "home": "Bath",
+          "away": "Leicester Tigers"
+        },
+        {
+          "home": "Bristol Bears",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Exeter Chiefs",
+          "away": "Gloucester"
+        }
+      ]
+    },
+    {
+      "round": 9,
+      "first_kickoff": "2026-04-24T19:00:00Z",
+      "last_kickoff": "2026-04-26T15:00:00Z",
+      "matches": [
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Saracens"
+        },
+        {
+          "home": "Bath",
+          "away": "Sale Sharks"
+        },
+        {
+          "home": "Bristol Bears",
+          "away": "Northampton Saints"
+        },
+        {
+          "home": "Exeter Chiefs",
+          "away": "Leicester Tigers"
+        },
+        {
+          "home": "Gloucester",
+          "away": "Harlequins"
+        }
+      ]
+    },
+    {
+      "round": 10,
+      "first_kickoff": "2026-05-01T19:00:00Z",
+      "last_kickoff": "2026-05-03T15:00:00Z",
+      "matches": [
+        {
+          "home": "Bath",
+          "away": "Newcastle Red Bulls"
+        },
+        {
+          "home": "Bristol Bears",
+          "away": "Saracens"
+        },
+        {
+          "home": "Exeter Chiefs",
+          "away": "Sale Sharks"
+        },
+        {
+          "home": "Gloucester",
+          "away": "Northampton Saints"
+        },
+        {
+          "home": "Harlequins",
+          "away": "Leicester Tigers"
+        }
+      ]
+    },
+    {
+      "round": 11,
+      "first_kickoff": "2026-05-08T19:00:00Z",
+      "last_kickoff": "2026-05-10T15:00:00Z",
+      "matches": [
+        {
+          "home": "Bristol Bears",
+          "away": "Bath"
+        },
+        {
+          "home": "Exeter Chiefs",
+          "away": "Newcastle Red Bulls"
+        },
+        {
+          "home": "Gloucester",
+          "away": "Saracens"
+        },
+        {
+          "home": "Harlequins",
+          "away": "Sale Sharks"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Northampton Saints"
+        }
+      ]
+    },
+    {
+      "round": 12,
+      "first_kickoff": "2026-05-15T19:00:00Z",
+      "last_kickoff": "2026-05-17T15:00:00Z",
+      "matches": [
+        {
+          "home": "Exeter Chiefs",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Gloucester",
+          "away": "Bath"
+        },
+        {
+          "home": "Harlequins",
+          "away": "Newcastle Red Bulls"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Saracens"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Sale Sharks"
+        }
+      ]
+    },
+    {
+      "round": 13,
+      "first_kickoff": "2026-05-22T19:00:00Z",
+      "last_kickoff": "2026-05-24T15:00:00Z",
+      "matches": [
+        {
+          "home": "Gloucester",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Harlequins",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Bath"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Newcastle Red Bulls"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Saracens"
+        }
+      ]
+    },
+    {
+      "round": 14,
+      "first_kickoff": "2026-05-29T19:00:00Z",
+      "last_kickoff": "2026-05-31T15:00:00Z",
+      "matches": [
+        {
+          "home": "Harlequins",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Leicester Tigers",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Bath"
+        },
+        {
+          "home": "Saracens",
+          "away": "Newcastle Red Bulls"
+        }
+      ]
+    },
+    {
+      "round": 15,
+      "first_kickoff": "2026-06-05T19:00:00Z",
+      "last_kickoff": "2026-06-07T15:00:00Z",
+      "matches": [
+        {
+          "home": "Leicester Tigers",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Northampton Saints",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Saracens",
+          "away": "Bristol Bears"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Bath"
+        }
+      ]
+    },
+    {
+      "round": 16,
+      "first_kickoff": "2026-06-12T19:00:00Z",
+      "last_kickoff": "2026-06-14T15:00:00Z",
+      "matches": [
+        {
+          "home": "Northampton Saints",
+          "away": "Leicester Tigers"
+        },
+        {
+          "home": "Sale Sharks",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Saracens",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Exeter Chiefs"
+        },
+        {
+          "home": "Bath",
+          "away": "Bristol Bears"
+        }
+      ]
+    },
+    {
+      "round": 17,
+      "first_kickoff": "2026-06-19T19:00:00Z",
+      "last_kickoff": "2026-06-21T15:00:00Z",
+      "matches": [
+        {
+          "home": "Sale Sharks",
+          "away": "Northampton Saints"
+        },
+        {
+          "home": "Saracens",
+          "away": "Leicester Tigers"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Bath",
+          "away": "Gloucester"
+        },
+        {
+          "home": "Bristol Bears",
+          "away": "Exeter Chiefs"
+        }
+      ]
+    },
+    {
+      "round": 18,
+      "first_kickoff": "2026-06-26T19:00:00Z",
+      "last_kickoff": "2026-06-28T15:00:00Z",
+      "matches": [
+        {
+          "home": "Saracens",
+          "away": "Sale Sharks"
+        },
+        {
+          "home": "Newcastle Red Bulls",
+          "away": "Northampton Saints"
+        },
+        {
+          "home": "Bath",
+          "away": "Leicester Tigers"
+        },
+        {
+          "home": "Bristol Bears",
+          "away": "Harlequins"
+        },
+        {
+          "home": "Exeter Chiefs",
+          "away": "Gloucester"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block page_title %}Transfers — {{ brand }} Fantasy{% endblock %}
+
+{% block extra_styles %}
+  .content { max-width: 760px; margin: 0 auto; padding: 22px 16px 64px; width: 100%; }
+  @media (max-width: 768px) { .content { padding: 14px 10px calc(var(--bottom-nav-h,56px) + 28px); } }
+  .page-title { font-family: var(--font-display); font-size: 30px; font-weight: 800;
+    letter-spacing: .02em; text-transform: uppercase; color: var(--forest); line-height: 1; }
+  .page-sub { margin-top: 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+
+  .feed { display: flex; flex-direction: column; }
+  .trade { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+  .trade:last-child { border-bottom: none; }
+  .badge { flex-shrink: 0; font-family: var(--font-display); font-size: 10px; font-weight: 800; letter-spacing: .06em;
+    text-transform: uppercase; padding: 4px 9px; border-radius: var(--r-full); }
+  .badge.fa { background: rgba(46,125,79,.14); color: var(--success); }
+  .badge.tr { background: rgba(11,59,46,.08); color: var(--forest); }
+  .body { flex: 1; min-width: 0; }
+  .teams { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--ink); }
+  .teams .arrow { color: var(--ink-faint); margin: 0 6px; }
+  .move { margin-top: 4px; font-size: 13px; color: var(--ink-muted); }
+  .move .in  { color: var(--success); font-weight: 700; }
+  .move .out { color: var(--danger);  font-weight: 700; }
+  .pos { font-family: var(--font-display); font-weight: 700; color: var(--ink-faint); font-size: 11px; }
+  .when { margin-top: 4px; font-size: 11px; color: var(--ink-faint); }
+  .empty, .loading { padding: 44px 20px; text-align: center; color: var(--ink-muted); font-size: 13px; }
+  .empty h3 { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--forest);
+    text-transform: uppercase; letter-spacing: .03em; margin-bottom: 8px; }
+  .empty a { display:inline-block; margin-top: 10px; }
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="page-title">Transfers</div>
+  <div class="page-sub" id="sub">Completed trades &amp; free-agent moves</div>
+  <div class="ofds-card"><div class="feed" id="feed"><div class="loading">Loading…</div></div></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  async function init() {
+    let data;
+    try { data = await (await fetch('/api/trades')).json(); }
+    catch { document.getElementById('feed').innerHTML = '<div class="loading">Failed to load — refresh to retry.</div>'; return; }
+
+    const feed = document.getElementById('feed');
+    const hist = data.history || [];
+    if (!hist.length) {
+      feed.innerHTML = `<div class="empty"><h3>No trades yet</h3>
+        <p>Free-agent pickups and team-to-team trades will appear here.</p>
+        <a class="ofds-btn ofds-btn--primary ofds-btn--sm" href="/players">Make a move in the Player Hub</a></div>`;
+      return;
+    }
+    feed.innerHTML = hist.map(rowHTML).join('');
+  }
+
+  function plyr(p) { return p ? `${esc(p.name)} <span class="pos">${p.position}</span>` : '—'; }
+
+  function rowHTML(t) {
+    const when = t.resolved_at || t.created_at;
+    const whenStr = when ? new Date(when).toLocaleString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+    if (t.type === 'free_agent') {
+      // from_team picked up in_player, dropped out_player (→ free agents)
+      return `<div class="trade">
+        <span class="badge fa">Free agent</span>
+        <div class="body">
+          <div class="teams">${esc(t.from_team)}</div>
+          <div class="move">In <span class="in">${plyr(t.in_player)}</span> · Out <span class="out">${plyr(t.out_player)}</span></div>
+          <div class="when">${whenStr}</div>
+        </div></div>`;
+    }
+    // player_trade: from_team gave out_player, received in_player from to_team
+    return `<div class="trade">
+      <span class="badge tr">Trade</span>
+      <div class="body">
+        <div class="teams">${esc(t.from_team)}<span class="arrow">⇄</span>${esc(t.to_team || '')}</div>
+        <div class="move"><b>${esc(t.from_team)}</b> got <span class="in">${plyr(t.in_player)}</span>,
+          gave <span class="out">${plyr(t.out_player)}</span></div>
+        <div class="when">${whenStr}</div>
+      </div></div>`;
+  }
+
+  function esc(s){ return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  init();
+</script>
+{% endblock %}

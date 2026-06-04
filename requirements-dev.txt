@@ -1,0 +1,3 @@
+# Dev/test dependencies (not shipped to Vercel — api/requirements.txt is runtime).
+-r api/requirements.txt
+pytest>=8.0

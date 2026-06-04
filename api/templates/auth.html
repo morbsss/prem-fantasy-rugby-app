@@ -1,17 +1,11 @@
 {% extends "base.html" %}
 
-{% block page_title %}Login - Fantasy Rugby{% endblock %}
+{% block page_title %}Sign in — Meatyboys Rugby Fantasy{% endblock %}
 
 {% block extra_styles %}
-  .auth-wrap {
-    flex: 1;
-    display: grid;
-    place-items: center;
-    padding: 32px 16px;
-  }
+  .auth-wrap { flex: 1; display: grid; place-items: center; padding: 32px 16px; }
   .auth-card {
-    width: 100%;
-    max-width: 440px;
+    width: 100%; max-width: 460px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
@@ -19,124 +13,108 @@
     overflow: hidden;
   }
   .auth-hero {
-    background: var(--forest);
-    color: var(--cream);
-    padding: 28px 24px 22px;
-    text-align: center;
+    background: var(--forest); color: var(--cream);
+    padding: 28px 24px 22px; text-align: center;
+    transition: background var(--motion-med);
   }
   .auth-hero h1 {
     font-family: var(--font-display);
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    line-height: 1.1;
+    font-size: 26px; font-weight: 800;
+    letter-spacing: .04em; text-transform: uppercase; line-height: 1.1;
   }
   .auth-hero h1 .accent { color: var(--amber); }
   .auth-hero p {
-    margin-top: 6px;
-    font-size: 12px;
-    opacity: .75;
-    letter-spacing: .04em;
-    text-transform: uppercase;
+    margin-top: 6px; font-size: 12px; opacity: .75;
+    letter-spacing: .04em; text-transform: uppercase;
   }
 
-  .tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
+  .tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface); }
   .tab {
-    flex: 1;
-    padding: 14px;
-    text-align: center;
-    background: transparent;
-    color: var(--ink-muted);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .04em;
-    text-transform: uppercase;
+    flex: 1; padding: 14px; text-align: center; background: transparent;
+    color: var(--ink-muted); font-size: 13px; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase;
     border-bottom: 2px solid transparent;
     transition: color var(--motion-fast), border-color var(--motion-fast);
     min-height: 48px;
   }
   .tab:hover { color: var(--ink); }
-  .tab.active {
-    color: var(--forest);
-    border-bottom-color: var(--amber);
-  }
+  .tab.active { color: var(--forest); border-bottom-color: var(--amber); }
 
   .tab-content { display: none; padding: 24px; }
   .tab-content.active { display: block; }
 
   .form-group { margin-bottom: 14px; }
   .form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
+    display: block; margin-bottom: 6px; font-size: 11px; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted);
   }
-  .form-group input,
-  .form-group select {
-    width: 100%;
-    padding: 11px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    color: var(--ink);
-    font-size: 14px;
-    min-height: 44px;
+  .form-group input {
+    width: 100%; padding: 11px 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--r-md);
+    color: var(--ink); font-size: 14px; min-height: 44px;
     transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
   }
-  .form-group input:focus,
-  .form-group select:focus {
-    outline: none;
-    border-color: var(--forest);
+  .form-group input:focus {
+    outline: none; border-color: var(--forest);
     box-shadow: 0 0 0 3px rgba(11,59,46,.12);
   }
 
+  /* League chooser cards */
+  .league-step-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-muted); margin-bottom: 8px;
+  }
+  .league-cards { display: grid; gap: 10px; margin-bottom: 16px; }
+  @media (min-width: 420px) { .league-cards { grid-template-columns: 1fr 1fr; } }
+  .league-card {
+    text-align: left; padding: 14px; border-radius: var(--r-md);
+    border: 1.5px solid var(--border); background: var(--surface);
+    cursor: pointer; transition: border-color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .league-card:hover { border-color: var(--border-strong); }
+  .league-card.selected {
+    border-color: var(--forest);
+    box-shadow: 0 0 0 3px rgba(11,59,46,.12);
+  }
+  .league-card .lc-comp {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+  .league-card .lc-name {
+    font-family: var(--font-display); font-size: 17px; font-weight: 800;
+    color: var(--ink); line-height: 1.1;
+  }
+  .league-card .lc-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border-strong); align-self: flex-end; margin-top: -28px;
+    display: grid; place-items: center;
+  }
+  .league-card.selected .lc-dot { border-color: var(--amber); background: var(--amber); }
+
+  #register-team-step { display: none; }
+  #register-team-step.revealed { display: block; }
+
   .auth-card form button[type="submit"] {
-    width: 100%;
-    margin-top: 4px;
-    min-height: 48px;
-    padding: 12px;
-    background: var(--amber);
-    color: var(--forest-deep);
-    border-radius: var(--r-md);
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: .03em;
-    text-transform: uppercase;
-    cursor: pointer;
+    width: 100%; margin-top: 4px; min-height: 48px; padding: 12px;
+    background: var(--amber); color: var(--forest-deep); border-radius: var(--r-md);
+    font-family: var(--font-body); font-size: 14px; font-weight: 700;
+    letter-spacing: .03em; text-transform: uppercase; cursor: pointer;
     transition: background var(--motion-fast), transform var(--motion-fast);
   }
   .auth-card form button[type="submit"]:hover:not(:disabled) { background: var(--amber-deep); }
   .auth-card form button[type="submit"]:active:not(:disabled) { transform: scale(.98); }
   .auth-card form button[type="submit"]:disabled { opacity: .45; cursor: not-allowed; }
 
-  .alert {
-    margin-bottom: 14px;
-    padding: 10px 12px;
-    border-radius: var(--r-md);
-    font-size: 13px;
-    font-weight: 500;
-  }
+  .alert { margin-bottom: 14px; padding: 10px 12px; border-radius: var(--r-md); font-size: 13px; font-weight: 500; }
   .alert-error { background: rgba(179,58,46,.10); border: 1px solid var(--danger); color: var(--danger); }
   .alert-info  { background: rgba(11,59,46,.06); border: 1px solid var(--forest); color: var(--forest); }
 
   .loading-spinner {
-    display: inline-block;
-    width: 14px; height: 14px;
-    border: 2px solid rgba(6,32,24,.25);
-    border-radius: 50%;
-    border-top-color: var(--forest-deep);
-    animation: spin .6s linear infinite;
-    margin-right: 6px;
-    vertical-align: -2px;
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(6,32,24,.25); border-radius: 50%;
+    border-top-color: var(--forest-deep); animation: spin .6s linear infinite;
+    margin-right: 6px; vertical-align: -2px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 {% endblock %}
@@ -145,8 +123,8 @@
 <div class="auth-wrap">
 <div class="auth-card">
   <div class="auth-hero">
-    <h1>OFDS<span class="accent">.</span> Fantasy</h1>
-    <p>Owen Farrel Dis-appreciation Society</p>
+    <h1>Meatyboys<span class="accent">.</span></h1>
+    <p>Rugby Fantasy</p>
   </div>
   <div class="tabs">
     <button class="tab active" data-tab="login">Sign in</button>
@@ -157,14 +135,14 @@
     <div id="login-alert"></div>
     <form id="login-form">
       <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="login-username" placeholder="Enter username" required>
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required>
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" id="login-password" placeholder="Enter password" required>
+        <input type="password" id="login-password" placeholder="Enter password" autocomplete="current-password" required>
       </div>
-      <button type="submit" id="login-btn">Login</button>
+      <button type="submit" id="login-btn">Sign in</button>
     </form>
   </div>
 
@@ -172,24 +150,28 @@
     <div id="register-alert"></div>
     <form id="register-form">
       <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="register-username" placeholder="At least 3 characters" minlength="3" required>
+        <label>Email</label>
+        <input type="email" id="register-email" placeholder="you@example.com" autocomplete="email" required>
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" id="register-password" placeholder="At least 6 characters" minlength="6" required>
+        <input type="password" id="register-password" placeholder="At least 6 characters" minlength="6" autocomplete="new-password" required>
       </div>
       <div class="form-group">
-        <label>Confirm Password</label>
-        <input type="password" id="register-password-confirm" placeholder="Confirm password" required>
+        <label>Confirm password</label>
+        <input type="password" id="register-password-confirm" placeholder="Confirm password" autocomplete="new-password" required>
       </div>
-      <div class="form-group">
-        <label>Choose Your Team</label>
-        <select id="register-team" required>
-          <option value="">-- Select a team --</option>
-        </select>
+
+      <div class="league-step-label">Join a fantasy league</div>
+      <div class="league-cards" id="league-cards"></div>
+
+      <div id="register-team-step">
+        <div class="form-group">
+          <label>Name your team</label>
+          <input type="text" id="register-team" placeholder="e.g. The Try Hards" maxlength="40">
+        </div>
+        <button type="submit" id="register-btn">Create account</button>
       </div>
-      <button type="submit" id="register-btn">Create Account</button>
     </form>
   </div>
 </div>
@@ -198,7 +180,16 @@
 
 {% block scripts %}
 <script>
-  // Tab switching
+  const html = document.documentElement;
+  const DEFAULT_THEME = 'forest';
+  let selectedLeague = null;   // { slug, theme, ... }
+
+  function applyTheme(t) { html.setAttribute('data-theme', t); }
+
+  // Tab switching also drives the theming state (spec §7):
+  //  - register tab with no league chosen → grayscale
+  //  - a league chosen → that league's theme
+  //  - login tab → default theme
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       const tabName = tab.dataset.tab;
@@ -207,103 +198,111 @@
       tab.classList.add('active');
       document.getElementById(tabName).classList.add('active');
       document.getElementById(tabName + '-alert').innerHTML = '';
+      if (tabName === 'register') {
+        applyTheme(selectedLeague ? selectedLeague.theme : 'grayscale');
+      } else {
+        applyTheme(DEFAULT_THEME);
+      }
     });
   });
 
-  // Load available teams
-  async function loadTeams() {
+  // Load the two joinable leagues and render chooser cards.
+  async function loadLeagues() {
     try {
-      const res = await fetch('/api/auth/teams');
-      const teams = await res.json();
-      const select = document.getElementById('register-team');
-      teams.forEach(team => {
-        const option = document.createElement('option');
-        option.value = team.name;
-        option.textContent = team.name + (team.owner ? ` (claimed by ${team.owner})` : '');
-        option.disabled = !team.available;
-        select.appendChild(option);
+      const res = await fetch('/api/leagues');
+      const leagues = await res.json();
+      const wrap = document.getElementById('league-cards');
+      wrap.innerHTML = '';
+      leagues.forEach(lg => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'league-card';
+        card.dataset.slug = lg.slug;
+        card.dataset.theme = lg.theme;
+        card.innerHTML =
+          `<span class="lc-comp">${lg.comp_name}</span>` +
+          `<span class="lc-name">${lg.name}</span>` +
+          `<span class="lc-dot"></span>`;
+        card.addEventListener('click', () => selectLeague(lg, card));
+        wrap.appendChild(card);
       });
-    } catch (err) {
-      console.error('Failed to load teams:', err);
-    }
+    } catch (err) { console.error('Failed to load leagues:', err); }
   }
 
-  // Login form
+  function selectLeague(lg, card) {
+    selectedLeague = lg;
+    document.querySelectorAll('.league-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    applyTheme(lg.theme);                                   // live theme preview
+    document.getElementById('register-team-step').classList.add('revealed');
+  }
+
+  // Login
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const username = document.getElementById('login-username').value;
+    const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const btn = document.getElementById('login-btn');
     const alertDiv = document.getElementById('login-alert');
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
-
+    btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Signing in...';
     try {
       const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
-
       const data = await res.json();
-
       if (res.ok) {
-        alertDiv.innerHTML = `<div class="alert alert-info">Logged in successfully. Redirecting...</div>`;
-        setTimeout(() => window.location.href = '/', 500);
+        alertDiv.innerHTML = `<div class="alert alert-info">Signed in. Redirecting...</div>`;
+        setTimeout(() => window.location.href = '/', 400);
       } else {
-        alertDiv.innerHTML = `<div class="alert alert-error">${data.error || 'Login failed'}</div>`;
+        alertDiv.innerHTML = `<div class="alert alert-error">${data.error || 'Sign in failed'}</div>`;
       }
     } catch (err) {
       alertDiv.innerHTML = `<div class="alert alert-error">Network error: ${err.message}</div>`;
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = 'Login';
-    }
+    } finally { btn.disabled = false; btn.innerHTML = 'Sign in'; }
   });
 
-  // Register form
+  // Register
   document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const username = document.getElementById('register-username').value;
+    const email = document.getElementById('register-email').value.trim();
     const password = document.getElementById('register-password').value;
     const passwordConfirm = document.getElementById('register-password-confirm').value;
-    const team = document.getElementById('register-team').value;
-    const btn = document.getElementById('register-btn');
+    const team = document.getElementById('register-team').value.trim();
     const alertDiv = document.getElementById('register-alert');
 
+    if (!selectedLeague) {
+      alertDiv.innerHTML = `<div class="alert alert-error">Choose a league to join first.</div>`;
+      return;
+    }
     if (password !== passwordConfirm) {
-      alertDiv.innerHTML = `<div class="alert alert-error">Passwords do not match</div>`;
+      alertDiv.innerHTML = `<div class="alert alert-error">Passwords do not match.</div>`;
+      return;
+    }
+    if (!team) {
+      alertDiv.innerHTML = `<div class="alert alert-error">Give your team a name.</div>`;
       return;
     }
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading-spinner"></span> Creating account...';
-
+    const btn = document.getElementById('register-btn');
+    btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Creating account...';
     try {
       const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, team_name: team })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, team_name: team, league: selectedLeague.slug })
       });
-
       const data = await res.json();
-
       if (res.ok) {
-        alertDiv.innerHTML = `<div class="alert alert-info">Account created successfully. Redirecting...</div>`;
-        setTimeout(() => window.location.href = '/', 500);
+        alertDiv.innerHTML = `<div class="alert alert-info">Account created. Redirecting...</div>`;
+        setTimeout(() => window.location.href = '/', 400);
       } else {
         alertDiv.innerHTML = `<div class="alert alert-error">${data.error || 'Registration failed'}</div>`;
       }
     } catch (err) {
       alertDiv.innerHTML = `<div class="alert alert-error">Network error: ${err.message}</div>`;
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = 'Create Account';
-    }
+    } finally { btn.disabled = false; btn.innerHTML = 'Create account'; }
   });
 
-  // Load teams on page load
-  loadTeams();
+  loadLeagues();
 </script>
 {% endblock %}
